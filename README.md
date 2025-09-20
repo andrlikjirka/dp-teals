@@ -1,2 +1,2 @@
-# dp-privacy-trail
-Diploma Thesis Project - Audit &amp; GDPR Compliance system
+# dp-audit
+Diploma Thesis Project - Tamper-evident & Verifiable Audit logging service of personal data processing activities
