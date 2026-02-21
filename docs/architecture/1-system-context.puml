@@ -1,0 +1,16 @@
+@startuml
+
+title "Kryptograficky verifikovatelný auditní log: Systémový kontext"
+
+actor "Auditor" as Auditor
+[Informační systém] as Producer <<Producer>>
+component "Systém pro správu klíčů (KMS)" as KMS
+[Tamper-Evident Audit Log] as TEALS <<System>>
+'actor "Administrátor" as Admin
+
+Auditor --> TEALS : Vyhledává auditní záznamy\na ověřuje jejich integritu
+Producer -> TEALS : Produkuje auditní záznamy \ndle činností zpracování osobních dat
+TEALS ..> KMS: Šifrování a digitální podepisování dat \n a správa kryptografických klíčů
+'TEALS <- Admin: Konfigurace systému a řízení přístupu
+
+@enduml

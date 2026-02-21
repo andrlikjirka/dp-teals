@@ -1,0 +1,28 @@
+@startuml
+
+skinparam nodesep 60
+skinparam ranksep 60
+
+'skinparam linetype ortho
+
+title "Tamper-Evident Audit Log System: Components"
+
+component "Data Processor" as Producer <<System>>
+database "MerkleTree\nStorage" as TreeStore
+database "WORM\nStorage" as WORM
+database "Metadata\nStorage" as MetadataStore
+component "Secure Key Storage (KSM)" as KSM
+
+package "TEALS: Ingestion Service" {
+    component "gRPC Handler" <<Transport>> as ApiHandler
+    component "Normalizer"
+    component "Ledger" as Ledger
+    component "Encryptor"
+}
+
+Producer ..> IngerstorAPI : Sends audit events\n<<gRPC API>>
+IngerstorAPI -- ApiHandler
+
+
+
+@enduml

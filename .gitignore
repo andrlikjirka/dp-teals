@@ -1,0 +1,15 @@
+.cursor/
+.idea/
+.vscode/
+.env
+.env.local
+out
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+*.test
+*.out
