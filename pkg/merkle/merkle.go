@@ -113,7 +113,11 @@ func (t *Tree) Append(data []byte) error {
 }
 
 func (t *Tree) Print() {
-	t.printNode(t.root, "", true)
+	t.lock.RLock()
+	root := t.root // Capture the root while under lock
+	t.lock.RUnlock()
+
+	t.printNode(root, "", true)
 }
 
 func (t *Tree) printNode(n *Node, prefix string, isTail bool) {
