@@ -32,37 +32,34 @@ func NewTree(data [][]byte, hashFunc HashFunc) (*Tree, error) {
 		hashFunc = DefaultHashFunc
 	}
 
-	t := &Tree{
-		hashFunc: hashFunc,
-	}
-	t.build(data)
-
+	t := build(data, hashFunc)
 	return t, nil
 }
 
 // build constructs the Merkle Tree from the provided data.
-func (t *Tree) build(data [][]byte) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
+func build(data [][]byte, hashFunc HashFunc) *Tree {
 	var leaves []*Node
 	indexMap := make(map[string][]int)
 	// create leaf nodes
 	for i, d := range data {
-		leafHash := hashLeafData(d, t.hashFunc)
+		leafHash := hashLeafData(d, hashFunc)
 		leaves = append(leaves, &Node{Hash: leafHash})
 
 		hashHex := hex.EncodeToString(leafHash)
-		indexMap[hashHex] = append(t.indexMap[hashHex], i)
+		indexMap[hashHex] = append(indexMap[hashHex], i)
 	}
 
-	t.Leaves = leaves
-	t.indexMap = indexMap
-	t.root = t.buildRecursive(leaves)
+	t := &Tree{
+		Leaves:   leaves,
+		indexMap: indexMap,
+		hashFunc: hashFunc,
+		root:     buildRecursive(leaves, hashFunc),
+	}
+	return t
 }
 
-// buildRecursive builds the tree recursively from the given nodes and returns the root node
-func (t *Tree) buildRecursive(nodes []*Node) *Node {
+// buildRecursive builds the tree recursively from the given nodes and returns the root node. It implements the tree construction logic defined in RFC 6962 to construct deterministic append-only binary trees (avoid data padding).
+func buildRecursive(nodes []*Node, hashFunc HashFunc) *Node {
 	n := len(nodes)
 	if n == 1 {
 		return nodes[0] // Base case: if only one node, return it
@@ -71,10 +68,10 @@ func (t *Tree) buildRecursive(nodes []*Node) *Node {
 	k := largestPowerOfTwoLessThan(n) // find the largest power of two less than n to determine how to split the nodes into left and right halves
 
 	// split the slice into left and right halves
-	left := t.buildRecursive(nodes[:k])
-	right := t.buildRecursive(nodes[k:])
+	left := buildRecursive(nodes[:k], hashFunc)
+	right := buildRecursive(nodes[k:], hashFunc)
 
-	parentHash := hashInternalNodes(left.Hash, right.Hash, t.hashFunc) // compute the parent hash by combining the left and right child hashes
+	parentHash := hashInternalNodes(left.Hash, right.Hash, hashFunc) // compute the parent hash by combining the left and right child hashes
 
 	parent := &Node{ // create a new parent node with the combined hash and set its children
 		Hash:  parentHash,
@@ -111,7 +108,7 @@ func (t *Tree) Append(data []byte) error {
 	hashHex := hex.EncodeToString(leafHash)
 	t.indexMap[hashHex] = append(t.indexMap[hashHex], len(t.Leaves)-1)
 
-	t.root = t.buildRecursive(t.Leaves)
+	t.root = buildRecursive(t.Leaves, t.hashFunc)
 	return nil
 }
 
