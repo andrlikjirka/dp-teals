@@ -2,6 +2,8 @@ package merkle
 
 import (
 	"testing"
+
+	"github.com/andrlikjirka/hash"
 )
 
 func TestGenerateInclusionProof(t *testing.T) {
@@ -177,7 +179,7 @@ func TestVerifyInclusionProof(t *testing.T) {
 		treeData     [][]byte
 		leafIndex    int
 		verifyData   []byte
-		hashFunc     HashFunc
+		hashFunc     hash.HashFunc
 		shouldVerify bool
 		wantErr      bool
 	}{
@@ -213,7 +215,7 @@ func TestVerifyInclusionProof(t *testing.T) {
 			treeData:     [][]byte{[]byte("a"), []byte("b"), []byte("c"), []byte("d")},
 			leafIndex:    2,
 			verifyData:   []byte("c"),
-			hashFunc:     DefaultHashFunc,
+			hashFunc:     hash.DefaultHashFunc,
 			shouldVerify: true,
 			wantErr:      false,
 		},

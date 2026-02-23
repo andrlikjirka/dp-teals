@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
+
+	"github.com/andrlikjirka/hash"
 )
 
 type InclusionProof struct {
@@ -56,9 +58,9 @@ func (t *Tree) GenerateInclusionProofByData(data []byte) (*InclusionProof, error
 }
 
 // VerifyInclusionProof verifies that the provided leaf data is included in the Merkle Tree with the given root hash using the provided inclusion proof.
-func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byte, hashFunc HashFunc) bool {
+func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byte, hashFunc hash.HashFunc) bool {
 	if hashFunc == nil {
-		hashFunc = DefaultHashFunc
+		hashFunc = hash.DefaultHashFunc
 	}
 
 	hash := hashFunc(append([]byte{0x00}, leafData...))
