@@ -128,7 +128,7 @@ func verifySubProof(m, n int, b bool, proofHashes [][]byte, oldRoot []byte, hash
 			return nil, nil, nil, errors.New("proof too short")
 		}
 		newRight := remainingProof[0]                                     // right side is entirely new, so the prover provides its hash directly
-		combinedNewRoot := hashInternalNodes(newLeft, newRight, hashFunc) // combine the new left and new right to get the computed new root for this subtree
+		combinedNewRoot := HashInternalNodes(newLeft, newRight, hashFunc) // combine the new left and new right to get the computed new root for this subtree
 		return oldHash, combinedNewRoot, remainingProof[1:], nil          // return the computed old root, the computed new root, and the remaining proof hashes
 	}
 	// if old tree was large enough that it completely filled the left half and spilled over into the right half
@@ -140,8 +140,8 @@ func verifySubProof(m, n int, b bool, proofHashes [][]byte, oldRoot []byte, hash
 		return nil, nil, nil, errors.New("proof too short")
 	}
 	leftHash := remainingProof[0] //entire left half is identical in both the old and new trees, so the prover provides its single combined hash
-	combinedOldRoot := hashInternalNodes(leftHash, oldRight, hashFunc)
-	combinedNewRoot := hashInternalNodes(leftHash, newRight, hashFunc)
+	combinedOldRoot := HashInternalNodes(leftHash, oldRight, hashFunc)
+	combinedNewRoot := HashInternalNodes(leftHash, newRight, hashFunc)
 
 	return combinedOldRoot, combinedNewRoot, remainingProof[1:], nil // return the computed old root, the computed new root, and the remaining proof hashes
 }

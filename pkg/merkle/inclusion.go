@@ -48,7 +48,7 @@ func (t *Tree) GenerateInclusionProofByData(data []byte) (*InclusionProof, error
 	t.lock.RLock()
 	defer t.lock.RUnlock()
 
-	leafHash := hashLeafData(data, t.hashFunc)
+	leafHash := HashLeafData(data, t.hashFunc)
 	indices := t.indexMap[hex.EncodeToString(leafHash)]
 	if len(indices) == 0 {
 		return nil, errors.New("leaf not found in the tree")

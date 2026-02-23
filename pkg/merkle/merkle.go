@@ -44,7 +44,7 @@ func build(data [][]byte, hashFunc hash.HashFunc) *Tree {
 	indexMap := make(map[string][]int)
 	// create leaf nodes
 	for i, d := range data {
-		leafHash := hashLeafData(d, hashFunc)
+		leafHash := HashLeafData(d, hashFunc)
 		leaves = append(leaves, &Node{Hash: leafHash})
 
 		hashHex := hex.EncodeToString(leafHash)
@@ -73,7 +73,7 @@ func buildRecursive(nodes []*Node, hashFunc hash.HashFunc) *Node {
 	left := buildRecursive(nodes[:k], hashFunc)
 	right := buildRecursive(nodes[k:], hashFunc)
 
-	parentHash := hashInternalNodes(left.Hash, right.Hash, hashFunc) // compute the parent hash by combining the left and right child hashes
+	parentHash := HashInternalNodes(left.Hash, right.Hash, hashFunc) // compute the parent hash by combining the left and right child hashes
 
 	parent := &Node{ // create a new parent node with the combined hash and set its children
 		Hash:  parentHash,
@@ -104,7 +104,7 @@ func (t *Tree) Append(data []byte) error {
 		t.indexMap = make(map[string][]int)
 	}
 
-	leafHash := hashLeafData(data, t.hashFunc)
+	leafHash := HashLeafData(data, t.hashFunc)
 	t.Leaves = append(t.Leaves, &Node{Hash: leafHash})
 
 	hashHex := hex.EncodeToString(leafHash)
@@ -119,10 +119,10 @@ func (t *Tree) Print() {
 	root := t.root // Capture the root while under lock
 	t.lock.RUnlock()
 
-	t.printNode(root, "", true)
+	printNode(root, "", true)
 }
 
-func (t *Tree) printNode(n *Node, prefix string, isTail bool) {
+func printNode(n *Node, prefix string, isTail bool) {
 	if n == nil {
 		return
 	}
@@ -136,7 +136,7 @@ func (t *Tree) printNode(n *Node, prefix string, isTail bool) {
 		} else {
 			newPrefix += "    "
 		}
-		t.printNode(n.Right, newPrefix, false)
+		printNode(n.Right, newPrefix, false)
 	}
 
 	fmt.Printf("%s", prefix)
@@ -154,6 +154,6 @@ func (t *Tree) printNode(n *Node, prefix string, isTail bool) {
 		} else {
 			newPrefix += "│   "
 		}
-		t.printNode(n.Left, newPrefix, true)
+		printNode(n.Left, newPrefix, true)
 	}
 }

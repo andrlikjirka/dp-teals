@@ -62,15 +62,15 @@ func TestHashLeafData(t *testing.T) {
 				t.Fatalf("Failed to create tree: %v", err)
 			}
 
-			result := hashLeafData(tt.data, tree.hashFunc)
+			result := HashLeafData(tt.data, tree.hashFunc)
 
 			if (err != nil) != tt.expectErr {
-				t.Errorf("hashLeafData() error = %v, wantErr %v", err, tt.expectErr)
+				t.Errorf("HashLeafData() error = %v, wantErr %v", err, tt.expectErr)
 				return
 			}
 
 			if !tt.validate(result) {
-				t.Errorf("hashLeafData() validation failed for data: %s", string(tt.data))
+				t.Errorf("HashLeafData() validation failed for data: %s", string(tt.data))
 			}
 		})
 	}
@@ -138,7 +138,7 @@ func TestHashInternalNodes(t *testing.T) {
 				t.Fatalf("Failed to create tree: %v", err)
 			}
 
-			result := hashInternalNodes(tt.left, tt.right, tree.hashFunc)
+			result := HashInternalNodes(tt.left, tt.right, tree.hashFunc)
 
 			if (err != nil) != tt.expectErr {
 				t.Errorf("hashInternalNodes() error = %v, wantErr %v", err, tt.expectErr)
@@ -174,8 +174,8 @@ func TestHashPrefixDifference(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tree, _ := NewTree([][]byte{tt.data}, nil)
 
-			leafHash := hashLeafData(tt.data, tree.hashFunc)
-			internalHash := hashInternalNodes(tt.data, tt.data, tree.hashFunc)
+			leafHash := HashLeafData(tt.data, tree.hashFunc)
+			internalHash := HashInternalNodes(tt.data, tt.data, tree.hashFunc)
 
 			differ := !bytes.Equal(leafHash, internalHash)
 			if differ != tt.shouldDiffer {
