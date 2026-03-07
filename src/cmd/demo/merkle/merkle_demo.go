@@ -13,7 +13,11 @@ func main() {
 
 	// 1. Initialization
 	initialData := [][]byte{
-		[]byte("tx1"), []byte("tx2"), []byte("tx3"), []byte("tx4"), []byte("tx5"),
+		[]byte("tx1"),
+		[]byte("tx2"),
+		[]byte("tx3"),
+		[]byte("tx4"),
+		[]byte("tx5"),
 	}
 	tree, err := merkle.NewTree(initialData, nil)
 	if err != nil {
@@ -38,7 +42,7 @@ func main() {
 	fmt.Println()
 
 	// 4. Test Inclusion Proof (Newly Appended Data)
-	demoInclusionProof(tree, newRoot, newData)
+	demoInclusionProof(tree, newRoot, []byte("tx6"))
 
 	// 5. Test Consistency Proof (Old Tree vs New Tree)
 	newSize := len(tree.Leaves)
@@ -54,9 +58,12 @@ func demoInclusionProof(tree *merkle.Tree, root []byte, targetData []byte) {
 	if err != nil {
 		log.Fatalf("Failed to generate inclusion proof: %v", err)
 	}
+	fmt.Printf("Proof generated with %d siblings:\n", len(proof.Siblings))
+	for i, sibling := range proof.Siblings {
+		fmt.Printf("  Sibling %d: %x\n", i, sibling[:4])
+	}
 
 	valid := merkle.VerifyInclusionProof(targetData, proof, root, nil)
-	fmt.Printf("Proof generated with %d siblings\n", len(proof.Siblings))
 	fmt.Printf("Inclusion proof valid: %v\n", valid)
 	fmt.Println()
 }
@@ -91,7 +98,7 @@ func demoConsistencyProof(tree *merkle.Tree, m, n int, oldRoot, newRoot []byte) 
 
 	fmt.Printf("Consistency proof generated with %d hashes:\n", len(proof.Hashes))
 	for i, h := range proof.Hashes {
-		fmt.Printf("  Hash %d: %x\n", i, h)
+		fmt.Printf("  Hash %d: %x\n", i, h[:4])
 	}
 
 	valid := merkle.VerifyConsistencyProof(m, n, oldRoot, newRoot, proof, nil)
