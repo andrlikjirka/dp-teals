@@ -14,11 +14,14 @@ type Node struct {
 	Hash   []byte
 	Left   *Node
 	Right  *Node
+	Parent *Node
 	Height int // 0 for leaves, +1 for each merge
 }
 
 type MMR struct {
 	peaks    []*Node
+	Leaves   []*Node
+	indexMap map[string][]int // hash → indices
 	hashFunc hash.HashFunc
 	size     int // Number of leaves appended
 	lock     sync.RWMutex
@@ -31,6 +34,8 @@ func NewMMR(hashFunc hash.HashFunc) *MMR {
 	}
 	return &MMR{
 		peaks:    make([]*Node, 0),
+		Leaves:   make([]*Node, 0),
+		indexMap: make(map[string][]int),
 		hashFunc: hashFunc,
 		size:     0,
 	}
@@ -44,12 +49,17 @@ func (m *MMR) Append(data []byte) error {
 		return errors.New("empty leaf not allowed")
 	}
 
-	leafHash := m.hashFunc(data)
+	leafHash := merkle.HashLeafData(data, m.hashFunc)
 	newNode := &Node{
 		Hash:   leafHash,
 		Height: 0,
 	}
+	m.Leaves = append(m.Leaves, newNode)
 	m.size++ // update the MMR size to reflect the new leaf
+
+	// Update indexMap to track this leaf's hash to its index
+	hashHex := hex.EncodeToString(leafHash)
+	m.indexMap[hashHex] = append(m.indexMap[hashHex], len(m.Leaves)-1)
 
 	// check if we can merge with existing peaks
 	for len(m.peaks) > 0 {
@@ -59,22 +69,23 @@ func (m *MMR) Append(data []byte) error {
 		}
 		m.peaks = m.peaks[:len(m.peaks)-1] // pop the last peak from the list
 
-		// merge the two nodes
-		mergedHash := merkle.HashInternalNodes(lastPeak.Hash, newNode.Hash, m.hashFunc)
+		rightChild := newNode
+		mergedHash := merkle.HashInternalNodes(lastPeak.Hash, newNode.Hash, m.hashFunc) // merge the two nodes
 		newNode = &Node{
 			Hash:   mergedHash,
 			Left:   lastPeak,
-			Right:  newNode,
+			Right:  rightChild,
 			Height: lastPeak.Height + 1,
 		}
-
+		lastPeak.Parent = newNode
+		rightChild.Parent = newNode
 	}
 	m.peaks = append(m.peaks, newNode) // push the resulting mountain peak back onto the list
 
 	return nil
 }
 
-// RootHash computes the root hash of the MMR by combining all peaks. The order of peaks is important for consistency.
+// RootHash computes the root hash of the MMR by combining all peaks (peak bagging). The order of peaks is important for consistency.
 // The MMR root is the hash of all current peaks combined from right to left.
 func (m *MMR) RootHash() []byte {
 	m.lock.RLock()
@@ -90,6 +101,8 @@ func (m *MMR) RootHash() []byte {
 	}
 	return root
 }
+
+// ============ Debugging and Visualization Methods ============
 
 // PrintSummary provides a concise overview of the MMR's current state, including the number of leaves, the number of peaks, and the current root hash.
 // This is useful for quickly assessing the MMR's status without delving into the full tree structure.
