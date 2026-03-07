@@ -44,6 +44,7 @@ func (t *Tree) GenerateInclusionProof(index int) (*InclusionProof, error) {
 	return proof, nil
 }
 
+// GenerateInclusionProofByData generates an inclusion proof for the first occurrence of the specified leaf data in the Merkle Tree.
 func (t *Tree) GenerateInclusionProofByData(data []byte) (*InclusionProof, error) {
 	t.lock.RLock()
 	defer t.lock.RUnlock()
