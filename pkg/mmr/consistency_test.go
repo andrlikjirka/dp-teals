@@ -3,8 +3,6 @@ package mmr
 import (
 	"fmt"
 	"testing"
-
-	"github.com/andrlikjirka/merkle"
 )
 
 func TestGenerateConsistencyProof_Table(t *testing.T) {
@@ -223,7 +221,7 @@ func cloneConsistencyProof(in *ConsistencyProof) *ConsistencyProof {
 		OldSize:          in.OldSize,
 		NewSize:          in.NewSize,
 		OldPeaksHashes:   make([][]byte, len(in.OldPeaksHashes)),
-		ConsistencyPaths: make([]*merkle.InclusionProof, len(in.ConsistencyPaths)),
+		ConsistencyPaths: make([]*ConsistencyPath, len(in.ConsistencyPaths)),
 		RightPeaks:       make([][]byte, len(in.RightPeaks)),
 	}
 	for i := range in.OldPeaksHashes {
@@ -236,7 +234,7 @@ func cloneConsistencyProof(in *ConsistencyProof) *ConsistencyProof {
 		if p == nil {
 			continue
 		}
-		cp := &merkle.InclusionProof{
+		cp := &ConsistencyPath{
 			Siblings: make([][]byte, len(p.Siblings)),
 			Left:     append([]bool(nil), p.Left...),
 		}

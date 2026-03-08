@@ -9,13 +9,20 @@ import (
 	"github.com/andrlikjirka/merkle"
 )
 
+// ConsistencyPath represents the path from an old peak to a new peak in the MMR. It consists of the sibling hashes along the path and the direction (left/right) of each sibling (inclusion proof).
+// This path is used to prove that a specific old peak is included in the new MMR structure, demonstrating that the old MMR is a prefix of the new MMR.
+type ConsistencyPath struct {
+	Siblings [][]byte
+	Left     []bool
+}
+
 // ConsistencyProof represents the proof that a smaller MMR (with treeSize1 leaves) is a prefix of a larger MMR (with treeSize2 leaves).
 type ConsistencyProof struct {
 	OldSize          int
 	NewSize          int
-	OldPeaksHashes   [][]byte                 // Hashes of the old peaks (for verification)
-	ConsistencyPaths []*merkle.InclusionProof // Inclusion paths from old peaks to new peaks
-	RightPeaks       [][]byte                 // Additional peaks completing NewSize
+	OldPeaksHashes   [][]byte           // Hashes of the old peaks (for verification)
+	ConsistencyPaths []*ConsistencyPath // Inclusion paths from old peaks to new peaks
+	RightPeaks       [][]byte           // Additional peaks completing NewSize
 }
 
 // GenerateConsistencyProof proves that treeSize1 is a prefix of treeSize2.
@@ -35,7 +42,7 @@ func (m *MMR) GenerateConsistencyProof(treeSize1, treeSize2 int) (*ConsistencyPr
 		OldSize:          treeSize1,
 		NewSize:          treeSize2,
 		OldPeaksHashes:   make([][]byte, 0),
-		ConsistencyPaths: make([]*merkle.InclusionProof, 0),
+		ConsistencyPaths: make([]*ConsistencyPath, 0),
 		RightPeaks:       make([][]byte, 0),
 	}
 
@@ -90,7 +97,7 @@ func (m *MMR) GenerateConsistencyProof(treeSize1, treeSize2 int) (*ConsistencyPr
 			current = parent
 		}
 
-		proof.ConsistencyPaths = append(proof.ConsistencyPaths, &merkle.InclusionProof{
+		proof.ConsistencyPaths = append(proof.ConsistencyPaths, &ConsistencyPath{
 			Siblings: siblings,
 			Left:     left,
 		})
@@ -173,6 +180,9 @@ func VerifyConsistencyProof(proof *ConsistencyProof, oldRoot []byte, newRoot []b
 	for i, oldHash := range proof.OldPeaksHashes {
 		currentHash := oldHash
 		path := proof.ConsistencyPaths[i]
+		if path == nil || len(path.Left) != len(path.Siblings) {
+			return false
+		}
 
 		for j, sibling := range path.Siblings {
 			if path.Left[j] {
