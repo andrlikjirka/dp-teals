@@ -24,13 +24,13 @@ type MMR struct {
 	peaks    []*Node
 	Leaves   []*Node
 	indexMap map[string][]int // hash → indices
-	hashFunc hash.HashFunc
+	hashFunc hash.Func
 	size     int // Number of leaves appended
 	lock     sync.RWMutex
 }
 
 // NewMMR initializes a new MMR instance with an optional custom hash function. If no hash function is provided, it defaults to the standard hash function defined in the hash package. The MMR starts with empty peaks and leaves, and an empty index map for tracking leaf hashes.
-func NewMMR(hashFunc hash.HashFunc) *MMR {
+func NewMMR(hashFunc hash.Func) *MMR {
 	if hashFunc == nil {
 		hashFunc = hash.DefaultHashFunc
 	}

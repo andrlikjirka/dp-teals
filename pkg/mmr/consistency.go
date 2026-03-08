@@ -145,7 +145,7 @@ func (m *MMR) getPeaksAtSize(size int) []*Node {
 
 // VerifyConsistencyProof checks if old peaks legally transition into newRoot.
 // It verifies that the old peaks match the old root and that following the consistency paths from the old peaks leads to the new peaks, which then combine to form the new root.
-func VerifyConsistencyProof(proof *ConsistencyProof, oldRoot []byte, newRoot []byte, hashFunc hash.HashFunc) bool {
+func VerifyConsistencyProof(proof *ConsistencyProof, oldRoot []byte, newRoot []byte, hashFunc hash.Func) bool {
 	if hashFunc == nil {
 		hashFunc = hash.DefaultHashFunc
 	}

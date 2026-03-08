@@ -105,7 +105,7 @@ func (m *MMR) bagPeaksRightToLeft(peaks []*Node) []byte {
 }
 
 // VerifyInclusionProof verifies the inclusion proof for a given leaf data against the MMR root hash using the provided hash function.
-func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byte, hashFunc hash.HashFunc) bool {
+func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byte, hashFunc hash.Func) bool {
 	// 1. Validate the proof structure
 	if proof == nil {
 		return false
