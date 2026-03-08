@@ -34,14 +34,13 @@ func main() {
 	// 2. Test Inclusion Proof (Existing Data)
 	oldRoot := m.RootHash()
 	oldSize := len(m.Leaves)
-	demoInclusionProof(m, oldRoot, []byte("tx5"))
+	demoInclusionProof(m, oldRoot, []byte("tx1"))
 
 	// 3. Test Append
 	err := m.Append([]byte("tx6"))
 	err = m.Append([]byte("tx7"))
 	err = m.Append([]byte("tx8"))
 	err = m.Append([]byte("tx9"))
-	err = m.Append([]byte("tx10"))
 	if err != nil {
 		panic(err)
 	}
