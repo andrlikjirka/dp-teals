@@ -31,7 +31,6 @@ func New(env string) *Logger {
 
 // WithComponent adds a "component" field to the logger for better context in logs.
 func (l *Logger) WithComponent(name string) *Logger {
-	// We return a new *logger.Logger so we don't mutate the original
 	return &Logger{
 		Logger: l.Logger.With(slog.String("component", name)),
 	}
