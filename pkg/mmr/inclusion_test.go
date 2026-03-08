@@ -3,8 +3,6 @@ package mmr
 import (
 	"bytes"
 	"testing"
-
-	"github.com/andrlikjirka/merkle"
 )
 
 func TestGenerateInclusionProof_Table(t *testing.T) {
@@ -13,14 +11,14 @@ func TestGenerateInclusionProof_Table(t *testing.T) {
 		leaves   [][]byte
 		index    int
 		wantErr  bool
-		validate func(*merkle.InclusionProof) bool
+		validate func(*InclusionProof) bool
 	}{
 		{
 			name:    "single leaf MMR - no siblings needed",
 			leaves:  [][]byte{[]byte("a")},
 			index:   0,
 			wantErr: false,
-			validate: func(proof *merkle.InclusionProof) bool {
+			validate: func(proof *InclusionProof) bool {
 				// Single leaf, single peak, no merging -> should have peak bagging for this peak only
 				// Since there's only one peak and no other peaks, no siblings needed
 				return len(proof.Siblings) == 0 && len(proof.Left) == 0
@@ -31,7 +29,7 @@ func TestGenerateInclusionProof_Table(t *testing.T) {
 			leaves:  [][]byte{[]byte("a"), []byte("b")},
 			index:   0,
 			wantErr: false,
-			validate: func(proof *merkle.InclusionProof) bool {
+			validate: func(proof *InclusionProof) bool {
 				// Two leaves merge to one peak of height 1
 				// Proof from leaf to peak requires 1 sibling (the other leaf)
 				return len(proof.Siblings) == 1 && len(proof.Left) == 1
@@ -42,7 +40,7 @@ func TestGenerateInclusionProof_Table(t *testing.T) {
 			leaves:  [][]byte{[]byte("a"), []byte("b")},
 			index:   1,
 			wantErr: false,
-			validate: func(proof *merkle.InclusionProof) bool {
+			validate: func(proof *InclusionProof) bool {
 				return len(proof.Siblings) == 1 && len(proof.Left) == 1
 			},
 		},
@@ -51,7 +49,7 @@ func TestGenerateInclusionProof_Table(t *testing.T) {
 			leaves:  [][]byte{[]byte("a"), []byte("b"), []byte("c")},
 			index:   0,
 			wantErr: false,
-			validate: func(proof *merkle.InclusionProof) bool {
+			validate: func(proof *InclusionProof) bool {
 				// Leaf 0 is part of first peak (height 1, contains a+b)
 				// Need 1 sibling to reach peak, then 1 sibling for the other peak
 				return len(proof.Siblings) == 2 && len(proof.Siblings) == len(proof.Left)
@@ -62,7 +60,7 @@ func TestGenerateInclusionProof_Table(t *testing.T) {
 			leaves:  [][]byte{[]byte("a"), []byte("b"), []byte("c")},
 			index:   2,
 			wantErr: false,
-			validate: func(proof *merkle.InclusionProof) bool {
+			validate: func(proof *InclusionProof) bool {
 				// Leaf 2 is a standalone peak (height 0)
 				// Need 1 sibling for peak bagging (the merged peak of a+b)
 				return len(proof.Siblings) == 1 && len(proof.Left) == 1
@@ -73,7 +71,7 @@ func TestGenerateInclusionProof_Table(t *testing.T) {
 			leaves:  [][]byte{[]byte("a"), []byte("b"), []byte("c"), []byte("d")},
 			index:   1,
 			wantErr: false,
-			validate: func(proof *merkle.InclusionProof) bool {
+			validate: func(proof *InclusionProof) bool {
 				// All merge to single peak, need to climb to root
 				return len(proof.Siblings) == 2 && len(proof.Left) == 2
 			},
@@ -83,7 +81,7 @@ func TestGenerateInclusionProof_Table(t *testing.T) {
 			leaves:  [][]byte{[]byte("a"), []byte("b"), []byte("c"), []byte("d"), []byte("e")},
 			index:   0,
 			wantErr: false,
-			validate: func(proof *merkle.InclusionProof) bool {
+			validate: func(proof *InclusionProof) bool {
 				// Leaf 0 is in first peak (height 2)
 				// Need siblings to climb to peak + peak bagging sibling
 				return len(proof.Siblings) >= 2 && len(proof.Siblings) == len(proof.Left)
@@ -94,7 +92,7 @@ func TestGenerateInclusionProof_Table(t *testing.T) {
 			leaves:  [][]byte{[]byte("a"), []byte("b")},
 			index:   -1,
 			wantErr: true,
-			validate: func(proof *merkle.InclusionProof) bool {
+			validate: func(proof *InclusionProof) bool {
 				return true // not called when error expected
 			},
 		},
@@ -103,7 +101,7 @@ func TestGenerateInclusionProof_Table(t *testing.T) {
 			leaves:  [][]byte{[]byte("a"), []byte("b")},
 			index:   5,
 			wantErr: true,
-			validate: func(proof *merkle.InclusionProof) bool {
+			validate: func(proof *InclusionProof) bool {
 				return true // not called when error expected
 			},
 		},
@@ -289,13 +287,13 @@ func TestVerifyInclusionProofWithTamperedData_Table(t *testing.T) {
 		name        string
 		leaves      [][]byte
 		leafIndex   int
-		modifyProof func(*merkle.InclusionProof)
+		modifyProof func(*InclusionProof)
 	}{
 		{
 			name:      "tampered sibling hash",
 			leaves:    [][]byte{[]byte("a"), []byte("b"), []byte("c")},
 			leafIndex: 0,
-			modifyProof: func(proof *merkle.InclusionProof) {
+			modifyProof: func(proof *InclusionProof) {
 				if len(proof.Siblings) > 0 {
 					proof.Siblings[0][0] ^= 0xFF // flip bits
 				}
@@ -305,7 +303,7 @@ func TestVerifyInclusionProofWithTamperedData_Table(t *testing.T) {
 			name:      "flipped left boolean",
 			leaves:    [][]byte{[]byte("a"), []byte("b"), []byte("c"), []byte("d")},
 			leafIndex: 1,
-			modifyProof: func(proof *merkle.InclusionProof) {
+			modifyProof: func(proof *InclusionProof) {
 				if len(proof.Left) > 0 {
 					proof.Left[0] = !proof.Left[0]
 				}
@@ -315,7 +313,7 @@ func TestVerifyInclusionProofWithTamperedData_Table(t *testing.T) {
 			name:      "removed sibling",
 			leaves:    [][]byte{[]byte("a"), []byte("b"), []byte("c")},
 			leafIndex: 0,
-			modifyProof: func(proof *merkle.InclusionProof) {
+			modifyProof: func(proof *InclusionProof) {
 				if len(proof.Siblings) > 1 {
 					proof.Siblings = proof.Siblings[:len(proof.Siblings)-1]
 					proof.Left = proof.Left[:len(proof.Left)-1]
@@ -326,7 +324,7 @@ func TestVerifyInclusionProofWithTamperedData_Table(t *testing.T) {
 			name:      "added extra sibling",
 			leaves:    [][]byte{[]byte("a"), []byte("b")},
 			leafIndex: 0,
-			modifyProof: func(proof *merkle.InclusionProof) {
+			modifyProof: func(proof *InclusionProof) {
 				proof.Siblings = append(proof.Siblings, make([]byte, 32))
 				proof.Left = append(proof.Left, false)
 			},

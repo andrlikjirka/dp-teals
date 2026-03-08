@@ -9,11 +9,36 @@ import (
 	"github.com/andrlikjirka/merkle"
 )
 
-// GenerateInclusionProof generates the proof for a leaf in the MMR by its index
-func (m *MMR) GenerateInclusionProof(index int) (*merkle.InclusionProof, error) {
+// InclusionProof represents the proof that a leaf is included in the MMR. It consists of the sibling hashes along the path from the leaf to its peak, and the direction (left/right) of each sibling.
+type InclusionProof struct {
+	Siblings [][]byte
+	Left     []bool
+}
+
+// GenerateInclusionProof generates the proof for a leaf in the MMR by its index.
+func (m *MMR) GenerateInclusionProof(index int) (*InclusionProof, error) {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 
+	return m.generateInclusionProofLocked(index)
+}
+
+// GenerateInclusionProofByData generates the proof for a leaf in the MMR by its data. It first computes the hash of the data to find the corresponding leaf index, then generates the inclusion proof for that index.
+func (m *MMR) GenerateInclusionProofByData(data []byte) (*InclusionProof, error) {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+
+	leafHash := merkle.HashLeafData(data, m.hashFunc)
+	indices := m.indexMap[hex.EncodeToString(leafHash)]
+	if len(indices) == 0 {
+		return nil, errors.New("leaf not found in the MMR")
+	}
+
+	return m.generateInclusionProofLocked(indices[0])
+}
+
+// generateInclusionProofLocked is the internal method that generates the inclusion proof for a leaf at a given index. It assumes the caller has already acquired the read lock.
+func (m *MMR) generateInclusionProofLocked(index int) (*InclusionProof, error) {
 	if index < 0 || index >= len(m.Leaves) {
 		return nil, errors.New("invalid index")
 	}
@@ -60,22 +85,8 @@ func (m *MMR) GenerateInclusionProof(index int) (*merkle.InclusionProof, error) 
 		left = append(left, true) // sibling is on the left
 	}
 
-	proof := &merkle.InclusionProof{Siblings: siblings, Left: left}
+	proof := &InclusionProof{Siblings: siblings, Left: left}
 	return proof, nil
-}
-
-// GenerateInclusionProofByData generates the proof for a leaf in the MMR by its data content
-func (m *MMR) GenerateInclusionProofByData(data []byte) (*merkle.InclusionProof, error) {
-	m.lock.RLock()
-	defer m.lock.RUnlock()
-
-	leafHash := merkle.HashLeafData(data, m.hashFunc)
-	indices := m.indexMap[hex.EncodeToString(leafHash)]
-	if len(indices) == 0 {
-		return nil, errors.New("leaf not found in the MMR")
-	}
-
-	return m.GenerateInclusionProof(indices[0]) // generate proof for the first occurrence of the leaf (if duplicates exist)
 }
 
 // bagPeaksRightToLeft is a helper method that takes a slice of peaks and combines them into a single hash by hashing from right to left.
@@ -94,6 +105,35 @@ func (m *MMR) bagPeaksRightToLeft(peaks []*Node) []byte {
 }
 
 // VerifyInclusionProof verifies the inclusion proof for a given leaf data against the MMR root hash using the provided hash function.
-func VerifyInclusionProof(leafData []byte, proof *merkle.InclusionProof, rootHash []byte, hashFunc hash.HashFunc) bool {
-	return merkle.VerifyInclusionProof(leafData, proof, rootHash, hashFunc)
+func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byte, hashFunc hash.HashFunc) bool {
+	// 1. Validate the proof structure
+	if proof == nil {
+		return false
+	}
+	if len(proof.Siblings) != len(proof.Left) {
+		return false
+	}
+	if len(leafData) == 0 || len(rootHash) == 0 {
+		return false
+	}
+
+	if hashFunc == nil {
+		hashFunc = hash.DefaultHashFunc
+	}
+
+	// 2. Hash the leaf (Domain separator: 0x00)
+	h := hashFunc(append([]byte{0x00}, leafData...))
+
+	// 3. Traverse the path
+	for i, siblingHash := range proof.Siblings {
+		// Standard internal node / peak bagging domain separator: 0x01
+		// (Change this if your specific MMR spec requires a different prefix for peaks)
+		if proof.Left[i] {
+			h = hashFunc(append([]byte{0x01}, append(siblingHash, h...)...))
+		} else {
+			h = hashFunc(append([]byte{0x01}, append(h, siblingHash...)...))
+		}
+	}
+
+	return bytes.Equal(h, rootHash)
 }
