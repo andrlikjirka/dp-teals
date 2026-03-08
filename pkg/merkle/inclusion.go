@@ -60,19 +60,31 @@ func (t *Tree) GenerateInclusionProofByData(data []byte) (*InclusionProof, error
 
 // VerifyInclusionProof verifies that the provided leaf data is included in the Merkle Tree with the given root hash using the provided inclusion proof.
 func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byte, hashFunc hash.HashFunc) bool {
+	if proof == nil {
+		return false
+	}
+
+	if len(proof.Siblings) != len(proof.Left) {
+		return false
+	}
+
+	if len(leafData) == 0 || len(rootHash) == 0 {
+		return false
+	}
+
 	if hashFunc == nil {
 		hashFunc = hash.DefaultHashFunc
 	}
 
-	hash := hashFunc(append([]byte{0x00}, leafData...))
+	hashValue := hashFunc(append([]byte{0x00}, leafData...))
 
-	for i, siblingHash := range proof.Siblings { // iterate through the proof and compute the hash up to the root
+	for i, siblingHash := range proof.Siblings { // iterate through the proof and compute the hashValue up to the root
 		if proof.Left[i] { // sibling is on the left}
-			hash = hashFunc(append([]byte{0x01}, append(siblingHash, hash...)...))
+			hashValue = hashFunc(append([]byte{0x01}, append(siblingHash, hashValue...)...))
 		} else { // sibling is on the right
-			hash = hashFunc(append([]byte{0x01}, append(hash, siblingHash...)...))
+			hashValue = hashFunc(append([]byte{0x01}, append(hashValue, siblingHash...)...))
 		}
 	}
 
-	return bytes.Equal(hash, rootHash)
+	return bytes.Equal(hashValue, rootHash)
 }
