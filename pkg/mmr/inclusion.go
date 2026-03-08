@@ -9,7 +9,7 @@ import (
 	"github.com/andrlikjirka/merkle"
 )
 
-// GenerateInclusionProof generates the proof for a leaf in the MMR
+// GenerateInclusionProof generates the proof for a leaf in the MMR by its index
 func (m *MMR) GenerateInclusionProof(index int) (*merkle.InclusionProof, error) {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
@@ -64,7 +64,7 @@ func (m *MMR) GenerateInclusionProof(index int) (*merkle.InclusionProof, error) 
 	return proof, nil
 }
 
-// GenerateInclusionProofByData generates the proof for a leaf in the MMR by its data
+// GenerateInclusionProofByData generates the proof for a leaf in the MMR by its data content
 func (m *MMR) GenerateInclusionProofByData(data []byte) (*merkle.InclusionProof, error) {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
@@ -78,7 +78,7 @@ func (m *MMR) GenerateInclusionProofByData(data []byte) (*merkle.InclusionProof,
 	return m.GenerateInclusionProof(indices[0]) // generate proof for the first occurrence of the leaf (if duplicates exist)
 }
 
-// bagPeaksRightToLeft is a helper that mimics the RootHash bagging logic for a subset of peaks
+// bagPeaksRightToLeft is a helper method that takes a slice of peaks and combines them into a single hash by hashing from right to left.
 func (m *MMR) bagPeaksRightToLeft(peaks []*Node) []byte {
 	if len(peaks) == 0 {
 		return nil
@@ -93,7 +93,7 @@ func (m *MMR) bagPeaksRightToLeft(peaks []*Node) []byte {
 	return root
 }
 
-// VerifyInclusionProof verifies that the provided leaf data is included in the MMR with the given root hash using the provided inclusion proof.
+// VerifyInclusionProof verifies the inclusion proof for a given leaf data against the MMR root hash using the provided hash function.
 func VerifyInclusionProof(leafData []byte, proof *merkle.InclusionProof, rootHash []byte, hashFunc hash.HashFunc) bool {
 	return merkle.VerifyInclusionProof(leafData, proof, rootHash, hashFunc)
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/andrlikjirka/merkle"
 )
 
+// Node represents a single node in the MMR, which can be a leaf or an internal node. Each node stores its hash, pointers to its left and right children (if any), a pointer to its parent, and its height in the tree. The height is 0 for leaves and increases by 1 for each merge of two nodes.
 type Node struct {
 	Hash   []byte
 	Left   *Node
@@ -18,6 +19,7 @@ type Node struct {
 	Height int // 0 for leaves, +1 for each merge
 }
 
+// MMR (Merkle Mountain Range) is a data structure that maintains a dynamic collection of leaves and their corresponding peaks. It allows for efficient appending of new leaves and provides methods to compute the root hash, generate inclusion proofs, and consistency proofs. The MMR maintains an index map to track the positions of leaf hashes for quick proof generation. It uses a mutex to ensure thread-safe operations when modifying the structure.
 type MMR struct {
 	peaks    []*Node
 	Leaves   []*Node
@@ -27,7 +29,7 @@ type MMR struct {
 	lock     sync.RWMutex
 }
 
-// NewMMR initializes a new MMR with the provided hash function.
+// NewMMR initializes a new MMR instance with an optional custom hash function. If no hash function is provided, it defaults to the standard hash function defined in the hash package. The MMR starts with empty peaks and leaves, and an empty index map for tracking leaf hashes.
 func NewMMR(hashFunc hash.HashFunc) *MMR {
 	if hashFunc == nil {
 		hashFunc = hash.DefaultHashFunc
@@ -41,6 +43,8 @@ func NewMMR(hashFunc hash.HashFunc) *MMR {
 	}
 }
 
+// Append adds a new leaf to the MMR with the given data.
+// It computes the hash of the new leaf, creates a new node, and appends it to the list of leaves. The method then checks if the new node can be merged with existing peaks (if they have the same height) and merges them accordingly, updating the peaks list. The index map is updated to track the new leaf's hash and its index for future proof generation. The method returns an error if an attempt is made to append an empty leaf.
 func (m *MMR) Append(data []byte) error {
 	m.lock.Lock()
 	defer m.lock.Unlock()
