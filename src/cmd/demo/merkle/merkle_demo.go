@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/andrlikjirka/hash"
 	"github.com/andrlikjirka/merkle"
 )
 
@@ -63,7 +64,7 @@ func demoInclusionProof(tree *merkle.Tree, root []byte, targetData []byte) {
 		fmt.Printf("  Sibling %d: %x\n", i, sibling[:4])
 	}
 
-	valid := merkle.VerifyInclusionProof(targetData, proof, root, nil)
+	valid := merkle.VerifyInclusionProof(targetData, proof, root, hash.DefaultHashFunc)
 	fmt.Printf("Inclusion proof valid: %v\n", valid)
 	fmt.Println()
 }
@@ -101,7 +102,7 @@ func demoConsistencyProof(tree *merkle.Tree, m, n int, oldRoot, newRoot []byte) 
 		fmt.Printf("  Hash %d: %x\n", i, h[:4])
 	}
 
-	valid := merkle.VerifyConsistencyProof(m, n, oldRoot, newRoot, proof, nil)
+	valid := merkle.VerifyConsistencyProof(m, n, oldRoot, newRoot, proof, hash.DefaultHashFunc)
 	fmt.Printf("Consistency proof valid: %v\n", valid)
 	fmt.Println()
 }
