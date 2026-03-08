@@ -3,20 +3,18 @@ package main
 import (
 	"fmt"
 
+	"github.com/andrlikjirka/hash"
 	"github.com/andrlikjirka/mmr"
 )
 
 func main() {
+	// 1. Initialization
 	data := [][]byte{
 		[]byte("tx1"),
 		[]byte("tx2"),
 		[]byte("tx3"),
 		[]byte("tx4"),
 		[]byte("tx5"),
-		[]byte("tx6"),
-		[]byte("tx7"),
-		[]byte("tx8"),
-		[]byte("tx9"),
 	}
 
 	m := mmr.NewMMR(nil)
@@ -33,7 +31,25 @@ func main() {
 	m.PrintPeaks()
 	m.PrintTree()
 
-	demoInclusionProof(m, m.RootHash(), []byte("tx2"))
+	// 2. Test Inclusion Proof (Existing Data)
+	oldRoot := m.RootHash()
+	oldSize := len(m.Leaves)
+	demoInclusionProof(m, oldRoot, []byte("tx5"))
+
+	// 3. Test Append
+	err := m.Append([]byte("tx6"))
+	err = m.Append([]byte("tx7"))
+	err = m.Append([]byte("tx8"))
+	err = m.Append([]byte("tx9"))
+	err = m.Append([]byte("tx10"))
+	if err != nil {
+		panic(err)
+	}
+	newRoot := m.RootHash()
+	newSize := len(m.Leaves)
+
+	// 4. Test Consistency Proof (Old Tree vs New Tree)
+	demoConsistencyProof(m, oldSize, newSize, oldRoot, newRoot)
 }
 
 func demoInclusionProof(m *mmr.MMR, root []byte, targetData []byte) {
@@ -49,7 +65,27 @@ func demoInclusionProof(m *mmr.MMR, root []byte, targetData []byte) {
 		fmt.Printf("  Sibling %d: %x\n", i, sibling[:4])
 	}
 
-	valid := mmr.VerifyInclusionProof(targetData, proof, root, nil)
+	valid := mmr.VerifyInclusionProof(targetData, proof, root, hash.DefaultHashFunc)
 	fmt.Printf("Inclusion proof valid: %v\n", valid)
+	fmt.Println()
+}
+
+func demoConsistencyProof(m *mmr.MMR, oldSize int, newSize int, oldRoot []byte, newRoot []byte) {
+	fmt.Printf("--- Testing Consistency Proof (Size %d -> %d) ---\n", oldSize, newSize)
+
+	// 1. Generate the consistency proof
+	proof, err := m.GenerateConsistencyProof(oldSize, newSize)
+	if err != nil {
+		fmt.Printf("Error generating consistency proof: %v\n", err)
+		return
+	}
+
+	fmt.Println("Proof generated successfully:")
+	fmt.Printf("  Consistency Paths (Old Peaks advancing): %d\n", len(proof.ConsistencyPaths))
+	fmt.Printf("  Right Peaks (New Peaks appended): %d\n", len(proof.RightPeaks))
+
+	// 2. Verify the proof using OldPeaksHashes from the proof
+	valid := mmr.VerifyConsistencyProof(proof, oldRoot, newRoot, hash.DefaultHashFunc)
+	fmt.Printf("Consistency proof valid: %v\n", valid)
 	fmt.Println()
 }
