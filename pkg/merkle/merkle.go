@@ -20,12 +20,12 @@ type Tree struct {
 	root     *Node
 	Leaves   []*Node
 	indexMap map[string][]int // hash → indices
-	hashFunc hash.HashFunc
+	hashFunc hash.Func
 	lock     sync.RWMutex
 }
 
 // NewTree creates a new Merkle Tree from the provided data.
-func NewTree(data [][]byte, hashFunc hash.HashFunc) (*Tree, error) {
+func NewTree(data [][]byte, hashFunc hash.Func) (*Tree, error) {
 	if len(data) == 0 {
 		return nil, errors.New("no data provided")
 	}
@@ -39,7 +39,7 @@ func NewTree(data [][]byte, hashFunc hash.HashFunc) (*Tree, error) {
 }
 
 // build constructs the Merkle Tree from the provided data.
-func build(data [][]byte, hashFunc hash.HashFunc) *Tree {
+func build(data [][]byte, hashFunc hash.Func) *Tree {
 	var leaves []*Node
 	indexMap := make(map[string][]int)
 	// create leaf nodes
@@ -61,7 +61,7 @@ func build(data [][]byte, hashFunc hash.HashFunc) *Tree {
 }
 
 // buildRecursive builds the tree recursively from the given nodes and returns the root node. It implements the tree construction logic defined in RFC 6962 to construct deterministic append-only binary trees (avoid data padding).
-func buildRecursive(nodes []*Node, hashFunc hash.HashFunc) *Node {
+func buildRecursive(nodes []*Node, hashFunc hash.Func) *Node {
 	n := len(nodes)
 	if n == 1 {
 		return nodes[0] // Base case: if only one node, return it

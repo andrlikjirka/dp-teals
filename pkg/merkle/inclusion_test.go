@@ -179,7 +179,7 @@ func TestVerifyInclusionProof(t *testing.T) {
 		treeData     [][]byte
 		leafIndex    int
 		verifyData   []byte
-		hashFunc     hash.HashFunc
+		hashFunc     hash.Func
 		shouldVerify bool
 		wantErr      bool
 	}{

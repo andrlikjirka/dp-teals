@@ -64,7 +64,7 @@ func (t *Tree) generateInclusionProofLocked(index int) (*InclusionProof, error) 
 }
 
 // VerifyInclusionProof verifies that the provided leaf data is included in the Merkle Tree with the given root hash using the provided inclusion proof.
-func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byte, hashFunc hash.HashFunc) bool {
+func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byte, hashFunc hash.Func) bool {
 	if proof == nil {
 		return false
 	}

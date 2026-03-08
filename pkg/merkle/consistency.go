@@ -78,7 +78,7 @@ func largestPowerOfTwoLessThan(n int) int {
 }
 
 // VerifyConsistencyProof verifies that the new root is consistent with the old root using the provided consistency proof.
-func VerifyConsistencyProof(m, n int, oldRoot, newRoot []byte, proof *ConsistencyProof, hashFunc hash.HashFunc) bool {
+func VerifyConsistencyProof(m, n int, oldRoot, newRoot []byte, proof *ConsistencyProof, hashFunc hash.Func) bool {
 	if hashFunc == nil {
 		hashFunc = hash.DefaultHashFunc
 	}
@@ -104,7 +104,7 @@ func VerifyConsistencyProof(m, n int, oldRoot, newRoot []byte, proof *Consistenc
 }
 
 // verifySubProof is a helper function that recursively verifies the consistency proof. It returns the computed old root, the computed new root, any remaining proof hashes, and an error if the proof is invalid.
-func verifySubProof(m, n int, b bool, proofHashes [][]byte, oldRoot []byte, hashFunc hash.HashFunc) ([]byte, []byte, [][]byte, error) {
+func verifySubProof(m, n int, b bool, proofHashes [][]byte, oldRoot []byte, hashFunc hash.Func) ([]byte, []byte, [][]byte, error) {
 	if m == n { //zoomed in on a subtree that is perfectly identical in both trees
 		if b { // looking at the exact branch that formed the original oldRoot
 			return oldRoot, oldRoot, proofHashes, nil
