@@ -5,7 +5,7 @@ import (
 	"errors"
 	"math/bits"
 
-	"github.com/andrlikjirka/hash"
+	"github.com/andrlijirka/dp-teals/pkg/hash"
 )
 
 type ConsistencyProof struct {

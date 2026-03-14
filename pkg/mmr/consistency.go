@@ -5,8 +5,8 @@ import (
 	"errors"
 	"math/bits"
 
-	"github.com/andrlikjirka/hash"
-	"github.com/andrlikjirka/merkle"
+	"github.com/andrlijirka/dp-teals/pkg/hash"
+	"github.com/andrlijirka/dp-teals/pkg/merkle"
 )
 
 // ConsistencyPath represents the path from an old peak to a new peak in the MMR. It consists of the sibling hashes along the path and the direction (left/right) of each sibling (inclusion proof).

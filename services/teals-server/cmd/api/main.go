@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/andrlikjirka/dp-teals/teals-server/internal/server"
-	"github.com/andrlikjirka/logger"
+	"github.com/andrlijirka/dp-teals/pkg/logger"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/server"
 	"github.com/go-chi/chi/v5"
 )
 

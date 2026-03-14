@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/andrlikjirka/logger"
+	"github.com/andrlijirka/dp-teals/pkg/logger"
 )
 
 // Server encapsulates the HTTP server and its dependencies.

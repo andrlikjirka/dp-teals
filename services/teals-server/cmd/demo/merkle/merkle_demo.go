@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/andrlikjirka/hash"
-	"github.com/andrlikjirka/merkle"
+	"github.com/andrlijirka/dp-teals/pkg/hash"
+	"github.com/andrlijirka/dp-teals/pkg/merkle"
 )
 
 func main() {

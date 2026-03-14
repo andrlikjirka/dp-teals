@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/andrlikjirka/hash"
-	"github.com/andrlikjirka/merkle"
+	"github.com/andrlijirka/dp-teals/pkg/hash"
+	"github.com/andrlijirka/dp-teals/pkg/merkle"
 )
 
 // Node represents a single node in the MMR, which can be a leaf or an internal node. Each node stores its hash, pointers to its left and right children (if any), a pointer to its parent, and its height in the tree. The height is 0 for leaves and increases by 1 for each merge of two nodes.

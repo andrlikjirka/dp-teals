@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/andrlikjirka/hash"
-	"github.com/andrlikjirka/mmr"
+	"github.com/andrlijirka/dp-teals/pkg/hash"
+	"github.com/andrlijirka/dp-teals/pkg/mmr"
 )
 
 func main() {
