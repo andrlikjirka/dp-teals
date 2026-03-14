@@ -1,0 +1,15 @@
+version: v2
+
+managed:
+  enabled: true
+  disable:
+    - file_option: go_package
+      module: buf.build/bufbuild/protovalidate
+
+plugins:
+  - remote: buf.build/protocolbuffers/go
+    out: gen
+    opt: module=github.com/andrlikjirka/dp-teals/proto
+  - remote: buf.build/grpc/go
+    out: gen
+    opt: module=github.com/andrlikjirka/dp-teals/proto

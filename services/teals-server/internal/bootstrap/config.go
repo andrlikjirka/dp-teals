@@ -1,4 +1,4 @@
-package server
+package bootstrap
 
 import (
 	"sync"
@@ -17,7 +17,9 @@ var (
 
 // Config holds the server configuration loaded from environment variables.
 type Config struct {
-	Port int `env:"PORT" validate:"required"`
+	Env              string `env:"ENV" envDefault:"development"`
+	Port             int    `env:"PORT" validate:"required"`
+	EnableReflection bool   `env:"ENABLE_REFLECTION" envDefault:"false"`
 	//DatabaseURL string `env:"DATABASE_URL" validate:"required"`
 }
 

@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package audit.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;ingestionv1";
+
+// The audit ingestion service definition.
+service IngestionService {
+  rpc Append (AppendRequest) returns (AppendResponse) {}
+}
+
+// The request message containing the audit event to be appended.
+message AppendRequest {
+  AuditEvent event = 1;
+}
+
+// The response message containing the ID of the appended audit event.
+message AppendResponse {
+  bool success = 1;
+}
+
+// The audit event message containing all relevant information about the event.
+message AuditEvent {
+  string id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  Environment environment = 3;
+  Actor actor = 4;
+  Subject subject = 5;
+  Resource resource = 6;
+  string action = 7;
+  string result = 8;
+  google.protobuf.Struct metadata = 9;
+}
+
+// The environment message containing information about the service and trace context of the audit event.
+message Environment {
+  string service = 1;
+  string trace_id = 2;
+  string span_id = 3;
+}
+
+// The actor message containing information about the actor responsible for the audit event.
+message Actor {
+  string type = 1;
+  string id = 2;
+}
+
+// The subject message containing information about the personal data subject.
+message Subject {
+  string id = 1;
+}
+
+// The resource message containing information about the resource involved in the audit event.
+message Resource {
+  string id = 1;
+  string type = 2;
+  string name = 3;
+}
