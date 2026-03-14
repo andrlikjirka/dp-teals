@@ -1,9 +1,0 @@
-go 1.25.0
-
-use (
-	pkg/hash
-	pkg/logger
-	pkg/merkle
-	pkg/mmr
-	services/teals-server
-)
