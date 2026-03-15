@@ -4,15 +4,15 @@ import (
 	"context"
 
 	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/application/ingestion"
 )
 
 type IngestionServiceServer struct {
 	ingestionv1.UnimplementedIngestionServiceServer
-	service *service.Service
+	service *ingestion.Service
 }
 
-func NewIngestionServiceServer(s *service.Service) (*IngestionServiceServer, error) {
+func NewIngestionServiceServer(s *ingestion.Service) (*IngestionServiceServer, error) {
 	return &IngestionServiceServer{
 		service: s,
 	}, nil

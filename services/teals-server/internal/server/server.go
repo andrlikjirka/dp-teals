@@ -1,14 +1,17 @@
-package bootstrap
+package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
 
+	"buf.build/go/protovalidate"
 	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
 	"github.com/andrlijirka/dp-teals/pkg/logger"
-	v1 "github.com/andrlijirka/dp-teals/services/teals-server/internal/transport/api/grpc/v1"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/api/grpc/v1"
+	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -31,7 +34,14 @@ func NewServer(cfg Config, log *logger.Logger, ingestor *v1.IngestionServiceServ
 		return nil, fmt.Errorf("failed to listen on port %d: %w", cfg.Port, err)
 	}
 
-	grpcSrv := grpc.NewServer()
+	validator, err := protovalidate.New()
+	if err != nil {
+		return nil, errors.New("failed to create protovalidate validator")
+	}
+
+	grpcSrv := grpc.NewServer(
+		grpc.UnaryInterceptor(protovalidate_middleware.UnaryServerInterceptor(validator)),
+	)
 	ingestionv1.RegisterIngestionServiceServer(grpcSrv, ingestor)
 
 	healthServer := health.NewServer()
