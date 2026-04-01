@@ -1,4 +1,4 @@
-package server
+package bootstrap
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"buf.build/go/protovalidate"
 	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
 	"github.com/andrlijirka/dp-teals/pkg/logger"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/api/grpc/v1"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/transport/grpc/v1"
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"

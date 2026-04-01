@@ -19,5 +19,5 @@ message AppendRequest {
 
 // The response message containing the ID of the appended audit event.
 message AppendResponse {
-  bool success = 1;
+  string event_id = 1;
 }

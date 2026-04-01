@@ -7,15 +7,15 @@ import (
 	"syscall"
 
 	"github.com/andrlijirka/dp-teals/pkg/logger"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/api/grpc/v1"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/application/ingestion"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/server"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/bootstrap"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/ingestion"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/transport/grpc/v1"
 	"golang.org/x/sync/errgroup"
 )
 
 func main() {
 	// 1. Setup Server
-	config := server.MustLoadConfig(".env")
+	config := bootstrap.MustLoadConfig(".env")
 	log := logger.New(config.Env)
 
 	ingestionService := ingestion.NewIngestionService()
@@ -25,7 +25,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	server, err := server.NewServer(config, log, ingestor)
+	server, err := bootstrap.NewServer(config, log, ingestor)
 	if err != nil {
 		log.Error("Failed to create server", "error", err)
 		os.Exit(1)
