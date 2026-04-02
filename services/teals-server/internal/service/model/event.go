@@ -3,14 +3,14 @@ package model
 import (
 	"time"
 
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/ingestion/errors"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/ingestion/model/enum"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/errors"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/model/enum"
 	"github.com/google/uuid"
 )
 
 // AuditEvent represents an audit event with all relevant details.
 type AuditEvent struct {
-	Id          uuid.UUID
+	ID          uuid.UUID
 	Timestamp   time.Time
 	Environment *Environment
 	Actor       Actor
@@ -98,7 +98,7 @@ func NewAuditEvent(params CreateAuditEventParams) (*AuditEvent, error) {
 	}
 
 	return &AuditEvent{
-		Id:          params.ID,
+		ID:          params.ID,
 		Timestamp:   params.Timestamp,
 		Environment: params.Environment,
 		Actor:       params.Actor,

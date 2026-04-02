@@ -8,7 +8,9 @@ import (
 
 	"github.com/andrlijirka/dp-teals/pkg/logger"
 	"github.com/andrlijirka/dp-teals/services/teals-server/internal/bootstrap"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/ingestion"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/infrastructure/canonizer"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/infrastructure/repository"
+	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service"
 	"github.com/andrlijirka/dp-teals/services/teals-server/internal/transport/grpc/v1"
 	"golang.org/x/sync/errgroup"
 )
@@ -18,7 +20,17 @@ func main() {
 	config := bootstrap.MustLoadConfig(".env")
 	log := logger.New(config.Env)
 
-	ingestionService := ingestion.NewIngestionService()
+	pool, err := bootstrap.NewPgxPool(context.Background(), config.DatabaseURL)
+	if err != nil {
+		log.Error("Failed to create database pool", "error", err)
+		os.Exit(1)
+	}
+	defer pool.Close()
+
+	serializer := canonizer.NewJcsSerializer()
+	auditLogRepo := repository.NewAuditLogRepository(pool)
+	ingestionService := service.NewAuditService(auditLogRepo, serializer, log)
+
 	ingestor, err := v1.NewIngestionServiceServer(ingestionService)
 	if err != nil {
 		log.Error("Failed to create gRPC service", "error", err)

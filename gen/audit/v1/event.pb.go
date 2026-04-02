@@ -24,23 +24,23 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Action int32
+type ActionType int32
 
 const (
-	Action_ACTION_UNSPECIFIED Action = 0
-	Action_ACTION_ACCESS      Action = 1
-	Action_ACTION_CREATE      Action = 2
-	Action_ACTION_UPDATE      Action = 3
-	Action_ACTION_DELETE      Action = 4
-	Action_ACTION_SHARE       Action = 5
-	Action_ACTION_EXPORT      Action = 6
-	Action_ACTION_LOGIN       Action = 7
-	Action_ACTION_LOGOUT      Action = 8
+	ActionType_ACTION_UNSPECIFIED ActionType = 0
+	ActionType_ACTION_ACCESS      ActionType = 1
+	ActionType_ACTION_CREATE      ActionType = 2
+	ActionType_ACTION_UPDATE      ActionType = 3
+	ActionType_ACTION_DELETE      ActionType = 4
+	ActionType_ACTION_SHARE       ActionType = 5
+	ActionType_ACTION_EXPORT      ActionType = 6
+	ActionType_ACTION_LOGIN       ActionType = 7
+	ActionType_ACTION_LOGOUT      ActionType = 8
 )
 
-// Enum value maps for Action.
+// Enum value maps for ActionType.
 var (
-	Action_name = map[int32]string{
+	ActionType_name = map[int32]string{
 		0: "ACTION_UNSPECIFIED",
 		1: "ACTION_ACCESS",
 		2: "ACTION_CREATE",
@@ -51,7 +51,7 @@ var (
 		7: "ACTION_LOGIN",
 		8: "ACTION_LOGOUT",
 	}
-	Action_value = map[string]int32{
+	ActionType_value = map[string]int32{
 		"ACTION_UNSPECIFIED": 0,
 		"ACTION_ACCESS":      1,
 		"ACTION_CREATE":      2,
@@ -64,30 +64,30 @@ var (
 	}
 )
 
-func (x Action) Enum() *Action {
-	p := new(Action)
+func (x ActionType) Enum() *ActionType {
+	p := new(ActionType)
 	*p = x
 	return p
 }
 
-func (x Action) String() string {
+func (x ActionType) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (Action) Descriptor() protoreflect.EnumDescriptor {
+func (ActionType) Descriptor() protoreflect.EnumDescriptor {
 	return file_audit_v1_event_proto_enumTypes[0].Descriptor()
 }
 
-func (Action) Type() protoreflect.EnumType {
+func (ActionType) Type() protoreflect.EnumType {
 	return &file_audit_v1_event_proto_enumTypes[0]
 }
 
-func (x Action) Number() protoreflect.EnumNumber {
+func (x ActionType) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Action.Descriptor instead.
-func (Action) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use ActionType.Descriptor instead.
+func (ActionType) EnumDescriptor() ([]byte, []int) {
 	return file_audit_v1_event_proto_rawDescGZIP(), []int{0}
 }
 
@@ -197,8 +197,8 @@ type AuditEvent struct {
 	Environment   *Environment           `protobuf:"bytes,3,opt,name=environment,proto3" json:"environment,omitempty"`
 	Actor         *Actor                 `protobuf:"bytes,4,opt,name=actor,proto3" json:"actor,omitempty"`
 	Subject       *Subject               `protobuf:"bytes,5,opt,name=subject,proto3" json:"subject,omitempty"`
+	Action        ActionType             `protobuf:"varint,7,opt,name=action,proto3,enum=audit.v1.ActionType" json:"action,omitempty"`
 	Resource      *Resource              `protobuf:"bytes,6,opt,name=resource,proto3" json:"resource,omitempty"`
-	Action        Action                 `protobuf:"varint,7,opt,name=action,proto3,enum=audit.v1.Action" json:"action,omitempty"`
 	Result        *Result                `protobuf:"bytes,8,opt,name=result,proto3" json:"result,omitempty"`
 	Metadata      *structpb.Struct       `protobuf:"bytes,9,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -270,18 +270,18 @@ func (x *AuditEvent) GetSubject() *Subject {
 	return nil
 }
 
+func (x *AuditEvent) GetAction() ActionType {
+	if x != nil {
+		return x.Action
+	}
+	return ActionType_ACTION_UNSPECIFIED
+}
+
 func (x *AuditEvent) GetResource() *Resource {
 	if x != nil {
 		return x.Resource
 	}
 	return nil
-}
-
-func (x *AuditEvent) GetAction() Action {
-	if x != nil {
-		return x.Action
-	}
-	return Action_ACTION_UNSPECIFIED
 }
 
 func (x *AuditEvent) GetResult() *Result {
@@ -575,17 +575,17 @@ var File_audit_v1_event_proto protoreflect.FileDescriptor
 
 const file_audit_v1_event_proto_rawDesc = "" +
 	"\n" +
-	"\x14audit/v1/event.proto\x12\baudit.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1bbuf/validate/validate.proto\"\xd8\x03\n" +
+	"\x14audit/v1/event.proto\x12\baudit.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1bbuf/validate/validate.proto\"\xdc\x03\n" +
 	"\n" +
 	"AuditEvent\x12\x16\n" +
 	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x12@\n" +
 	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\ttimestamp\x127\n" +
 	"\venvironment\x18\x03 \x01(\v2\x15.audit.v1.EnvironmentR\venvironment\x12-\n" +
 	"\x05actor\x18\x04 \x01(\v2\x0f.audit.v1.ActorB\x06\xbaH\x03\xc8\x01\x01R\x05actor\x123\n" +
-	"\asubject\x18\x05 \x01(\v2\x11.audit.v1.SubjectB\x06\xbaH\x03\xc8\x01\x01R\asubject\x126\n" +
-	"\bresource\x18\x06 \x01(\v2\x12.audit.v1.ResourceB\x06\xbaH\x03\xc8\x01\x01R\bresource\x124\n" +
-	"\x06action\x18\a \x01(\x0e2\x10.audit.v1.ActionB\n" +
-	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\x06action\x120\n" +
+	"\asubject\x18\x05 \x01(\v2\x11.audit.v1.SubjectB\x06\xbaH\x03\xc8\x01\x01R\asubject\x128\n" +
+	"\x06action\x18\a \x01(\x0e2\x14.audit.v1.ActionTypeB\n" +
+	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\x06action\x126\n" +
+	"\bresource\x18\x06 \x01(\v2\x12.audit.v1.ResourceB\x06\xbaH\x03\xc8\x01\x01R\bresource\x120\n" +
 	"\x06result\x18\b \x01(\v2\x10.audit.v1.ResultB\x06\xbaH\x03\xc8\x01\x01R\x06result\x123\n" +
 	"\bmetadata\x18\t \x01(\v2\x17.google.protobuf.StructR\bmetadata\"[\n" +
 	"\vEnvironment\x12\x18\n" +
@@ -613,8 +613,9 @@ const file_audit_v1_event_proto_rawDesc = "" +
 	"\x06Status\x12\x16\n" +
 	"\x12STATUS_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSTATUS_SUCCESS\x10\x01\x12\x12\n" +
-	"\x0eSTATUS_FAILURE\x10\x02*\xb6\x01\n" +
-	"\x06Action\x12\x16\n" +
+	"\x0eSTATUS_FAILURE\x10\x02*\xba\x01\n" +
+	"\n" +
+	"ActionType\x12\x16\n" +
 	"\x12ACTION_UNSPECIFIED\x10\x00\x12\x11\n" +
 	"\rACTION_ACCESS\x10\x01\x12\x11\n" +
 	"\rACTION_CREATE\x10\x02\x12\x11\n" +
@@ -642,7 +643,7 @@ func file_audit_v1_event_proto_rawDescGZIP() []byte {
 var file_audit_v1_event_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_audit_v1_event_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_audit_v1_event_proto_goTypes = []any{
-	(Action)(0),                   // 0: audit.v1.Action
+	(ActionType)(0),               // 0: audit.v1.ActionType
 	(Actor_Type)(0),               // 1: audit.v1.Actor.Type
 	(Result_Status)(0),            // 2: audit.v1.Result.Status
 	(*AuditEvent)(nil),            // 3: audit.v1.AuditEvent
@@ -659,8 +660,8 @@ var file_audit_v1_event_proto_depIdxs = []int32{
 	4,  // 1: audit.v1.AuditEvent.environment:type_name -> audit.v1.Environment
 	5,  // 2: audit.v1.AuditEvent.actor:type_name -> audit.v1.Actor
 	6,  // 3: audit.v1.AuditEvent.subject:type_name -> audit.v1.Subject
-	7,  // 4: audit.v1.AuditEvent.resource:type_name -> audit.v1.Resource
-	0,  // 5: audit.v1.AuditEvent.action:type_name -> audit.v1.Action
+	0,  // 4: audit.v1.AuditEvent.action:type_name -> audit.v1.ActionType
+	7,  // 5: audit.v1.AuditEvent.resource:type_name -> audit.v1.Resource
 	8,  // 6: audit.v1.AuditEvent.result:type_name -> audit.v1.Result
 	10, // 7: audit.v1.AuditEvent.metadata:type_name -> google.protobuf.Struct
 	1,  // 8: audit.v1.Actor.type:type_name -> audit.v1.Actor.Type

@@ -1,0 +1,18 @@
+name: dp-teals
+
+services:
+  db:
+    image: postgres:18-alpine3.23
+    container_name: postgres_db
+    ports:
+      - "5432:5432"
+    networks:
+      - teals-server-net
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+networks:
+  teals-server-net:
+    driver: bridge

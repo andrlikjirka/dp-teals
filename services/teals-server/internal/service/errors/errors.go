@@ -12,4 +12,8 @@ var (
 	ErrMissingTimestamp    = errors.New("missing or invalid timestamp")
 	ErrInvalidResource     = errors.New("invalid resource: missing ID or name")
 	ErrMissingSubjectID    = errors.New("invalid subject: missing ID")
+
+	ErrEventSerializationFailed = errors.New("failed to serialize audit event")
+	ErrDuplicateEventID         = errors.New("duplicate event ID")
+	ErrEventAppendFailed        = errors.New("failed to append audit event")
 )
