@@ -12,14 +12,14 @@ import (
 )
 
 type AuditService struct {
-	repo       ports.AuditLogRepository
+	tx         ports.TransactionProvider
 	serializer ports.Serializer
 	logger     *logger.Logger
 }
 
-func NewAuditService(r ports.AuditLogRepository, s ports.Serializer, l *logger.Logger) *AuditService {
+func NewAuditService(tx ports.TransactionProvider, s ports.Serializer, l *logger.Logger) *AuditService {
 	return &AuditService{
-		repo:       r,
+		tx:         tx,
 		serializer: s,
 		logger:     l,
 	}
@@ -32,7 +32,10 @@ func (s *AuditService) IngestAuditEvent(ctx context.Context, event *model.AuditE
 		return uuid.Nil, svcerrors.ErrEventSerializationFailed
 	}
 
-	err = s.repo.StoreAuditLogEntry(ctx, event.ID, payloadBytes)
+	err = s.tx.Transact(ctx, func(r ports.Repositories) error {
+		return r.AuditLog.StoreAuditLogEntry(ctx, event.ID, payloadBytes)
+	})
+
 	if err != nil {
 		if errors.Is(err, svcerrors.ErrDuplicateEventID) {
 			s.logger.Warn("duplicate audit event rejected", "event_id", event.ID)

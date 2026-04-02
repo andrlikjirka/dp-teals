@@ -10,19 +10,18 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type AuditLogRepository struct {
-	pool *pgxpool.Pool
+	db db
 }
 
-func NewAuditLogRepository(pool *pgxpool.Pool) *AuditLogRepository {
-	return &AuditLogRepository{pool: pool}
+func NewAuditLogRepository(db db) *AuditLogRepository {
+	return &AuditLogRepository{db: db}
 }
 
 func (r *AuditLogRepository) StoreAuditLogEntry(ctx context.Context, eventId uuid.UUID, payload json.RawMessage) error {
-	_, err := r.pool.Exec(ctx, query.InsertAuditEvent, eventId, payload)
+	_, err := r.db.Exec(ctx, query.InsertAuditEvent, eventId, payload)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {

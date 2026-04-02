@@ -28,8 +28,8 @@ func main() {
 	defer pool.Close()
 
 	serializer := canonizer.NewJcsSerializer()
-	auditLogRepo := repository.NewAuditLogRepository(pool)
-	ingestionService := service.NewAuditService(auditLogRepo, serializer, log)
+	txProvider := repository.NewTransactionProvider(pool)
+	ingestionService := service.NewAuditService(txProvider, serializer, log)
 
 	ingestor, err := v1.NewIngestionServiceServer(ingestionService)
 	if err != nil {
