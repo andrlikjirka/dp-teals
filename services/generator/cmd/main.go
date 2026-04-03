@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
-	"github.com/andrlijirka/dp-teals/pkg/logger"
-	"github.com/andrlijirka/dp-teals/services/generator/internal/generator"
+	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	"github.com/andrlikjirka/dp-teals/pkg/logger"
+	"github.com/andrlikjirka/dp-teals/services/generator/internal/generator"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"

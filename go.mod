@@ -1,4 +1,4 @@
-module github.com/andrlijirka/dp-teals
+module github.com/andrlikjirka/dp-teals
 
 go 1.25
 

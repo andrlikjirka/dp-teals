@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
-	"github.com/andrlijirka/dp-teals/services/generator/internal/model"
+	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	"github.com/andrlikjirka/dp-teals/services/generator/internal/model"
 )
 
 // sender defines the interface for sending audit events to the ingestion service.

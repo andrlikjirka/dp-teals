@@ -1,6 +1,6 @@
 package merkle
 
-import "github.com/andrlijirka/dp-teals/pkg/hash"
+import "github.com/andrlikjirka/dp-teals/pkg/hash"
 
 // HashLeafData computes the hash of the leaf data by prefixing it with 0x00 and applying the hash function.
 func HashLeafData(data []byte, hashFunc hash.Func) []byte {

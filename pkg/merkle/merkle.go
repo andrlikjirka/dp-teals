@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/andrlijirka/dp-teals/pkg/hash"
+	"github.com/andrlikjirka/dp-teals/pkg/hash"
 )
 
 type Node struct {

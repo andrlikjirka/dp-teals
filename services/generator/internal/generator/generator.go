@@ -8,9 +8,9 @@ import (
 	"math/rand"
 	"time"
 
-	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
-	"github.com/andrlijirka/dp-teals/pkg/logger"
-	"github.com/andrlijirka/dp-teals/services/generator/internal/model"
+	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	"github.com/andrlikjirka/dp-teals/pkg/logger"
+	"github.com/andrlikjirka/dp-teals/services/generator/internal/model"
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/structpb"
 )

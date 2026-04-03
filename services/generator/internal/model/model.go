@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
+	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
 )
 
 type AuditEvent struct {

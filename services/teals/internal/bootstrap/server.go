@@ -7,8 +7,8 @@ import (
 	"net"
 
 	"buf.build/go/protovalidate"
-	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
-	"github.com/andrlijirka/dp-teals/pkg/logger"
+	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	"github.com/andrlikjirka/dp-teals/pkg/logger"
 	protovalidatemiddleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"

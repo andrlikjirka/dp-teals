@@ -3,7 +3,7 @@ package merkle
 import (
 	"testing"
 
-	"github.com/andrlijirka/dp-teals/pkg/hash"
+	"github.com/andrlikjirka/dp-teals/pkg/hash"
 )
 
 func TestGenerateInclusionProof(t *testing.T) {

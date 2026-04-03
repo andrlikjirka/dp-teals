@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"errors"
 
-	"github.com/andrlijirka/dp-teals/pkg/hash"
-	"github.com/andrlijirka/dp-teals/pkg/merkle"
+	"github.com/andrlikjirka/dp-teals/pkg/hash"
+	"github.com/andrlikjirka/dp-teals/pkg/merkle"
 )
 
 // InclusionProof represents the proof that a leaf is included in the MMR. It consists of the sibling hashes along the path from the leaf to its peak, and the direction (left/right) of each sibling.

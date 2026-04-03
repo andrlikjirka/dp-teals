@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 
-	"github.com/andrlijirka/dp-teals/pkg/hash"
+	"github.com/andrlikjirka/dp-teals/pkg/hash"
 )
 
 type InclusionProof struct {

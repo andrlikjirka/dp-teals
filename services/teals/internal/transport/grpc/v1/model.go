@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
-	"github.com/andrlijirka/dp-teals/services/teals/internal/service/model"
-	"github.com/andrlijirka/dp-teals/services/teals/internal/service/model/enum"
+	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model/enum"
 	"github.com/google/uuid"
 )
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/andrlijirka/dp-teals/services/teals/internal/service/ports"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/ports"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )

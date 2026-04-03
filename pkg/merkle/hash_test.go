@@ -5,7 +5,7 @@ import (
 	"crypto/sha256"
 	"testing"
 
-	"github.com/andrlijirka/dp-teals/pkg/hash"
+	"github.com/andrlikjirka/dp-teals/pkg/hash"
 )
 
 func sha256Bytes(b []byte) []byte {

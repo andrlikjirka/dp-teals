@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
-	"github.com/andrlijirka/dp-teals/services/teals/internal/service"
-	svcerrors "github.com/andrlijirka/dp-teals/services/teals/internal/service/errors"
+	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/service"
+	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/andrlijirka/dp-teals/pkg/logger"
-	svcerrors "github.com/andrlijirka/dp-teals/services/teals/internal/service/errors"
-	"github.com/andrlijirka/dp-teals/services/teals/internal/service/model"
-	"github.com/andrlijirka/dp-teals/services/teals/internal/service/ports"
+	"github.com/andrlikjirka/dp-teals/pkg/logger"
+	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/ports"
 	"github.com/google/uuid"
 )
 
