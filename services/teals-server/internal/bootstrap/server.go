@@ -2,7 +2,6 @@ package bootstrap
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -10,15 +9,14 @@ import (
 	"buf.build/go/protovalidate"
 	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
 	"github.com/andrlijirka/dp-teals/pkg/logger"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/transport/grpc/v1"
-	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
+	protovalidatemiddleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
-// Server encapsulates the HTTP server and its dependencies.
+// Server encapsulates the gRPC server and its dependencies.
 type Server struct {
 	grpcSrv      *grpc.Server
 	listener     net.Listener
@@ -28,19 +26,25 @@ type Server struct {
 }
 
 // NewServer creates a new Server instance with the given configuration
-func NewServer(cfg Config, log *logger.Logger, ingestor *v1.IngestionServiceServer) (*Server, error) {
+func NewServer(cfg Config, log *logger.Logger, ingestor ingestionv1.IngestionServiceServer) (*Server, error) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Port))
 	if err != nil {
 		return nil, fmt.Errorf("failed to listen on port %d: %w", cfg.Port, err)
 	}
 
+	defer func() {
+		if err != nil {
+			_ = listener.Close()
+		}
+	}()
+
 	validator, err := protovalidate.New()
 	if err != nil {
-		return nil, errors.New("failed to create protovalidate validator")
+		return nil, fmt.Errorf("failed to create protovalidate validator: %w", err)
 	}
 
 	grpcSrv := grpc.NewServer(
-		grpc.UnaryInterceptor(protovalidate_middleware.UnaryServerInterceptor(validator)),
+		grpc.UnaryInterceptor(protovalidatemiddleware.UnaryServerInterceptor(validator)),
 	)
 	ingestionv1.RegisterIngestionServiceServer(grpcSrv, ingestor)
 
@@ -61,7 +65,7 @@ func NewServer(cfg Config, log *logger.Logger, ingestor *v1.IngestionServiceServ
 	}, nil
 }
 
-// Run starts the HTTP server and listens for incoming requests.
+// Run starts the gRPC server and listens for incoming requests.
 func (s *Server) Run() error {
 	if s.listener == nil {
 		return fmt.Errorf("server listener is not initialized")

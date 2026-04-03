@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,19 +12,36 @@ import (
 	"github.com/andrlijirka/dp-teals/services/teals-server/internal/infrastructure/canonizer"
 	"github.com/andrlijirka/dp-teals/services/teals-server/internal/infrastructure/repository"
 	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/transport/grpc/v1"
+	v1 "github.com/andrlijirka/dp-teals/services/teals-server/internal/transport/grpc/v1"
 	"golang.org/x/sync/errgroup"
 )
 
 func main() {
+	err := run()
+	if err != nil {
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	// 1. Setup Server
-	config := bootstrap.MustLoadConfig(".env")
+	if err := bootstrap.LoadEnvFile(".env"); err != nil {
+		fmt.Printf("env file error: %v\n", err)
+		return err
+	}
+	config, err := bootstrap.LoadConfig()
+	if err != nil {
+		fmt.Printf("failed to load config: %v\n", err)
+		return err
+	}
 	log := logger.New(config.Env)
 
-	pool, err := bootstrap.NewPgxPool(context.Background(), config.DatabaseURL)
+	dbCtx, dbCancel := context.WithTimeout(context.Background(), config.DBConnectTimeout)
+	defer dbCancel()
+	pool, err := bootstrap.NewPgxPool(dbCtx, config.DatabaseURL)
 	if err != nil {
 		log.Error("Failed to create database pool", "error", err)
-		os.Exit(1)
+		return err
 	}
 	defer pool.Close()
 
@@ -31,21 +49,14 @@ func main() {
 	txProvider := repository.NewTransactionProvider(pool)
 	ingestionService := service.NewAuditService(txProvider, serializer, log)
 
-	ingestor, err := v1.NewIngestionServiceServer(ingestionService)
-	if err != nil {
-		log.Error("Failed to create gRPC service", "error", err)
-		os.Exit(1)
-	}
-
+	ingestor := v1.NewIngestionServiceServer(ingestionService)
 	server, err := bootstrap.NewServer(config, log, ingestor)
 	if err != nil {
 		log.Error("Failed to create server", "error", err)
-		os.Exit(1)
+		return err
 	}
 
 	// 2. Create an errgroup with context
-	// The ctx is canceled if any function in the group returns an error
-	// or if we cancel it manually via signal.
 	g, ctx := errgroup.WithContext(context.Background())
 
 	// 3. Run the gRPC Server
@@ -56,23 +67,27 @@ func main() {
 
 	// 4. Listen for shutdown signals in a separate goroutine
 	g.Go(func() error {
-		// This will block until a shutdown signal is received or the context is canceled
 		interceptSignals(ctx, log)
 
-		return server.Stop(ctx)
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), config.ShutdownTimeout)
+		defer shutdownCancel()
+
+		return server.Stop(shutdownCtx)
 	})
 
 	// 5. Wait for everything to finish
 	if err := g.Wait(); err != nil {
 		log.Error("Application terminated with error", "error", err)
-		os.Exit(1)
+		return err
 	}
+	return nil
 }
 
 func interceptSignals(ctx context.Context, log *logger.Logger) {
 	sigc := make(chan os.Signal, 1)
-
+	defer signal.Stop(sigc)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+
 	select {
 	case sig := <-sigc:
 		log.Info("Shutdown signal received", "signal", sig.String())

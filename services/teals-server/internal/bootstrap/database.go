@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// NewPgxPool creates a new pgxpool.Pool with the given connection string and pings the database to ensure connectivity. It returns the pool or an error if the connection fails.
 func NewPgxPool(ctx context.Context, connString string) (*pgxpool.Pool, error) {
 	pool, err := pgxpool.New(ctx, connString)
 	if err != nil {
