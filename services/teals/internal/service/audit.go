@@ -5,9 +5,9 @@ import (
 	"errors"
 
 	"github.com/andrlijirka/dp-teals/pkg/logger"
-	svcerrors "github.com/andrlijirka/dp-teals/services/teals-server/internal/service/errors"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/model"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/ports"
+	svcerrors "github.com/andrlijirka/dp-teals/services/teals/internal/service/errors"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/service/model"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/service/ports"
 	"github.com/google/uuid"
 )
 

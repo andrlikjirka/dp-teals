@@ -8,11 +8,11 @@ import (
 	"syscall"
 
 	"github.com/andrlijirka/dp-teals/pkg/logger"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/bootstrap"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/infrastructure/canonizer"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/infrastructure/repository"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service"
-	v1 "github.com/andrlijirka/dp-teals/services/teals-server/internal/transport/grpc/v1"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/bootstrap"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/infrastructure/canonizer"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/infrastructure/repository"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/service"
+	v1 "github.com/andrlijirka/dp-teals/services/teals/internal/transport/grpc/v1"
 	"golang.org/x/sync/errgroup"
 )
 

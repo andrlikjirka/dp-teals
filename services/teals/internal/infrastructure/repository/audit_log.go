@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/infrastructure/repository/sql/query"
-	svcerrors "github.com/andrlijirka/dp-teals/services/teals-server/internal/service/errors"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/infrastructure/repository/sql/query"
+	svcerrors "github.com/andrlijirka/dp-teals/services/teals/internal/service/errors"
 	"github.com/google/uuid"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"

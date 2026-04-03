@@ -3,8 +3,8 @@ package model
 import (
 	"time"
 
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/errors"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/model/enum"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/service/errors"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/service/model/enum"
 	"github.com/google/uuid"
 )
 

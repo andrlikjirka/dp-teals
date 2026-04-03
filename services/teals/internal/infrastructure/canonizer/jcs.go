@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/model"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/ports"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/service/model"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/service/ports"
 	"github.com/gowebpki/jcs"
 )
 

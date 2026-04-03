@@ -1,7 +1,7 @@
 package ports
 
 import (
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/model"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/service/model"
 )
 
 // Serializer serializes data into a canonical form.

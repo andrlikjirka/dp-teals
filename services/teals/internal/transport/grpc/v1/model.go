@@ -5,8 +5,8 @@ import (
 	"time"
 
 	ingestionv1 "github.com/andrlijirka/dp-teals/gen/audit/v1"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/model"
-	"github.com/andrlijirka/dp-teals/services/teals-server/internal/service/model/enum"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/service/model"
+	"github.com/andrlijirka/dp-teals/services/teals/internal/service/model/enum"
 	"github.com/google/uuid"
 )
 
@@ -21,7 +21,10 @@ func MapToAuditEvent(req *ingestionv1.AppendRequest) (*model.AuditEvent, error) 
 		return nil, fmt.Errorf("event payload cannot be nil")
 	}
 
-	id, _ := uuid.Parse(ev.GetId())
+	id, err := uuid.Parse(ev.GetId())
+	if err != nil {
+		return nil, fmt.Errorf("invalid event id %q: %w", ev.GetId(), err)
+	}
 
 	var timestamp time.Time
 	if ts := ev.GetTimestamp(); ts != nil {
@@ -94,23 +97,23 @@ func toActor(actor *ingestionv1.Actor) (model.Actor, error) {
 	}, nil
 }
 
-func toAction(action ingestionv1.ActionType) (enum.ActionType, error) {
+func toAction(action ingestionv1.Action) (enum.ActionType, error) {
 	switch action {
-	case ingestionv1.ActionType_ACTION_ACCESS:
+	case ingestionv1.Action_ACTION_ACCESS:
 		return enum.ActionTypeAccess, nil
-	case ingestionv1.ActionType_ACTION_CREATE:
+	case ingestionv1.Action_ACTION_CREATE:
 		return enum.ActionTypeCreate, nil
-	case ingestionv1.ActionType_ACTION_UPDATE:
+	case ingestionv1.Action_ACTION_UPDATE:
 		return enum.ActionTypeUpdate, nil
-	case ingestionv1.ActionType_ACTION_DELETE:
+	case ingestionv1.Action_ACTION_DELETE:
 		return enum.ActionTypeDelete, nil
-	case ingestionv1.ActionType_ACTION_SHARE:
+	case ingestionv1.Action_ACTION_SHARE:
 		return enum.ActionTypeShare, nil
-	case ingestionv1.ActionType_ACTION_EXPORT:
+	case ingestionv1.Action_ACTION_EXPORT:
 		return enum.ActionTypeExport, nil
-	case ingestionv1.ActionType_ACTION_LOGIN:
+	case ingestionv1.Action_ACTION_LOGIN:
 		return enum.ActionTypeLogin, nil
-	case ingestionv1.ActionType_ACTION_LOGOUT:
+	case ingestionv1.Action_ACTION_LOGOUT:
 		return enum.ActionTypeLogout, nil
 	default:
 		return "", fmt.Errorf("unsupported action type: %v", action)
