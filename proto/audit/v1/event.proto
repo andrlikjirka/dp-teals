@@ -15,7 +15,7 @@ message AuditEvent {
   Environment environment = 3 ;
   Actor actor = 4 [(buf.validate.field).required = true];
   Subject subject = 5 [(buf.validate.field).required = true];
-  ActionType action = 7 [(buf.validate.field).enum = {defined_only: true, not_in: [0]}];
+  Action action = 7 [(buf.validate.field).enum = {defined_only: true, not_in: [0]}];
   Resource resource = 6 [(buf.validate.field).required = true];
   Result result = 8 [(buf.validate.field).required = true];
   google.protobuf.Struct metadata = 9;
@@ -52,7 +52,7 @@ message Resource {
   repeated string fields = 4;
 }
 
-enum ActionType {
+enum Action {
   ACTION_UNSPECIFIED = 0;
   ACTION_ACCESS = 1;
   ACTION_CREATE = 2;

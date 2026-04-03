@@ -8,6 +8,22 @@ generate_proto::
 update_proto_deps::
 	buf dep update
 
+# ==== Generator ====
+ADDR  ?= localhost:50051
+COUNT ?= 10
+DELAY ?= 0
+.PHONY: run-generator
+# Generates and sends audit events to the teals-server via gRPC.
+# Usage: make run-generator
+#        make run-generator COUNT=50
+#        make run-generator COUNT=100 ADDR=localhost:9090 DELAY=200
+run-generator:
+	@echo "Running generator: $(COUNT) events → $(ADDR)..."
+	go run ./services/generator/cmd \
+		--count=$(COUNT) \
+		--addr=$(ADDR) \
+		--delay=$(DELAY)
+
 # ==== TEALS Database Migrations ====
 
 include .env
