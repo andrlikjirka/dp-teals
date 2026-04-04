@@ -4,7 +4,7 @@
 // 	protoc        (unknown)
 // source: audit/v1/ingestion.proto
 
-package ingestionv1
+package auditv1
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
@@ -122,8 +122,8 @@ const file_audit_v1_ingestion_proto_rawDesc = "" +
 	"\x0eAppendResponse\x12\x19\n" +
 	"\bevent_id\x18\x01 \x01(\tR\aeventId2Q\n" +
 	"\x10IngestionService\x12=\n" +
-	"\x06Append\x12\x17.audit.v1.AppendRequest\x1a\x18.audit.v1.AppendResponse\"\x00B\x9c\x01\n" +
-	"\fcom.audit.v1B\x0eIngestionProtoP\x01Z;github.com/andrlikjirka/dp-teals/proto/audit/v1;ingestionv1\xa2\x02\x03AXX\xaa\x02\bAudit.V1\xca\x02\bAudit\\V1\xe2\x02\x14Audit\\V1\\GPBMetadata\xea\x02\tAudit::V1b\x06proto3"
+	"\x06Append\x12\x17.audit.v1.AppendRequest\x1a\x18.audit.v1.AppendResponse\"\x00B\x98\x01\n" +
+	"\fcom.audit.v1B\x0eIngestionProtoP\x01Z7github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1\xa2\x02\x03AXX\xaa\x02\bAudit.V1\xca\x02\bAudit\\V1\xe2\x02\x14Audit\\V1\\GPBMetadata\xea\x02\tAudit::V1b\x06proto3"
 
 var (
 	file_audit_v1_ingestion_proto_rawDescOnce sync.Once

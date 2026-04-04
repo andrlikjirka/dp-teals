@@ -5,7 +5,7 @@ package audit.v1;
 import "buf/validate/validate.proto";
 import "audit/v1/event.proto";
 
-option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;ingestionv1";
+option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1";
 
 // The audit ingestion service definition.
 service IngestionService {

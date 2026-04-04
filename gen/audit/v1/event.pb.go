@@ -4,7 +4,7 @@
 // 	protoc        (unknown)
 // source: audit/v1/event.proto
 
-package ingestionv1
+package auditv1
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
@@ -623,9 +623,9 @@ const file_audit_v1_event_proto_rawDesc = "" +
 	"\fACTION_SHARE\x10\x05\x12\x11\n" +
 	"\rACTION_EXPORT\x10\x06\x12\x10\n" +
 	"\fACTION_LOGIN\x10\a\x12\x11\n" +
-	"\rACTION_LOGOUT\x10\bB\x98\x01\n" +
+	"\rACTION_LOGOUT\x10\bB\x94\x01\n" +
 	"\fcom.audit.v1B\n" +
-	"EventProtoP\x01Z;github.com/andrlikjirka/dp-teals/proto/audit/v1;ingestionv1\xa2\x02\x03AXX\xaa\x02\bAudit.V1\xca\x02\bAudit\\V1\xe2\x02\x14Audit\\V1\\GPBMetadata\xea\x02\tAudit::V1b\x06proto3"
+	"EventProtoP\x01Z7github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1\xa2\x02\x03AXX\xaa\x02\bAudit.V1\xca\x02\bAudit\\V1\xe2\x02\x14Audit\\V1\\GPBMetadata\xea\x02\tAudit::V1b\x06proto3"
 
 var (
 	file_audit_v1_event_proto_rawDescOnce sync.Once

@@ -4,7 +4,7 @@
 // - protoc             (unknown)
 // source: audit/v1/ingestion.proto
 
-package ingestionv1
+package auditv1
 
 import (
 	context "context"

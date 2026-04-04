@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package audit.v1;
+
+option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1";
+
+// The key registration service definition.
+service KeyRegistrationService {
+  rpc RegisterKey(RegisterKeyRequest) returns (RegisterKeyResponse);
+}
+
+// The request message containing the producer ID and the PEM-encoded Ed25519 public key to be registered.
+message RegisterKeyRequest {
+  string producer_id  = 1;
+  bytes public_key = 2;
+}
+
+// The response message containing the registered key ID.
+message RegisterKeyResponse {
+  string key_id = 1;
+}
