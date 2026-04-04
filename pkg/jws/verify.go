@@ -1,13 +1,12 @@
 package jws
 
 import (
-	"bytes"
 	"context"
 	"crypto/ed25519"
 	"fmt"
 
-	"github.com/lestrrat-go/jwx/v2/jwa"
-	"github.com/lestrrat-go/jwx/v2/jws"
+	"github.com/lestrrat-go/jwx/v3/jwa"
+	"github.com/lestrrat-go/jwx/v3/jws"
 )
 
 type KeyProvider interface {
@@ -36,8 +35,8 @@ func (v *Ed25519Verifier) Verify(ctx context.Context, token string, payload []by
 		return fmt.Errorf("jws: parse token error: %w", err)
 	}
 
-	kid := msg.Signatures()[0].ProtectedHeaders().KeyID()
-	if kid == "" {
+	kid, ok := msg.Signatures()[0].ProtectedHeaders().KeyID()
+	if !ok {
 		return fmt.Errorf("jws: missing kid header")
 	}
 
@@ -46,12 +45,10 @@ func (v *Ed25519Verifier) Verify(ctx context.Context, token string, payload []by
 		return fmt.Errorf("jws: get public key error: %w", err)
 	}
 
-	result, err := jws.Verify([]byte(token), jws.WithKey(jwa.EdDSA, pub), jws.WithDetachedPayload(payload))
+	_, err = jws.Verify([]byte(token), jws.WithKey(jwa.EdDSA(), pub), jws.WithDetachedPayload(payload))
 	if err != nil {
 		return fmt.Errorf("jws: verify signature error: %w", err)
 	}
-	if !bytes.Equal(result, payload) {
-		return fmt.Errorf("jws: verify signature error: payload mismatch")
-	}
+
 	return nil
 }

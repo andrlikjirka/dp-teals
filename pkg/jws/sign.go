@@ -4,8 +4,8 @@ import (
 	"crypto/ed25519"
 	"fmt"
 
-	"github.com/lestrrat-go/jwx/v2/jwa"
-	"github.com/lestrrat-go/jwx/v2/jws"
+	"github.com/lestrrat-go/jwx/v3/jwa"
+	"github.com/lestrrat-go/jwx/v3/jws"
 )
 
 // Signer is an interface for signing payloads and producing JWS tokens.
@@ -30,14 +30,16 @@ func NewEd25519Signer(key ed25519.PrivateKey, kid string) (*Ed25519Signer, error
 // Sign creates a JWS token by signing the given payload with the Ed25519 private key. It returns the compact serialization of the JWS token.
 func (s *Ed25519Signer) Sign(payload []byte) (string, error) {
 	headers := jws.NewHeaders()
-	err := headers.Set(jws.KeyIDKey, s.kid)
-	if err != nil {
-		return "", fmt.Errorf("jws: set header error: %w", err)
+	if err := headers.Set(jws.KeyIDKey, s.kid); err != nil {
+		return "", fmt.Errorf("jws: set kid header error: %w", err)
+	}
+	if err := headers.Set("b64", false); err != nil {
+		return "", fmt.Errorf("jws: set b64 header error: %w", err)
 	}
 
 	token, err := jws.Sign(
 		nil,
-		jws.WithKey(jwa.EdDSA, s.key, jws.WithProtectedHeaders(headers)),
+		jws.WithKey(jwa.EdDSA(), s.key, jws.WithProtectedHeaders(headers)),
 		jws.WithCompact(),
 		jws.WithDetachedPayload(payload))
 	if err != nil {
