@@ -24,8 +24,8 @@ type Ed25519Verifier struct {
 }
 
 // NewEd25519Verifier creates a new Ed25519Verifier with the given public key.
-func NewEd25519Verifier(p KeyProvider) (*Ed25519Verifier, error) {
-	return &Ed25519Verifier{provider: p}, nil
+func NewEd25519Verifier(p KeyProvider) *Ed25519Verifier {
+	return &Ed25519Verifier{provider: p}
 }
 
 // Verify checks the JWS token's signature against the provided payload using the Ed25519 public key. It returns an error if the signature is invalid or if the payload does not match the one in the token.
