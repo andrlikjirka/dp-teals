@@ -36,11 +36,14 @@ func (s *KeyRegistrationServiceServer) RegisterKey(ctx context.Context, req *aud
 	if err != nil {
 		switch {
 		case errors.Is(err, svcerrors.ErrInvalidPublicKey):
-			return nil, status.Error(codes.InvalidArgument, "invalid producer public key")
+			return nil, status.Error(codes.InvalidArgument, "invalid producer public_key")
 		case errors.Is(err, svcerrors.ErrDuplicateProducerKey):
-			return nil, status.Error(codes.AlreadyExists, "producer public key already registered")
+			return nil, status.Error(codes.AlreadyExists, "producer public_key already registered")
+		case errors.Is(err, svcerrors.ErrProducerNotFound):
+			return nil, status.Errorf(codes.NotFound, "producer %s not found", producerId)
+
 		default:
-			return nil, status.Error(codes.Internal, "failed to register producer public key")
+			return nil, status.Error(codes.Internal, "failed to register producer public_key")
 		}
 	}
 
