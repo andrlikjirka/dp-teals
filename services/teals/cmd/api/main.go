@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	pkgjws "github.com/andrlikjirka/dp-teals/pkg/jws"
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/bootstrap"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/canonizer"
@@ -45,12 +46,20 @@ func run() error {
 	}
 	defer pool.Close()
 
+	// Infrastructure
 	serializer := canonizer.NewJcsSerializer()
 	txProvider := repository.NewTransactionProvider(pool)
-	ingestionService := service.NewAuditService(txProvider, serializer, log)
+	keyRepo := repository.NewProducerKeyRepository(pool)
 
+	// Services
+	ingestionService := service.NewAuditService(txProvider, serializer, log)
+	keyService := service.NewKeyService(keyRepo, log)
+	verifier := pkgjws.NewEd25519Verifier(keyRepo)
+
+	// Transport
 	ingestor := v1.NewIngestionServiceServer(ingestionService)
-	server, err := bootstrap.NewServer(config, log, ingestor)
+	keys := v1.NewKeyRegistrationServiceServer(keyService)
+	server, err := bootstrap.NewServer(config, log, ingestor, keys, verifier)
 	if err != nil {
 		log.Error("Failed to create server", "error", err)
 		return err

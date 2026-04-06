@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	auditv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service"
 	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
 	"google.golang.org/grpc/codes"
@@ -13,7 +13,7 @@ import (
 
 // IngestionServiceServer implements the gRPC server for the IngestionService defined in the protobuf.
 type IngestionServiceServer struct {
-	ingestionv1.UnimplementedIngestionServiceServer
+	auditv1.UnimplementedIngestionServiceServer
 	service *service.AuditService
 }
 
@@ -25,7 +25,7 @@ func NewIngestionServiceServer(s *service.AuditService) *IngestionServiceServer 
 }
 
 // Append handles incoming AppendRequest messages, maps them to the internal audit event model, and calls the service layer to ingest the event. It returns an AppendResponse with the event ID if successful, or an appropriate gRPC error status if the request is invalid or if there was an error during ingestion.
-func (s *IngestionServiceServer) Append(ctx context.Context, req *ingestionv1.AppendRequest) (*ingestionv1.AppendResponse, error) {
+func (s *IngestionServiceServer) Append(ctx context.Context, req *auditv1.AppendRequest) (*auditv1.AppendResponse, error) {
 	e, err := MapToAuditEvent(req)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
@@ -39,5 +39,5 @@ func (s *IngestionServiceServer) Append(ctx context.Context, req *ingestionv1.Ap
 		return nil, status.Errorf(codes.Internal, "failed to append the audit event with ID %s", e.ID)
 	}
 
-	return &ingestionv1.AppendResponse{EventId: o.String()}, nil
+	return &auditv1.AppendResponse{EventId: o.String()}, nil
 }

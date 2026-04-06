@@ -7,8 +7,10 @@ import (
 	"net"
 
 	"buf.build/go/protovalidate"
-	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	auditv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	pkgjws "github.com/andrlikjirka/dp-teals/pkg/jws"
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/transport/grpc/interceptor"
 	protovalidatemiddleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -23,10 +25,11 @@ type Server struct {
 	logger       *slog.Logger
 	healthServer *health.Server
 	config       Config
+	verifier     pkgjws.Verifier
 }
 
 // NewServer creates a new Server instance with the given configuration
-func NewServer(cfg Config, log *logger.Logger, ingestor ingestionv1.IngestionServiceServer) (*Server, error) {
+func NewServer(cfg Config, log *logger.Logger, ingestor auditv1.IngestionServiceServer, keys auditv1.KeyRegistrationServiceServer, verifier pkgjws.Verifier) (*Server, error) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Port))
 	if err != nil {
 		return nil, fmt.Errorf("failed to listen on port %d: %w", cfg.Port, err)
@@ -43,14 +46,20 @@ func NewServer(cfg Config, log *logger.Logger, ingestor ingestionv1.IngestionSer
 		return nil, fmt.Errorf("failed to create protovalidate validator: %w", err)
 	}
 
+	jws := interceptor.NewJwsInterceptor(verifier, log)
 	grpcSrv := grpc.NewServer(
-		grpc.UnaryInterceptor(protovalidatemiddleware.UnaryServerInterceptor(validator)),
+		grpc.ChainUnaryInterceptor(
+			jws.UnaryInterceptor,
+			protovalidatemiddleware.UnaryServerInterceptor(validator),
+		),
 	)
-	ingestionv1.RegisterIngestionServiceServer(grpcSrv, ingestor)
+
+	auditv1.RegisterIngestionServiceServer(grpcSrv, ingestor)
+	auditv1.RegisterKeyRegistrationServiceServer(grpcSrv, keys)
 
 	healthServer := health.NewServer()
 	grpc_health_v1.RegisterHealthServer(grpcSrv, healthServer)
-	// go checkDatabaseHealth -> 1 sec interval -> halth server status update
+	// go checkDatabaseHealth -> 1 sec interval -> health server status update
 
 	if cfg.EnableReflection {
 		reflection.Register(grpcSrv)

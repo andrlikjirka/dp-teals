@@ -16,4 +16,10 @@ var (
 	ErrEventSerializationFailed = errors.New("failed to serialize audit event")
 	ErrDuplicateEventID         = errors.New("duplicate event ID")
 	ErrEventAppendFailed        = errors.New("failed to append audit event")
+
+	ErrDuplicateProducerKey  = errors.New("duplicate producer key")
+	ErrKeyRegistrationFailed = errors.New("failed to register producer key")
+	ErrInvalidProducerID     = errors.New("invalid producer ID")
+	ErrInvalidPublicKey      = errors.New("invalid public key")
+	ErrProducerNotFound      = errors.New("producer not found")
 )

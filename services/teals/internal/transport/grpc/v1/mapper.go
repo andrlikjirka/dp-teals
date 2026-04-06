@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"time"
 
-	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	auditv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model/enum"
 	"github.com/google/uuid"
 )
 
 // MapToAuditEvent converts an AppendRequest to an AuditEvent model.
-func MapToAuditEvent(req *ingestionv1.AppendRequest) (*model.AuditEvent, error) {
+func MapToAuditEvent(req *auditv1.AppendRequest) (*model.AuditEvent, error) {
 	if req == nil {
 		return nil, fmt.Errorf("audit event request cannot be nil")
 	}
@@ -64,7 +64,7 @@ func MapToAuditEvent(req *ingestionv1.AppendRequest) (*model.AuditEvent, error) 
 	})
 }
 
-func toEnvironment(env *ingestionv1.Environment) *model.Environment {
+func toEnvironment(env *auditv1.Environment) *model.Environment {
 	if env == nil {
 		return nil
 	}
@@ -76,16 +76,16 @@ func toEnvironment(env *ingestionv1.Environment) *model.Environment {
 	}
 }
 
-func toActor(actor *ingestionv1.Actor) (model.Actor, error) {
+func toActor(actor *auditv1.Actor) (model.Actor, error) {
 	if actor == nil {
 		return model.Actor{}, nil
 	}
 
 	var actorType enum.ActorType
 	switch actor.GetType() {
-	case ingestionv1.Actor_TYPE_USER:
+	case auditv1.Actor_TYPE_USER:
 		actorType = enum.ActorTypeUser
-	case ingestionv1.Actor_TYPE_SYSTEM:
+	case auditv1.Actor_TYPE_SYSTEM:
 		actorType = enum.ActorTypeSystem
 	default:
 		return model.Actor{}, fmt.Errorf("unsupported actor type: %v", actor.GetType())
@@ -97,30 +97,30 @@ func toActor(actor *ingestionv1.Actor) (model.Actor, error) {
 	}, nil
 }
 
-func toAction(action ingestionv1.Action) (enum.ActionType, error) {
+func toAction(action auditv1.Action) (enum.ActionType, error) {
 	switch action {
-	case ingestionv1.Action_ACTION_ACCESS:
+	case auditv1.Action_ACTION_ACCESS:
 		return enum.ActionTypeAccess, nil
-	case ingestionv1.Action_ACTION_CREATE:
+	case auditv1.Action_ACTION_CREATE:
 		return enum.ActionTypeCreate, nil
-	case ingestionv1.Action_ACTION_UPDATE:
+	case auditv1.Action_ACTION_UPDATE:
 		return enum.ActionTypeUpdate, nil
-	case ingestionv1.Action_ACTION_DELETE:
+	case auditv1.Action_ACTION_DELETE:
 		return enum.ActionTypeDelete, nil
-	case ingestionv1.Action_ACTION_SHARE:
+	case auditv1.Action_ACTION_SHARE:
 		return enum.ActionTypeShare, nil
-	case ingestionv1.Action_ACTION_EXPORT:
+	case auditv1.Action_ACTION_EXPORT:
 		return enum.ActionTypeExport, nil
-	case ingestionv1.Action_ACTION_LOGIN:
+	case auditv1.Action_ACTION_LOGIN:
 		return enum.ActionTypeLogin, nil
-	case ingestionv1.Action_ACTION_LOGOUT:
+	case auditv1.Action_ACTION_LOGOUT:
 		return enum.ActionTypeLogout, nil
 	default:
 		return "", fmt.Errorf("unsupported action type: %v", action)
 	}
 }
 
-func toSubject(subject *ingestionv1.Subject) model.Subject {
+func toSubject(subject *auditv1.Subject) model.Subject {
 	if subject == nil {
 		return model.Subject{}
 	}
@@ -130,7 +130,7 @@ func toSubject(subject *ingestionv1.Subject) model.Subject {
 	}
 }
 
-func toResource(resource *ingestionv1.Resource) model.Resource {
+func toResource(resource *auditv1.Resource) model.Resource {
 	if resource == nil {
 		return model.Resource{}
 	}
@@ -142,16 +142,16 @@ func toResource(resource *ingestionv1.Resource) model.Resource {
 	}
 }
 
-func toResult(result *ingestionv1.Result) (model.Result, error) {
+func toResult(result *auditv1.Result) (model.Result, error) {
 	if result == nil {
 		return model.Result{}, nil
 	}
 
 	var status enum.ResultStatusType
 	switch result.GetStatus() {
-	case ingestionv1.Result_STATUS_SUCCESS:
+	case auditv1.Result_STATUS_SUCCESS:
 		status = enum.ResultStatusSuccess
-	case ingestionv1.Result_STATUS_FAILURE:
+	case auditv1.Result_STATUS_FAILURE:
 		status = enum.ResultStatusFailure
 	default:
 		return model.Result{}, fmt.Errorf("unsupported result status: %v", result.GetStatus())
