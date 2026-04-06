@@ -7,6 +7,7 @@
 package auditv1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -21,7 +22,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// The request message containing the producer ID and the PEM-encoded Ed25519 public key to be registered.
+// The request message containing the producer ID and the raw Ed25519 public key bytes to be registered.
 type RegisterKeyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ProducerId    string                 `protobuf:"bytes,1,opt,name=producer_id,json=producerId,proto3" json:"producer_id,omitempty"`
@@ -123,12 +124,12 @@ var File_audit_v1_keys_proto protoreflect.FileDescriptor
 
 const file_audit_v1_keys_proto_rawDesc = "" +
 	"\n" +
-	"\x13audit/v1/keys.proto\x12\baudit.v1\"T\n" +
-	"\x12RegisterKeyRequest\x12\x1f\n" +
-	"\vproducer_id\x18\x01 \x01(\tR\n" +
-	"producerId\x12\x1d\n" +
+	"\x13audit/v1/keys.proto\x12\baudit.v1\x1a\x1bbuf/validate/validate.proto\"d\n" +
+	"\x12RegisterKeyRequest\x12'\n" +
+	"\vproducer_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\n" +
+	"producerId\x12%\n" +
 	"\n" +
-	"public_key\x18\x02 \x01(\fR\tpublicKey\",\n" +
+	"public_key\x18\x02 \x01(\fB\x06\xbaH\x03\xc8\x01\x01R\tpublicKey\",\n" +
 	"\x13RegisterKeyResponse\x12\x15\n" +
 	"\x06key_id\x18\x01 \x01(\tR\x05keyId2d\n" +
 	"\x16KeyRegistrationService\x12J\n" +
