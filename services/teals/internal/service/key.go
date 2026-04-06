@@ -41,8 +41,13 @@ func (s *KeyService) RegisterProducerKey(ctx context.Context, producerID uuid.UU
 		return "", svcerrors.ErrKeyRegistrationFailed
 	}
 
+	id, err := uuid.NewV7()
+	if err != nil {
+		s.logger.Error("failed to generate UUID for producer key", "error", err)
+		return "", svcerrors.ErrKeyRegistrationFailed
+	}
 	pk := &model.ProducerKey{
-		ID:         uuid.New(),
+		ID:         id,
 		ProducerID: producerID,
 		KeyID:      kid,
 		PublicKey:  pub,
