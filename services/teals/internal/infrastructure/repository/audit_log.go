@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql/query"
 	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
 	"github.com/google/uuid"
@@ -13,10 +14,10 @@ import (
 )
 
 type AuditLogRepository struct {
-	db db
+	db sql.Db
 }
 
-func NewAuditLogRepository(db db) *AuditLogRepository {
+func NewAuditLogRepository(db sql.Db) *AuditLogRepository {
 	return &AuditLogRepository{db: db}
 }
 
