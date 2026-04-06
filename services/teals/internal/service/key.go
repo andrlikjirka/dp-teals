@@ -16,12 +16,12 @@ import (
 
 // KeyService provides functionality for managing producer keys, including registration and retrieval.
 type KeyService struct {
-	registry ports.KeyRegistry
+	registry ports.ProducerKeyRegistry
 	logger   *logger.Logger
 }
 
-// NewKeyService creates a new instance of KeyService with the provided KeyRegistry and Logger.
-func NewKeyService(r ports.KeyRegistry, l *logger.Logger) *KeyService {
+// NewKeyService creates a new instance of KeyService with the provided KeyManager and Logger.
+func NewKeyService(r ports.ProducerKeyRegistry, l *logger.Logger) *KeyService {
 	return &KeyService{
 		registry: r,
 		logger:   l,

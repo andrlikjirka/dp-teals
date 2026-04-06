@@ -32,15 +32,12 @@ func TestEd25519Verifier_Verify(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	verifier, err := NewEd25519Verifier(&staticKeyProvider{keys: map[string]ed25519.PublicKey{kid: pub}})
-	if err != nil {
-		t.Fatal(err)
-	}
+	verifier := NewEd25519Verifier(&staticKeyProvider{keys: map[string]ed25519.PublicKey{kid: pub}})
 
 	payload := []byte("test payload")
 	token, _ := signer.Sign(payload)
 
-	err = verifier.Verify(context.Background(), token, payload)
+	_, err = verifier.Verify(context.Background(), token, payload)
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
@@ -57,16 +54,13 @@ func TestEd25519Verifier_Verify_PayloadMismatch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	verifier, err := NewEd25519Verifier(&staticKeyProvider{keys: map[string]ed25519.PublicKey{kid: pub}})
-	if err != nil {
-		t.Fatal(err)
-	}
+	verifier := NewEd25519Verifier(&staticKeyProvider{keys: map[string]ed25519.PublicKey{kid: pub}})
 
 	payload := []byte("test payload")
 	token, _ := signer.Sign(payload)
 
 	wrongPayload := []byte("wrong payload")
-	err = verifier.Verify(context.Background(), token, wrongPayload)
+	_, err = verifier.Verify(context.Background(), token, wrongPayload)
 	if err == nil {
 		t.Fatal("expected payload mismatch error")
 	}
@@ -84,15 +78,12 @@ func TestEd25519Verifier_Verify_WrongKey(t *testing.T) {
 		t.Fatal(err)
 	}
 	wrongPubKey, _, _ := ed25519.GenerateKey(rand.Reader)
-	verifier, err := NewEd25519Verifier(&staticKeyProvider{keys: map[string]ed25519.PublicKey{kid: wrongPubKey}})
-	if err != nil {
-		t.Fatal(err)
-	}
+	verifier := NewEd25519Verifier(&staticKeyProvider{keys: map[string]ed25519.PublicKey{kid: wrongPubKey}})
 
 	payload := []byte("test payload")
 	token, _ := signer.Sign(payload)
 
-	err = verifier.Verify(context.Background(), token, payload)
+	_, err = verifier.Verify(context.Background(), token, payload)
 	if err == nil {
 		t.Fatal("expected signature verification error with wrong key")
 	}
@@ -109,15 +100,12 @@ func TestEd25519Verifier_Verify_MissingKid(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	verifier, err := NewEd25519Verifier(&staticKeyProvider{keys: map[string]ed25519.PublicKey{}})
-	if err != nil {
-		t.Fatal(err)
-	}
+	verifier := NewEd25519Verifier(&staticKeyProvider{keys: map[string]ed25519.PublicKey{}})
 
 	payload := []byte("test payload")
 	token, _ := signer.Sign(payload)
 
-	err = verifier.Verify(context.Background(), token, payload)
+	_, err = verifier.Verify(context.Background(), token, payload)
 	if err == nil {
 		t.Fatal("expected key-not-found error")
 	}

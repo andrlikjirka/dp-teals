@@ -3,8 +3,8 @@ package ports
 import "context"
 
 type Repositories struct {
-	AuditLog AuditLog
-	// ProducerKey KeyRegistry
+	AuditLog     AuditLog
+	ProducerKeys ProducerKeyRegistry
 	//Ledger   Ledger
 }
 

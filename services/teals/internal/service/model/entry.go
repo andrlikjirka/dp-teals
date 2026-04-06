@@ -7,10 +7,10 @@ import (
 )
 
 type AuditLogEntry struct {
-	ID      *int64
-	EventID uuid.UUID
+	ID             *int64
+	EventID        uuid.UUID
+	SignatureToken string
 	//LeafIndex int64
-	//Signature []byte
 	CreatedAt time.Time
 	Payload   AuditEvent
 }

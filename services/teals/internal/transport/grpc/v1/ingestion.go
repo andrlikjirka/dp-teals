@@ -7,6 +7,7 @@ import (
 	auditv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service"
 	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/transport/grpc/interceptor"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -26,12 +27,17 @@ func NewIngestionServiceServer(s *service.AuditService) *IngestionServiceServer 
 
 // Append handles incoming AppendRequest messages, maps them to the internal audit event model, and calls the service layer to ingest the event. It returns an AppendResponse with the event ID if successful, or an appropriate gRPC error status if the request is invalid or if there was an error during ingestion.
 func (s *IngestionServiceServer) Append(ctx context.Context, req *auditv1.AppendRequest) (*auditv1.AppendResponse, error) {
+	sig, ok := interceptor.SignatureFromContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Internal, "missing JWS signature in context")
+	}
+
 	e, err := MapToAuditEvent(req)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
 	}
 
-	o, err := s.service.IngestAuditEvent(ctx, e)
+	o, err := s.service.IngestAuditEvent(ctx, e, sig.Token, sig.KeyID)
 	if err != nil {
 		if errors.Is(err, svcerrors.ErrDuplicateEventID) {
 			return nil, status.Errorf(codes.AlreadyExists, "audit event with ID %s already exists", e.ID)

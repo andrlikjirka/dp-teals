@@ -9,5 +9,5 @@ import (
 
 // AuditLog defines the interface for storing audit log entries.
 type AuditLog interface {
-	StoreAuditLogEntry(ctx context.Context, eventId uuid.UUID, payload json.RawMessage) error
+	StoreAuditLogEntry(ctx context.Context, eventId uuid.UUID, payload json.RawMessage, sigToken string, producerKeyId uuid.UUID) error
 }

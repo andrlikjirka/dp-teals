@@ -72,7 +72,7 @@ func (i *JwsAuditInterceptor) UnaryInterceptor(ctx context.Context, req any, inf
 	}
 
 	// 3. Verify the JWS signature using the verifier.
-	err = i.verifier.Verify(ctx, token, payload)
+	kid, err := i.verifier.Verify(ctx, token, payload)
 	if err != nil {
 		i.logger.Warn("request rejected: invalid JWS signature",
 			"method", info.FullMethod,
@@ -86,6 +86,8 @@ func (i *JwsAuditInterceptor) UnaryInterceptor(ctx context.Context, req any, inf
 		"method", info.FullMethod,
 		"event_id", protoReq.GetEvent().GetId(),
 	)
+
 	// 4. Delegate to the next handler in the chain.
+	ctx = ContextWithSignature(ctx, token, kid)
 	return handler(ctx, req)
 }

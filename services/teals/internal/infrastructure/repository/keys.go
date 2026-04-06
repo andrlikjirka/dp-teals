@@ -60,6 +60,27 @@ func (r *ProducerKeyRepository) PublicKey(ctx context.Context, kid string) (ed25
 	return record.PublicKey, nil
 }
 
+// GetProducerKeyByKid retrieves the producer key details for a given key ID (kid) from the database. It executes an SQL query to fetch the key record, and handles any errors that may occur during the operation. If no active key is found for the provided kid, it returns an error indicating that the public key was not found.
+func (r *ProducerKeyRepository) GetProducerKeyByKid(ctx context.Context, kid string) (*svcmodel.ProducerKey, error) {
+	var record model.ProducerKeyRecord
+	err := pgxscan.Get(ctx, r.db, &record, query.SelectProducerPublicKey, kid, svcmodel.KeyStatusActive)
+	if err != nil {
+		if pgxscan.NotFound(err) {
+			return nil, fmt.Errorf("producer key not found for kid %q", kid)
+		}
+		return nil, fmt.Errorf("select public key: %w", err)
+	}
+
+	return &svcmodel.ProducerKey{
+		ID:         record.ID,
+		ProducerID: record.ProducerID,
+		KeyID:      record.KeyID,
+		PublicKey:  record.PublicKey,
+		Status:     svcmodel.KeyStatus(record.Status),
+		CreatedAt:  record.CreatedAt,
+	}, nil
+}
+
 // RevokeKey revokes a producer key by updating its status in the database. It executes an SQL query to mark the key as revoked, and handles any errors that may occur during the operation.
 func (r *ProducerKeyRepository) RevokeKey(ctx context.Context, kid string) error {
 	tag, err := r.db.Exec(ctx, query.RevokeProducerPublicKey, kid)

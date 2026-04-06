@@ -11,12 +11,14 @@ import (
 	"github.com/google/uuid"
 )
 
+// AuditService provides methods to ingest audit events, handling the necessary serialization, database transactions, and error management. It interacts with the TransactionProvider to manage database operations and the Serializer to convert audit events into a storable format.
 type AuditService struct {
 	tx         ports.TransactionProvider
 	serializer ports.Serializer
 	logger     *logger.Logger
 }
 
+// NewAuditService creates a new instance of AuditService with the provided TransactionProvider, Serializer, and Logger. This allows the service to manage database transactions, serialize audit events, and log important information and errors during the ingestion process.
 func NewAuditService(tx ports.TransactionProvider, s ports.Serializer, l *logger.Logger) *AuditService {
 	return &AuditService{
 		tx:         tx,
@@ -25,7 +27,8 @@ func NewAuditService(tx ports.TransactionProvider, s ports.Serializer, l *logger
 	}
 }
 
-func (s *AuditService) IngestAuditEvent(ctx context.Context, event *model.AuditEvent) (uuid.UUID, error) {
+// IngestAuditEvent handles the ingestion of an audit event by serializing the event, retrieving the associated producer key, and storing the event in the database within a transaction. It returns the event ID if successful, or an appropriate error if any step of the process fails, including serialization errors, producer key retrieval failures, or database insertion issues such as duplicate event IDs.
+func (s *AuditService) IngestAuditEvent(ctx context.Context, event *model.AuditEvent, sigToken string, kid string) (uuid.UUID, error) {
 	payloadBytes, err := s.serializer.SerializeCanonicalAuditEvent(event)
 	if err != nil {
 		s.logger.Error("failed to serialize audit event payload", "error", err)
@@ -33,7 +36,13 @@ func (s *AuditService) IngestAuditEvent(ctx context.Context, event *model.AuditE
 	}
 
 	err = s.tx.Transact(ctx, func(r ports.Repositories) error {
-		return r.AuditLog.StoreAuditLogEntry(ctx, event.ID, payloadBytes)
+		producerKey, err := r.ProducerKeys.GetProducerKeyByKid(ctx, kid)
+		if err != nil {
+			s.logger.Error("failed to retrieve producer key by kid", "kid", kid, "error", err)
+			return svcerrors.ErrProducerKeyRetrievalFailed
+		}
+
+		return r.AuditLog.StoreAuditLogEntry(ctx, event.ID, payloadBytes, sigToken, producerKey.ID)
 	})
 
 	if err != nil {
