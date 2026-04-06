@@ -29,15 +29,17 @@ func NewProducerKeyRepository(db sql.Db) *ProducerKeyRepository {
 // AddPublicKey adds a new producer key to the database. It executes an SQL query to insert the key details, and handles any errors that may occur during the operation. If a key with the same ID already exists, it returns a specific error indicating a duplicate key.
 func (r *ProducerKeyRepository) AddPublicKey(ctx context.Context, key *svcmodel.ProducerKey) error {
 	_, err := r.db.Exec(ctx, query.AddProducerPublicKey,
-		key.ID, key.ProducerID, key.KeyId, []byte(key.PublicKey), string(key.Status),
+		key.ID, key.ProducerID, key.KeyID, []byte(key.PublicKey), string(key.Status), key.CreatedAt,
 	)
 	if err != nil {
 		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
-			return svcerrors.ErrDuplicateProducerKey
-		}
-		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.ForeignKeyViolation {
-			return svcerrors.ErrProducerNotFound
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case pgerrcode.UniqueViolation:
+				return svcerrors.ErrDuplicateProducerKey
+			case pgerrcode.ForeignKeyViolation:
+				return svcerrors.ErrProducerNotFound
+			}
 		}
 		return fmt.Errorf("store producer key: %w", err)
 	}
@@ -60,9 +62,12 @@ func (r *ProducerKeyRepository) PublicKey(ctx context.Context, kid string) (ed25
 
 // RevokeKey revokes a producer key by updating its status in the database. It executes an SQL query to mark the key as revoked, and handles any errors that may occur during the operation.
 func (r *ProducerKeyRepository) RevokeKey(ctx context.Context, kid string) error {
-	_, err := r.db.Exec(ctx, query.RevokeProducerPublicKey, kid)
+	tag, err := r.db.Exec(ctx, query.RevokeProducerPublicKey, kid)
 	if err != nil {
 		return fmt.Errorf("revoke producer key: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return svcerrors.ErrKeyNotFound
 	}
 	return nil
 }
