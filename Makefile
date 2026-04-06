@@ -1,3 +1,5 @@
+include .env
+
 # ==== Protocol Buffer Generation ====
 
 .PHONY: generate_proto update_proto_deps
@@ -12,23 +14,30 @@ update_proto_deps::
 ADDR  ?= localhost:50051
 COUNT ?= 10
 DELAY ?= 0
+
 .PHONY: run-generator
+
 # Generates and sends audit events to the teals-server via gRPC.
+# Signing is optional — omit KEY and KID to send unsigned events.
 # Usage: make run-generator
 #        make run-generator COUNT=50
 #        make run-generator COUNT=100 ADDR=localhost:9090 DELAY=200
+#        make run-generator KEY=<b64-private-key> KID=<thumbprint>
 run-generator:
 	@echo "Running generator: $(COUNT) events → $(ADDR)..."
 	go run ./services/generator/cmd \
 		--count=$(COUNT) \
 		--addr=$(ADDR) \
-		--delay=$(DELAY)
+		--delay=$(DELAY) \
+		$(if $(KEY),--key=$(KEY)) \
+		$(if $(KID),--kid=$(KID))
+
+run-keygen-tool:
+	@go run ./services/teals/cmd/keygen
 
 # ==== TEALS Database Migrations ====
-
-include .env
 DATABASE_URL ?= "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)"
-TEALS_MIGRATIONS_PATH ?= services/teals-server/internal/infrastructure/repository/sql/migrations
+TEALS_MIGRATIONS_PATH ?= services/teals/internal/infrastructure/repository/sql/migrations
 
 .PHONY: migrate-create-teals migrate-up-teals migrate-down-teals
 
