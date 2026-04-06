@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	auditv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
 	"github.com/andrlikjirka/dp-teals/pkg/jws"
 	"github.com/andrlikjirka/dp-teals/services/generator/internal/model"
 	"google.golang.org/grpc/metadata"
@@ -20,12 +20,12 @@ type sender interface {
 
 // GrpcSender implements the sender interface using gRPC to communicate with the ingestion service.
 type GrpcSender struct {
-	client ingestionv1.IngestionServiceClient
+	client auditv1.IngestionServiceClient
 	signer jws.Signer
 }
 
 // NewGrpcSender creates a new instance of grpcSender with the provided gRPC client.
-func NewGrpcSender(client ingestionv1.IngestionServiceClient, signer jws.Signer) *GrpcSender {
+func NewGrpcSender(client auditv1.IngestionServiceClient, signer jws.Signer) *GrpcSender {
 	return &GrpcSender{client: client, signer: signer}
 }
 
@@ -48,7 +48,7 @@ func (s *GrpcSender) send(ctx context.Context, event *model.AuditEvent) error {
 		ctx = metadata.AppendToOutgoingContext(ctx, signatureMetadataKey, token)
 	}
 
-	_, err = s.client.Append(ctx, &ingestionv1.AppendRequest{Event: protoEvent})
+	_, err = s.client.Append(ctx, &auditv1.AppendRequest{Event: protoEvent})
 	if err != nil {
 		return fmt.Errorf("error while sending event: %w", err)
 	}
