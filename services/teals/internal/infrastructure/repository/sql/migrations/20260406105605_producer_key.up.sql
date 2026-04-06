@@ -1,4 +1,4 @@
-CREATE TYPE producer_key_status AS ENUM ('active', 'revoked');
+CREATE TYPE teals.producer_key_status AS ENUM ('active', 'revoked');
 
 CREATE TABLE IF NOT EXISTS teals.producer_key (
     id          UUID PRIMARY KEY,
