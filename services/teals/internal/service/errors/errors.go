@@ -22,4 +22,5 @@ var (
 	ErrInvalidProducerID     = errors.New("invalid producer ID")
 	ErrInvalidPublicKey      = errors.New("invalid public key")
 	ErrProducerNotFound      = errors.New("producer not found")
+	ErrKeyNotFound           = errors.New("producer key not found")
 )

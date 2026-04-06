@@ -44,10 +44,10 @@ func (s *KeyService) RegisterProducerKey(ctx context.Context, producerID uuid.UU
 	pk := &model.ProducerKey{
 		ID:         uuid.New(),
 		ProducerID: producerID,
-		KeyId:      kid,
+		KeyID:      kid,
 		PublicKey:  pub,
 		Status:     model.KeyStatusActive,
-		CreatedAt:  time.Now(),
+		CreatedAt:  time.Now().UTC(),
 	}
 	err = s.registry.AddPublicKey(ctx, pk)
 	if err != nil {
@@ -59,10 +59,10 @@ func (s *KeyService) RegisterProducerKey(ctx context.Context, producerID uuid.UU
 			s.logger.Warn("key registration rejected: producer not found", "producer_id", producerID)
 			return "", svcerrors.ErrProducerNotFound
 		}
-		s.logger.Error("failed to store public key", "kid", kid, "producer_id", producerID, "error", err)
+		s.logger.Error("failed to store public_key", "kid", kid, "producer_id", producerID, "error", err)
 		return "", svcerrors.ErrKeyRegistrationFailed
 	}
 
-	s.logger.Info("producer key registered", "kid", kid, "producer_id", producerID)
+	s.logger.Info("producer public_key registered", "kid", kid, "producer_id", producerID)
 	return kid, nil
 }
