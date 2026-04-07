@@ -11,6 +11,7 @@ import (
 type AuditLogEntryRecord struct {
 	ID             int64     `db:"id"`
 	EventID        uuid.UUID `db:"event_id"`
+	ProducerKeyID  uuid.UUID `db:"producer_key_id"`
 	SignatureToken string    `db:"signature_token"`
 	//LeafIndex int64           `db:"leaf_index"`
 	CreatedAt time.Time       `db:"created_at"`
