@@ -32,7 +32,6 @@ func (i *SignatureInterceptor) UnaryInterceptor(ctx context.Context, req any, in
 		return handler(ctx, req)
 	}
 
-	// 1. Extract token from incoming metadata.
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		i.logger.Error("failed to extract gRPC metadata from context", "method", info.FullMethod)
@@ -45,7 +44,6 @@ func (i *SignatureInterceptor) UnaryInterceptor(ctx context.Context, req any, in
 	}
 	token := values[0]
 
-	// 4. Delegate to the next handler in the chain.
 	ctx = ContextWithSignature(ctx, token)
 	return handler(ctx, req)
 }
