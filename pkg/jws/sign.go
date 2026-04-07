@@ -8,12 +8,12 @@ import (
 	"github.com/lestrrat-go/jwx/v3/jws"
 )
 
-// JcsSigner is an interface for signing payloads and producing JWS tokens.
-type JcsSigner interface {
+// Signer is an interface for signing payloads and producing JWS tokens.
+type Signer interface {
 	Sign(payload []byte) (string, error)
 }
 
-// Ed25519Signer implements the JcsSigner interface using Ed25519 keys.
+// Ed25519Signer implements the Signer interface using Ed25519 keys.
 type Ed25519Signer struct {
 	key ed25519.PrivateKey
 	kid string
