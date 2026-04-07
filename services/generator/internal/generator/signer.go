@@ -17,11 +17,11 @@ type signer interface {
 
 // EventSigner is an implementation of the signer interface that uses a JWS signer to create signatures for audit events. It encapsulates the logic for converting audit events into a canonical format suitable for signing and delegates the actual signing process to the provided JWS signer.
 type EventSigner struct {
-	jwsSigner jws.JcsSigner
+	jwsSigner jws.Signer
 }
 
 // NewEventSigner creates a new instance of EventSigner with the provided JWS signer. This allows the generator to sign audit events using the specified JWS signing mechanism, ensuring that the events can be verified by the ingestion service upon receipt.
-func NewEventSigner(s jws.JcsSigner) *EventSigner {
+func NewEventSigner(s jws.Signer) *EventSigner {
 	return &EventSigner{jwsSigner: s}
 }
 

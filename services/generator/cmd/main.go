@@ -89,7 +89,7 @@ func waitForReady(conn *grpc.ClientConn, timeout time.Duration) error {
 	}
 }
 
-func buildSigner(privKeyB64, kid string, log *logger.Logger) (jws.JcsSigner, error) {
+func buildSigner(privKeyB64, kid string, log *logger.Logger) (jws.Signer, error) {
 	if privKeyB64 == "" && kid == "" {
 		log.Info("no signing key provided — events will be sent unsigned")
 		return nil, nil
