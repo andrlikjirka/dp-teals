@@ -1,4 +1,4 @@
-package canonicalizer
+package serializer
 
 import (
 	"time"

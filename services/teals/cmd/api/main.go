@@ -10,8 +10,8 @@ import (
 	pkgjws "github.com/andrlikjirka/dp-teals/pkg/jws"
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/bootstrap"
-	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/canonicalizer"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/serializer"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service"
 	v1 "github.com/andrlikjirka/dp-teals/services/teals/internal/transport/grpc/v1"
 	"golang.org/x/sync/errgroup"
@@ -47,7 +47,7 @@ func run() error {
 	defer pool.Close()
 
 	// Infrastructure
-	serializer := canonicalizer.NewJcsSerializer()
+	serializer := serializer.NewJcsSerializer()
 	txProvider := repository.NewTransactionProvider(pool)
 	keyRepo := repository.NewProducerKeyRepository(pool)
 
