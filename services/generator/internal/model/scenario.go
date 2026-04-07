@@ -3,26 +3,24 @@ package model
 import (
 	"fmt"
 	"math/rand"
-
-	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
 )
 
 // Scenario defines a user activity Scenario with specific characteristics for generating audit events.
 type Scenario struct {
 	Name        string
-	Actions     []ingestionv1.Action
-	ActorTypes  []ingestionv1.Actor_Type
+	Actions     []ActionType
+	ActorTypes  []ActorType
 	Resources   []*Resource
-	MetaTmpl    metadataTemplate // nil = no metadata
+	MetaTmpl    metadataTemplate
 	FailureProb float64
-	SelfSubject bool // subject.ID == actor.ID (auth scenarios)
+	SelfSubject bool
 }
 
 var Scenarios = []Scenario{
 	{
 		Name:        "crm_auth",
-		Actions:     []ingestionv1.Action{ingestionv1.Action_ACTION_LOGIN, ingestionv1.Action_ACTION_LOGOUT},
-		ActorTypes:  []ingestionv1.Actor_Type{ingestionv1.Actor_TYPE_USER},
+		Actions:     []ActionType{ActionLogin, ActionLogout},
+		ActorTypes:  []ActorType{ActorTypeUser},
 		Resources:   []*Resource{resCRMSession},
 		MetaTmpl:    tmplAuthAttempt,
 		FailureProb: 0.3,
@@ -30,32 +28,31 @@ var Scenarios = []Scenario{
 	},
 	{
 		Name:        "crm_contact_access",
-		Actions:     []ingestionv1.Action{ingestionv1.Action_ACTION_ACCESS},
-		ActorTypes:  []ingestionv1.Actor_Type{ingestionv1.Actor_TYPE_USER, ingestionv1.Actor_TYPE_SYSTEM},
+		Actions:     []ActionType{ActionAccess},
+		ActorTypes:  []ActorType{ActorTypeUser, ActorTypeSystem},
 		Resources:   []*Resource{resContact, resLead},
 		MetaTmpl:    tmplIPUserAgent,
 		FailureProb: 0.05,
 	},
 	{
 		Name:        "crm_record_mutation",
-		Actions:     []ingestionv1.Action{ingestionv1.Action_ACTION_CREATE, ingestionv1.Action_ACTION_UPDATE, ingestionv1.Action_ACTION_DELETE},
-		ActorTypes:  []ingestionv1.Actor_Type{ingestionv1.Actor_TYPE_USER, ingestionv1.Actor_TYPE_SYSTEM},
+		Actions:     []ActionType{ActionCreate, ActionUpdate, ActionDelete},
+		ActorTypes:  []ActorType{ActorTypeUser, ActorTypeSystem},
 		Resources:   []*Resource{resContact, resAccount, resOpportunity, resLead, resContract},
-		MetaTmpl:    tmplChangedFields, // only applied when action == UPDATE
+		MetaTmpl:    tmplChangedFields,
 		FailureProb: 0.10,
 	},
 	{
 		Name:        "crm_consent_change",
-		Actions:     []ingestionv1.Action{ingestionv1.Action_ACTION_UPDATE},
-		ActorTypes:  []ingestionv1.Actor_Type{ingestionv1.Actor_TYPE_USER},
+		Actions:     []ActionType{ActionUpdate},
+		ActorTypes:  []ActorType{ActorTypeUser},
 		Resources:   []*Resource{resMarketingConsent},
-		MetaTmpl:    nil,
 		FailureProb: 0.05,
 	},
 	{
 		Name:        "crm_data_export",
-		Actions:     []ingestionv1.Action{ingestionv1.Action_ACTION_SHARE, ingestionv1.Action_ACTION_EXPORT},
-		ActorTypes:  []ingestionv1.Actor_Type{ingestionv1.Actor_TYPE_USER},
+		Actions:     []ActionType{ActionShare, ActionExport},
+		ActorTypes:  []ActorType{ActorTypeUser},
 		Resources:   []*Resource{resContact, resContract, resCustomerReport},
 		MetaTmpl:    tmplExportInfo,
 		FailureProb: 0.20,

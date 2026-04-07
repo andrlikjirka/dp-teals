@@ -13,12 +13,12 @@ type KeyProvider interface {
 	PublicKey(ctx context.Context, kid string) (ed25519.PublicKey, error)
 }
 
-// Verifier is an interface for verifying JWS tokens and their associated payloads.
-type Verifier interface {
+// JcsVerifier is an interface for verifying JWS tokens and their associated payloads.
+type JcsVerifier interface {
 	Verify(ctx context.Context, token string, payload []byte) (string, error)
 }
 
-// Ed25519Verifier implements the Verifier interface using Ed25519 public keys.
+// Ed25519Verifier implements the JcsVerifier interface using Ed25519 public keys.
 type Ed25519Verifier struct {
 	provider KeyProvider
 }

@@ -8,7 +8,6 @@ import (
 
 	"buf.build/go/protovalidate"
 	auditv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
-	pkgjws "github.com/andrlikjirka/dp-teals/pkg/jws"
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/transport/grpc/interceptor"
 	protovalidatemiddleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
@@ -25,11 +24,10 @@ type Server struct {
 	logger       *slog.Logger
 	healthServer *health.Server
 	config       Config
-	verifier     pkgjws.Verifier
 }
 
 // NewServer creates a new Server instance with the given configuration
-func NewServer(cfg Config, log *logger.Logger, ingestor auditv1.IngestionServiceServer, keys auditv1.KeyRegistrationServiceServer, verifier pkgjws.Verifier) (*Server, error) {
+func NewServer(cfg Config, log *logger.Logger, ingestor auditv1.IngestionServiceServer, keys auditv1.KeyRegistrationServiceServer) (*Server, error) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Port))
 	if err != nil {
 		return nil, fmt.Errorf("failed to listen on port %d: %w", cfg.Port, err)
@@ -46,7 +44,7 @@ func NewServer(cfg Config, log *logger.Logger, ingestor auditv1.IngestionService
 		return nil, fmt.Errorf("failed to create protovalidate validator: %w", err)
 	}
 
-	jws := interceptor.NewJwsInterceptor(verifier, log)
+	jws := interceptor.NewSignatureInterceptor(log)
 	grpcSrv := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			jws.UnaryInterceptor,

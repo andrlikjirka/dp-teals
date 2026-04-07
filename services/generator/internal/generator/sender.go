@@ -5,46 +5,35 @@ import (
 	"fmt"
 
 	auditv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
-	"github.com/andrlikjirka/dp-teals/pkg/jws"
 	"github.com/andrlikjirka/dp-teals/services/generator/internal/model"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/protobuf/proto"
 )
 
 const signatureMetadataKey = "x-jws-event-signature"
 
 // sender defines the interface for sending audit events to the ingestion service.
 type sender interface {
-	send(ctx context.Context, event *model.AuditEvent) error
+	send(ctx context.Context, event *model.AuditEvent, token string) error
 }
 
 // GrpcSender implements the sender interface using gRPC to communicate with the ingestion service.
 type GrpcSender struct {
 	client auditv1.IngestionServiceClient
-	signer jws.Signer
 }
 
 // NewGrpcSender creates a new instance of grpcSender with the provided gRPC client.
-func NewGrpcSender(client auditv1.IngestionServiceClient, signer jws.Signer) *GrpcSender {
-	return &GrpcSender{client: client, signer: signer}
+func NewGrpcSender(client auditv1.IngestionServiceClient) *GrpcSender {
+	return &GrpcSender{client: client}
 }
 
 // send takes an auditEvent, converts it to the appropriate protobuf message, and sends it to the ingestion service using the gRPC client. It returns an error if the sending process fails.
-func (s *GrpcSender) send(ctx context.Context, event *model.AuditEvent) error {
+func (s *GrpcSender) send(ctx context.Context, event *model.AuditEvent, token string) error {
 	protoEvent, err := toProto(event)
 	if err != nil {
 		return fmt.Errorf("error while mapping to protoEvent: %w", err)
 	}
 
-	if s.signer != nil {
-		payload, err := proto.MarshalOptions{Deterministic: true}.Marshal(protoEvent)
-		if err != nil {
-			return fmt.Errorf("error while marshaling event for signing: %w", err)
-		}
-		token, err := s.signer.Sign(payload)
-		if err != nil {
-			return fmt.Errorf("error while signing event: %w", err)
-		}
+	if token != "" {
 		ctx = metadata.AppendToOutgoingContext(ctx, signatureMetadataKey, token)
 	}
 

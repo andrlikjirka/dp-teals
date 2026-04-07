@@ -11,14 +11,12 @@ const signatureContextKey contextKey = "x-audit-event-signature"
 // SignatureContext holds the JWS signature information extracted from the gRPC metadata.
 type SignatureContext struct {
 	Token string
-	KeyID string
 }
 
-// ContextWithSignature creates a new context with the provided JWS token and key ID for signature verification.
-func ContextWithSignature(ctx context.Context, token string, kid string) context.Context {
+// ContextWithSignature adds the JWS signature information to the context. It takes a context and a JWS token as input and returns a new context with the signature information stored under the signatureContextKey.
+func ContextWithSignature(ctx context.Context, token string) context.Context {
 	ctx = context.WithValue(ctx, signatureContextKey, &SignatureContext{
 		Token: token,
-		KeyID: kid,
 	})
 	return ctx
 }

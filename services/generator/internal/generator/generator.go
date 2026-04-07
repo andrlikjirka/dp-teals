@@ -8,22 +8,22 @@ import (
 	"math/rand"
 	"time"
 
-	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
 	"github.com/andrlikjirka/dp-teals/services/generator/internal/model"
 	"github.com/google/uuid"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // Generator is responsible for creating random audit events based on predefined scenarios.
 type Generator struct {
+	signer signer
 	sender sender
 	log    *logger.Logger
 }
 
 // NewGenerator initializes a new Generator instance with the provided logger.
-func NewGenerator(sender sender, log *logger.Logger) *Generator {
+func NewGenerator(signer signer, sender sender, log *logger.Logger) *Generator {
 	return &Generator{
+		signer: signer,
 		sender: sender,
 		log:    log,
 	}
@@ -37,8 +37,17 @@ func (g *Generator) Run(ctx context.Context, count int, delayMs int) error {
 	for i := range count {
 		genStart := time.Now()
 		event, err := buildAuditEvent()
-		m.genDur += time.Since(genStart)
 
+		token := ""
+		if g.signer != nil {
+			token, err = g.signer.Sign(event)
+			if err != nil {
+				m.failed++
+				g.log.Error("failed to sign event", "index", i, "error", err)
+				continue
+			}
+		}
+		m.genDur += time.Since(genStart)
 		if err != nil {
 			g.log.Error("failed to build event", "index", i, "error", err)
 			m.failed++
@@ -46,7 +55,7 @@ func (g *Generator) Run(ctx context.Context, count int, delayMs int) error {
 		}
 
 		sendStart := time.Now()
-		err = g.sender.send(ctx, event)
+		err = g.sender.send(ctx, event, token)
 		m.sendDur += time.Since(sendStart)
 
 		if err != nil {
@@ -87,7 +96,7 @@ func buildAuditEvent() (*model.AuditEvent, error) {
 	}
 
 	return &model.AuditEvent{
-		ID:          uuid.New().String(),
+		ID:          uuid.New(),
 		Timestamp:   time.Now().UTC(),
 		Environment: e,
 		Actor:       *act,
@@ -95,24 +104,24 @@ func buildAuditEvent() (*model.AuditEvent, error) {
 		Action:      a,
 		Resource:    *r,
 		Result:      *res,
-		Metadata:    metadata.AsMap(),
+		Metadata:    metadata,
 	}, nil
 }
 
 // buildMetadata generates metadata for an event based on the scenario's metadata template function, if defined. It returns nil if no metadata should be generated for this scenario/action combination.
-func buildMetadata(sc model.Scenario, action ingestionv1.Action, res *model.Resource, act *model.Actor) (*structpb.Struct, error) {
-	if sc.Name == "crm_record_mutation" && action != ingestionv1.Action_ACTION_UPDATE {
+func buildMetadata(sc model.Scenario, action model.ActionType, res *model.Resource, act *model.Actor) (map[string]any, error) {
+	if sc.Name == "crm_record_mutation" && action != model.ActionUpdate {
 		return nil, nil // only generate metadata for UPDATE actions in this scenario
 	}
 	if sc.MetaTmpl == nil {
 		return nil, nil
 	}
 	raw := sc.MetaTmpl(res, act)
-	return structpb.NewStruct(raw)
+	return raw, nil
 }
 
 // pickAction randomly selects an action from the scenario's list of possible actions.
-func pickAction(sc model.Scenario) ingestionv1.Action {
+func pickAction(sc model.Scenario) model.ActionType {
 	return sc.Actions[rand.Intn(len(sc.Actions))]
 }
 
@@ -145,12 +154,12 @@ func pickResult(sc model.Scenario) *model.Result {
 	if rand.Float64() < sc.FailureProb {
 		reasons := model.FailureReasons[sc.Name]
 		return &model.Result{
-			Status: ingestionv1.Result_STATUS_FAILURE,
+			Status: model.ResultStatusFailure,
 			Reason: reasons[rand.Intn(len(reasons))],
 		}
 	}
 	return &model.Result{
-		Status: ingestionv1.Result_STATUS_SUCCESS,
+		Status: model.ResultStatusSuccess,
 	}
 }
 

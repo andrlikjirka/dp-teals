@@ -57,8 +57,9 @@ func run() error {
 	}
 
 	client := ingestionv1.NewIngestionServiceClient(conn)
-	sender := generator.NewGrpcSender(client, signer)
-	gen := generator.NewGenerator(sender, log)
+	sender := generator.NewGrpcSender(client)
+	eventSigner := generator.NewEventSigner(signer)
+	gen := generator.NewGenerator(eventSigner, sender, log)
 
 	if err = gen.Run(context.Background(), *count, *delayMs); err != nil {
 		if errors.Is(err, context.Canceled) {
@@ -88,7 +89,7 @@ func waitForReady(conn *grpc.ClientConn, timeout time.Duration) error {
 	}
 }
 
-func buildSigner(privKeyB64, kid string, log *logger.Logger) (jws.Signer, error) {
+func buildSigner(privKeyB64, kid string, log *logger.Logger) (jws.JcsSigner, error) {
 	if privKeyB64 == "" && kid == "" {
 		log.Info("no signing key provided — events will be sent unsigned")
 		return nil, nil

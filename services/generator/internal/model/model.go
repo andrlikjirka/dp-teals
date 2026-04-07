@@ -3,16 +3,16 @@ package model
 import (
 	"time"
 
-	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
+	"github.com/google/uuid"
 )
 
 type AuditEvent struct {
-	ID          string
+	ID          uuid.UUID
 	Timestamp   time.Time
 	Environment *Environment
 	Actor       Actor
 	Subject     Subject
-	Action      ingestionv1.Action // proto enum — no internal equivalent needed
+	Action      ActionType
 	Resource    Resource
 	Result      Result
 	Metadata    map[string]any
@@ -25,7 +25,7 @@ type Environment struct {
 }
 
 type Actor struct {
-	Type ingestionv1.Actor_Type // proto enum — used directly
+	Type ActorType
 	ID   string
 }
 
@@ -40,6 +40,36 @@ type Resource struct {
 }
 
 type Result struct {
-	Status ingestionv1.Result_Status // proto enum — used directly
+	Status ResultStatus
 	Reason string
 }
+
+// ActionType represents the type of action performed on a resource.
+type ActionType string
+
+const (
+	ActionAccess ActionType = "ACCESS"
+	ActionCreate ActionType = "CREATE"
+	ActionUpdate ActionType = "UPDATE"
+	ActionDelete ActionType = "DELETE"
+	ActionShare  ActionType = "SHARE"
+	ActionExport ActionType = "EXPORT"
+	ActionLogin  ActionType = "LOGIN"
+	ActionLogout ActionType = "LOGOUT"
+)
+
+// ActorType represents whether the actor is a human user or an automated system.
+type ActorType string
+
+const (
+	ActorTypeUser   ActorType = "USER"
+	ActorTypeSystem ActorType = "SYSTEM"
+)
+
+// ResultStatus represents the outcome of the action.
+type ResultStatus string
+
+const (
+	ResultStatusSuccess ResultStatus = "SUCCESS"
+	ResultStatusFailure ResultStatus = "FAILURE"
+)

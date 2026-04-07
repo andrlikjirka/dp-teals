@@ -1,33 +1,29 @@
 package model
 
-import (
-	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
-)
-
 // Actors (CRM users + background services)
 var Actors = []Actor{
-	{ingestionv1.Actor_TYPE_USER, "7b46e8c2-4540-4239-be95-20673c333c22"}, // sales rep
-	{ingestionv1.Actor_TYPE_USER, "5d695536-c35c-4e34-a4c5-ea6cbf0ec90c"}, // account manager
-	{ingestionv1.Actor_TYPE_USER, "19945b15-2d93-4e01-a943-959f6bf2bff9"}, // account manager
-	{ingestionv1.Actor_TYPE_USER, "13236a7a-66fc-400b-a01d-98a82e0cecf5"}, // sales manager
-	{ingestionv1.Actor_TYPE_USER, "fb5cafa6-e9ad-4b61-990f-d81e8469a0df"}, // admin
-	{ingestionv1.Actor_TYPE_USER, "56f29607-98f9-4754-b8f0-b247e21609cb"}, // support agent
-	{ingestionv1.Actor_TYPE_SYSTEM, "crm-automation-service"},
-	{ingestionv1.Actor_TYPE_SYSTEM, "crm-integration-service"},
+	{ActorTypeUser, "7b46e8c2-4540-4239-be95-20673c333c22"},
+	{ActorTypeUser, "5d695536-c35c-4e34-a4c5-ea6cbf0ec90c"},
+	{ActorTypeUser, "19945b15-2d93-4e01-a943-959f6bf2bff9"},
+	{ActorTypeUser, "13236a7a-66fc-400b-a01d-98a82e0cecf5"},
+	{ActorTypeUser, "fb5cafa6-e9ad-4b61-990f-d81e8469a0df"},
+	{ActorTypeUser, "56f29607-98f9-4754-b8f0-b247e21609cb"},
+	{ActorTypeSystem, "crm-automation-service"},
+	{ActorTypeSystem, "crm-integration-service"},
 }
 
 // ActorsByType pre-group actors by type for more efficient lookup when picking actors for a Scenario
-var actorsByType map[ingestionv1.Actor_Type][]Actor
+var actorsByType map[ActorType][]Actor
 
 func init() {
-	actorsByType = make(map[ingestionv1.Actor_Type][]Actor)
+	actorsByType = make(map[ActorType][]Actor)
 	for _, a := range Actors {
 		actorsByType[a.Type] = append(actorsByType[a.Type], a)
 	}
 }
 
-// ActorsOfType returns all actors of the given proto type.
-func ActorsOfType(t ingestionv1.Actor_Type) []Actor {
+// ActorsOfType returns all actors of the given type.
+func ActorsOfType(t ActorType) []Actor {
 	return actorsByType[t]
 }
 

@@ -17,6 +17,8 @@ var (
 	ErrDuplicateEventID         = errors.New("duplicate event ID")
 	ErrEventAppendFailed        = errors.New("failed to append audit event")
 
+	ErrInvalidSignature = errors.New("invalid event signature")
+
 	ErrDuplicateProducerKey       = errors.New("duplicate producer key")
 	ErrKeyRegistrationFailed      = errors.New("failed to register producer key")
 	ErrInvalidPublicKey           = errors.New("invalid public key")

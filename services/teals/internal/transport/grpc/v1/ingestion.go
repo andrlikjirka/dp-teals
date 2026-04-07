@@ -37,10 +37,13 @@ func (s *IngestionServiceServer) Append(ctx context.Context, req *auditv1.Append
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
 	}
 
-	o, err := s.service.IngestAuditEvent(ctx, e, sig.Token, sig.KeyID)
+	o, err := s.service.IngestAuditEvent(ctx, e, sig.Token)
 	if err != nil {
 		if errors.Is(err, svcerrors.ErrDuplicateEventID) {
 			return nil, status.Errorf(codes.AlreadyExists, "audit event with ID %s already exists", e.ID)
+		}
+		if errors.Is(err, svcerrors.ErrInvalidSignature) {
+			return nil, status.Errorf(codes.Unauthenticated, "invalid signature for audit event with ID %s", e.ID)
 		}
 		return nil, status.Errorf(codes.Internal, "failed to append the audit event with ID %s", e.ID)
 	}

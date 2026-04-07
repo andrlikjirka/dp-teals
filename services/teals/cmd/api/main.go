@@ -52,14 +52,14 @@ func run() error {
 	keyRepo := repository.NewProducerKeyRepository(pool)
 
 	// Services
-	ingestionService := service.NewAuditService(txProvider, serializer, log)
-	keyService := service.NewKeyService(keyRepo, log)
 	verifier := pkgjws.NewEd25519Verifier(keyRepo)
+	ingestionService := service.NewAuditService(txProvider, serializer, verifier, log)
+	keyService := service.NewKeyService(keyRepo, log)
 
 	// Transport
 	ingestor := v1.NewIngestionServiceServer(ingestionService)
 	keys := v1.NewKeyRegistrationServiceServer(keyService)
-	server, err := bootstrap.NewServer(config, log, ingestor, keys, verifier)
+	server, err := bootstrap.NewServer(config, log, ingestor, keys)
 	if err != nil {
 		log.Error("Failed to create server", "error", err)
 		return err
