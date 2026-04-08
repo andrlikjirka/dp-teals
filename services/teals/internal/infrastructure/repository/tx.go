@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/andrlikjirka/dp-teals/pkg/hash"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/ports"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -27,6 +28,7 @@ func (tp *TransactionProvider) Transact(ctx context.Context, txFunc func(ports.R
 		r := ports.Repositories{
 			AuditLog:     NewAuditLogRepository(tx),
 			ProducerKeys: NewProducerKeyRepository(tx),
+			Ledger:       NewLedgerRepository(tx, hash.SHA3HashFunc),
 		}
 
 		return txFunc(r)

@@ -24,8 +24,8 @@ func NewAuditLogRepository(db sql.Db) *AuditLogRepository {
 }
 
 // StoreAuditLogEntry stores a new audit log entry in the database. It executes an SQL query to insert the event details, and handles any errors that may occur during the operation. If an entry with the same event ID already exists, it returns a specific error indicating a duplicate event ID.
-func (r *AuditLogRepository) StoreAuditLogEntry(ctx context.Context, eventId uuid.UUID, payload json.RawMessage, sigToken string, producerKeyId uuid.UUID) error {
-	_, err := r.db.Exec(ctx, query.InsertAuditEvent, eventId, payload, sigToken, producerKeyId)
+func (r *AuditLogRepository) StoreAuditLogEntry(ctx context.Context, eventId uuid.UUID, payload json.RawMessage, sigToken string, producerKeyId uuid.UUID, nodeID int64) error {
+	_, err := r.db.Exec(ctx, query.InsertAuditEvent, eventId, payload, sigToken, producerKeyId, nodeID)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {

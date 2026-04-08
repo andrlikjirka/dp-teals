@@ -5,7 +5,7 @@ import "context"
 type Repositories struct {
 	AuditLog     AuditLog
 	ProducerKeys ProducerKeyRegistry
-	//Ledger   Ledger
+	Ledger       Ledger
 }
 
 type TransactionProvider interface {

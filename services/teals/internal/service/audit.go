@@ -53,7 +53,13 @@ func (s *AuditService) IngestAuditEvent(ctx context.Context, event *model.AuditE
 			return svcerrors.ErrProducerKeyRetrievalFailed
 		}
 
-		return r.AuditLog.StoreAuditLogEntry(ctx, event.ID, payloadBytes, sigToken, producerKey.ID)
+		nodeID, err := r.Ledger.AppendLeaf(ctx, payloadBytes)
+		if err != nil {
+			s.logger.Error("failed to append audit event to ledger", "error", err)
+			return svcerrors.ErrLedgerAppendFailed
+		}
+
+		return r.AuditLog.StoreAuditLogEntry(ctx, event.ID, payloadBytes, sigToken, producerKey.ID, nodeID)
 	})
 
 	if err != nil {

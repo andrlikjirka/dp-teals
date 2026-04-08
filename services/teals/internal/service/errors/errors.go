@@ -22,7 +22,12 @@ var (
 	ErrDuplicateProducerKey       = errors.New("duplicate producer key")
 	ErrKeyRegistrationFailed      = errors.New("failed to register producer key")
 	ErrInvalidPublicKey           = errors.New("invalid public key")
+	ErrProducerKeyNotFound        = errors.New("producer key not found")
 	ErrProducerNotFound           = errors.New("producer not found")
 	ErrKeyNotFound                = errors.New("producer key not found")
 	ErrProducerKeyRetrievalFailed = errors.New("failed to retrieve producer key by kid")
+
+	ErrLedgerAppendFailed = errors.New("failed to append audit event to ledger")
+	ErrEmptyLeafData      = errors.New("empty leaf data not allowed")
+	ErrInsertNodeFailed   = errors.New("failed to insert node into ledger")
 )

@@ -47,13 +47,13 @@ func run() error {
 	defer pool.Close()
 
 	// Infrastructure
-	serializer := serializer.NewJcsSerializer()
+	jcsSerializer := serializer.NewJcsSerializer()
 	txProvider := repository.NewTransactionProvider(pool)
 	keyRepo := repository.NewProducerKeyRepository(pool)
 
 	// Services
 	verifier := pkgjws.NewEd25519Verifier(keyRepo)
-	ingestionService := service.NewAuditService(txProvider, serializer, verifier, log)
+	ingestionService := service.NewAuditService(txProvider, jcsSerializer, verifier, log)
 	keyService := service.NewKeyService(keyRepo, log)
 
 	// Transport
