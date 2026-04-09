@@ -30,4 +30,8 @@ var (
 	ErrLedgerAppendFailed = errors.New("failed to append audit event to ledger")
 	ErrEmptyLeafData      = errors.New("empty leaf data not allowed")
 	ErrInsertNodeFailed   = errors.New("failed to insert node into ledger")
+
+	ErrAuditLogEntryNotFound = errors.New("audit log entry not found")
+	ErrInclusionProofFailed  = errors.New("failed to generate inclusion proof")
+	ErrRootHashFailed        = errors.New("failed to get ledger root hash")
 )

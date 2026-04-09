@@ -10,11 +10,16 @@ import (
 func main() {
 	// 1. Initialization
 	data := [][]byte{
-		[]byte("tx1"),
-		[]byte("tx2"),
-		[]byte("tx3"),
-		[]byte("tx4"),
-		[]byte("tx5"),
+		[]byte("event1"),
+		[]byte("event2"),
+		[]byte("event3"),
+		[]byte("event4"),
+		[]byte("event5"),
+		[]byte("event6"),
+		[]byte("event7"),
+		[]byte("event8"),
+		[]byte("event9"),
+		[]byte("event10"),
 	}
 
 	m := mmr.NewMMR(nil)
@@ -33,22 +38,25 @@ func main() {
 
 	// 2. Test Inclusion Proof (Existing Data)
 	oldRoot := m.RootHash()
-	oldSize := len(m.Leaves)
-	demoInclusionProof(m, oldRoot, []byte("tx1"))
+	//oldSize := len(m.Leaves)
+	demoInclusionProof(m, oldRoot, []byte("event4"))
 
-	// 3. Test Append
-	err := m.Append([]byte("tx6"))
-	err = m.Append([]byte("tx7"))
-	err = m.Append([]byte("tx8"))
-	err = m.Append([]byte("tx9"))
-	if err != nil {
-		panic(err)
-	}
-	newRoot := m.RootHash()
-	newSize := len(m.Leaves)
+	/*
+		// 3. Test Append
+			err := m.Append([]byte("tx6"))
+			err = m.Append([]byte("tx7"))
+			err = m.Append([]byte("tx8"))
+			err = m.Append([]byte("tx9"))
+			if err != nil {
+				panic(err)
+			}
+			newRoot := m.RootHash()
+			newSize := len(m.Leaves)
 
-	// 4. Test Consistency Proof (Old Tree vs New Tree)
-	demoConsistencyProof(m, oldSize, newSize, oldRoot, newRoot)
+			// 4. Test Consistency Proof (Old Tree vs New Tree)
+			demoConsistencyProof(m, oldSize, newSize, oldRoot, newRoot)
+	*/
+
 }
 
 func demoInclusionProof(m *mmr.MMR, root []byte, targetData []byte) {

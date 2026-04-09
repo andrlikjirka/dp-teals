@@ -4,10 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/model"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql/query"
 	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
+	svcmodel "github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
+	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/google/uuid"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -37,4 +41,26 @@ func (r *AuditLogRepository) StoreAuditLogEntry(ctx context.Context, eventId uui
 	}
 
 	return nil
+}
+
+// GetAuditLogEntryByEventID retrieves the audit log entry and its MMR leaf index for a given event ID.
+func (r *AuditLogRepository) GetAuditLogEntryByEventID(ctx context.Context, eventID uuid.UUID) (*svcmodel.AuditLogEntry, error) {
+	var record model.AuditLogEntryRecord
+	err := pgxscan.Get(ctx, r.db, &record, query.GetAuditLogEntryByEventID, eventID)
+	if err != nil {
+		if pgxscan.NotFound(err) {
+			return nil, svcerrors.ErrAuditLogEntryNotFound
+		}
+		return nil, fmt.Errorf("get audit log entry by event id: %w", err)
+	}
+
+	return &svcmodel.AuditLogEntry{
+		ID:             &record.ID,
+		EventID:        record.EventID,
+		ProducerKeyID:  record.ProducerKeyID,
+		SignatureToken: record.SignatureToken,
+		LeafIndex:      record.LeafIndex,
+		CreatedAt:      record.CreatedAt,
+		// TODO: Payload deserialization
+	}, nil
 }

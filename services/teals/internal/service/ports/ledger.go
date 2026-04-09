@@ -2,6 +2,8 @@ package ports
 
 import (
 	"context"
+
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
 )
 
 // Ledger defines the interface for appending leaves to the MMR ledger.
@@ -17,7 +19,7 @@ type LedgerProver interface {
 	// RootHash returns the current root hash of the MMR ledger.
 	RootHash(ctx context.Context) (rootHash []byte, err error)
 	// GenerateInclusionProof generates an inclusion proof for the leaf at the specified index in the MMR ledger.
-	GenerateInclusionProof(ctx context.Context, leafIndex int64) (proof any, err error) // TODO proof
+	GenerateInclusionProof(ctx context.Context, leafIndex int64) (proof *model.InclusionProofData, err error)
 	// GenerateConsistencyProof generates a consistency proof between two specified indices in the MMR ledger, demonstrating that the ledger has evolved correctly from the earlier state to the later state.
-	GenerateConsistencyProof(ctx context.Context, fromIndex int64, toIndex int64) (proof any, err error) // TODO proof
+	//GenerateConsistencyProof(ctx context.Context, fromIndex int64, toIndex int64) (proof *mmr.ConsistencyProof, err error)
 }

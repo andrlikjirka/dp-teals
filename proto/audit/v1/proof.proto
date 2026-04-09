@@ -1,0 +1,37 @@
+syntax = "proto3";
+package audit.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1";
+
+service ProofService {
+  rpc GetInclusionProof (GetInclusionProofRequest) returns (GetInclusionProofResponse) {}
+  // rpc GetConsistencyProof (GetConsistencyProofRequest) returns (GetConsistencyProofResponse) {}
+  rpc GetRootHash (GetRootHashRequest)returns (GetRootHashResponse) {}
+}
+
+message InclusionProof {
+  repeated bytes siblings   = 4;
+  repeated bool  left       = 5;
+}
+
+message GetInclusionProofRequest {
+  string event_id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message GetInclusionProofResponse {
+  string         event_id     = 1;   
+  int64          leaf_index   = 2;
+  int64          ledger_size  = 3;
+  bytes          leaf_hash    = 4;
+  bytes          root_hash    = 5;
+  InclusionProof proof        = 6;
+}
+
+message GetRootHashRequest {}
+
+message GetRootHashResponse {
+  bytes root_hash = 1;
+  int64 size      = 2;
+}

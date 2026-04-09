@@ -6,9 +6,11 @@ import (
 
 	"github.com/andrlikjirka/dp-teals/pkg/hash"
 	"github.com/andrlikjirka/dp-teals/pkg/merkle"
+	"github.com/andrlikjirka/dp-teals/pkg/mmr"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/model"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql/query"
+	svcmodel "github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
 	"github.com/georgysavva/scany/v2/pgxscan"
 )
 
@@ -20,6 +22,10 @@ type LedgerRepository struct {
 
 // NewLedgerRepository creates a new instance of LedgerRepository with the provided database connection and hash function. The hash function is used to compute the hashes for the MMR nodes, and the database connection is used to persist the MMR structure.
 func NewLedgerRepository(db sql.Db, hashFunc hash.Func) *LedgerRepository {
+	if hashFunc == nil {
+		hashFunc = hash.DefaultHashFunc
+	}
+
 	return &LedgerRepository{
 		db:       db,
 		hashFunc: hashFunc,
@@ -48,7 +54,7 @@ func (r *LedgerRepository) AppendLeaf(ctx context.Context, payload []byte) (node
 	// 2. Get the current size of the MMR to determine the new leaf index
 	size, err := r.Size(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("get mmr size: %w", err)
+		return 0, fmt.Errorf("determine next leaf index: %w", err)
 	}
 
 	// 3. Insert the new leaf node into the ledger and get its ID
@@ -72,7 +78,7 @@ func (r *LedgerRepository) AppendLeaf(ctx context.Context, payload []byte) (node
 			return 0, fmt.Errorf("get peak at level %d: %w", currentLevel, err)
 		}
 		if peak == nil {
-			break // no merge possible — same as height mismatch in in-memory
+			break // no merge possible
 		}
 
 		mergedHash := merkle.HashInternalNodes(peak.Hash, currentHash, r.hashFunc)
@@ -147,4 +153,114 @@ func (r *LedgerRepository) setParent(ctx context.Context, parentID, leftChildID,
 		return fmt.Errorf("set parent: expected 2 rows affected, got %d", tag.RowsAffected())
 	}
 	return nil
+}
+
+// GenerateInclusionProof generates an inclusion proof for the leaf at the specified index in the MMR ledger. It first retrieves the path from the leaf to its peak, collecting sibling node IDs and their positions (left/right). Then it fetches the sibling hashes in a single query. Finally, it performs peak bagging by combining the peaks to the right and left of the leaf's peak to construct the full inclusion proof. If any error occurs during these steps, it wraps and returns the error.
+func (r *LedgerRepository) GenerateInclusionProof(ctx context.Context, leafIndex int64) (proof *svcmodel.InclusionProofData, err error) {
+	// phase 1: traverse from leaf up to its peak
+	var path []model.MmrNode
+	err = pgxscan.Select(ctx, r.db, &path, query.GetLeafToPeakPath, leafIndex)
+	if err != nil {
+		return nil, fmt.Errorf("get leaf path: %w", err)
+	}
+	if len(path) == 0 {
+		return nil, fmt.Errorf("leaf at index %d not found", leafIndex)
+	}
+
+	var siblingIDs []int64
+	var siblingLeft []bool
+
+	// collect sibling IDs and their positions (left/right)
+	for i := 0; i < len(path)-1; i++ {
+		current, parent := path[i], path[i+1]
+		if *parent.LeftChildID == current.ID {
+			siblingIDs = append(siblingIDs, *parent.RightChildID)
+			siblingLeft = append(siblingLeft, false) // sibling is on the right
+		} else {
+			siblingIDs = append(siblingIDs, *parent.LeftChildID)
+			siblingLeft = append(siblingLeft, true) // sibling is on the left
+		}
+	}
+
+	// fetch sibling hashes in one query
+	siblingHashes, err := r.getNodeHashes(ctx, siblingIDs)
+	if err != nil {
+		return nil, fmt.Errorf("get sibling hashes: %w", err)
+	}
+	var siblings [][]byte
+	for _, id := range siblingIDs {
+		siblings = append(siblings, siblingHashes[id])
+	}
+
+	// phase 2: peak bagging
+	peak := path[len(path)-1]
+	var allPeaks []model.MmrNode
+	if err := pgxscan.Select(ctx, r.db, &allPeaks, query.GetMmrPeaks); err != nil {
+		return nil, fmt.Errorf("get peaks: %w", err)
+	}
+	peakIdx := -1
+	for i, p := range allPeaks {
+		if p.ID == peak.ID {
+			peakIdx = i
+			break
+		}
+	}
+	if peakIdx == -1 {
+		return nil, fmt.Errorf("peak not found (internal state error)")
+	}
+	if peakIdx < len(allPeaks)-1 {
+		rightBag := r.bagPeaksRightToLeft(allPeaks[peakIdx+1:])
+		siblings = append(siblings, rightBag)
+		siblingLeft = append(siblingLeft, false)
+	}
+	for i := peakIdx - 1; i >= 0; i-- {
+		siblings = append(siblings, allPeaks[i].Hash)
+		siblingLeft = append(siblingLeft, true)
+	}
+
+	rootHash := r.bagPeaksRightToLeft(allPeaks)
+	treeSize, err := r.Size(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get tree size: %w", err)
+	}
+
+	return &svcmodel.InclusionProofData{
+		LeafIndex:  leafIndex,
+		LedgerSize: treeSize,
+		LeafHash:   path[0].Hash,
+		RootHash:   rootHash,
+		Proof:      &mmr.InclusionProof{Siblings: siblings, Left: siblingLeft},
+	}, nil
+}
+
+// getNodeHashes retrieves the hashes for a list of node IDs and returns a map of node ID to hash. It executes a query to fetch the nodes by their IDs, and constructs a map from the results. If there are no IDs provided, it returns an empty map. If an error occurs during the query execution, it wraps and returns the error.
+func (r *LedgerRepository) getNodeHashes(ctx context.Context, ids []int64) (map[int64][]byte, error) {
+	if len(ids) == 0 {
+		return map[int64][]byte{}, nil
+	}
+
+	var nodes []model.MmrNode
+	if err := pgxscan.Select(ctx, r.db, &nodes, query.GetNodesByIDs, ids); err != nil {
+		return nil, fmt.Errorf("get nodes by ids: %w", err)
+	}
+	result := make(map[int64][]byte, len(nodes))
+	for _, n := range nodes {
+		result[n.ID] = n.Hash
+	}
+	return result, nil
+}
+
+// bagPeaksRightToLeft is a helper method that takes a slice of peaks and combines them into a single hash by hashing from right to left. It starts with the rightmost peak's hash and iteratively combines it with the next peak to the left until all peaks are combined into a single root hash. If there are no peaks, it returns nil. If there is only one peak, it returns that peak's hash directly.
+func (r *LedgerRepository) bagPeaksRightToLeft(peaks []model.MmrNode) []byte {
+	if len(peaks) == 0 {
+		return nil
+	}
+	if len(peaks) == 1 {
+		return peaks[0].Hash
+	}
+	root := peaks[len(peaks)-1].Hash
+	for i := len(peaks) - 2; i >= 0; i-- {
+		root = merkle.HashInternalNodes(peaks[i].Hash, root, r.hashFunc)
+	}
+	return root
 }

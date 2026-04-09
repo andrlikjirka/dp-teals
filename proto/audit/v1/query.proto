@@ -1,0 +1,23 @@
+syntax = "proto3";
+package audit.v1;
+
+import "google/protobuf/timestamp.proto";
+import "buf/validate/validate.proto";
+import "audit/v1/event.proto";
+import "audit/v1/proof.proto";
+
+option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1";
+
+service AuditQueryService {
+  rpc GetAuditEvent (GetAuditEventRequest) returns (GetAuditEventResponse) {}
+  // rpc ListAuditEvents (ListAuditEventsRequest) returns (ListAuditEventsResponse) {}
+}
+
+message GetAuditEventRequest {
+  string event_id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message GetAuditEventResponse {
+  AuditEvent     event           = 1;
+  InclusionProof inclusion_proof = 2;
+}

@@ -23,6 +23,12 @@ var (
 	GetRightmostPeakAtLevel string
 	//go:embed scripts/ledger/SetMmrNodeParent.sql
 	SetMmrNodeParent string
-	//go:embed scripts/ledger/GerMmrPeaks.sql
+	//go:embed scripts/ledger/GetMmrPeaks.sql
 	GetMmrPeaks string
+	//go:embed scripts/audit_log/GetAuditLogEntryByEventID.sql
+	GetAuditLogEntryByEventID string
+	//go:embed scripts/ledger/GetLeafToPeakPath.sql
+	GetLeafToPeakPath string
+	//go:embed scripts/ledger/GetNodesByIDs.sql
+	GetNodesByIDs string
 )
