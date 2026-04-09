@@ -141,25 +141,3 @@ func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byt
 
 	return bytes.Equal(h, rootHash)
 }
-
-// VerifyInclusionProofByHash verifies the inclusion proof for a given leaf hash against the MMR root hash using the provided hash function. This is useful when the caller already has the leaf hash and wants to skip the hashing step.
-func VerifyInclusionProofByHash(leafHash []byte, proof *InclusionProof, rootHash []byte, hashFunc hash.Func) bool {
-	if proof == nil || len(leafHash) == 0 || len(rootHash) == 0 {
-		return false
-	}
-	if len(proof.Siblings) != len(proof.Left) {
-		return false
-	}
-	if hashFunc == nil {
-		hashFunc = hash.DefaultHashFunc
-	}
-	h := leafHash // already hashed — skip the domain-separated HashLeafData step
-	for i, siblingHash := range proof.Siblings {
-		if proof.Left[i] {
-			h = hashFunc(append([]byte{0x01}, append(siblingHash, h...)...))
-		} else {
-			h = hashFunc(append([]byte{0x01}, append(h, siblingHash...)...))
-		}
-	}
-	return bytes.Equal(h, rootHash)
-}
