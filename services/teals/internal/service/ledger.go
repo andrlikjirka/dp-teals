@@ -13,55 +13,71 @@ import (
 
 // LedgerService provides methods to interact with the MMR ledger, such as generating inclusion proofs and retrieving the root hash.
 type LedgerService struct {
-	auditLog     ports.AuditLog
-	ledgerProver ports.LedgerProver
-	logger       *logger.Logger
+	tx     ports.TransactionProvider
+	logger *logger.Logger
 }
 
-// NewLedgerService creates a new instance of LedgerService with the provided AuditLog, LedgerProver, and Logger. This allows the service to generate inclusion proofs for audit log entries and retrieve the current root hash of the MMR ledger, while logging important information and errors during these operations.
-func NewLedgerService(auditLog ports.AuditLog, ledgerProver ports.LedgerProver, l *logger.Logger) *LedgerService {
+// NewLedgerService creates a new instance of LedgerService with the provided TransactionProvider and Logger. This allows the service to manage database transactions and log important information and errors during ledger operations.
+func NewLedgerService(tx ports.TransactionProvider, l *logger.Logger) *LedgerService {
 	return &LedgerService{
-		auditLog:     auditLog,
-		ledgerProver: ledgerProver,
-		logger:       l,
+		tx:     tx,
+		logger: l,
 	}
 }
 
 // GetInclusionProof retrieves the audit log entry for the given event ID and generates an inclusion proof for that entry in the MMR ledger. It returns the inclusion proof if successful, or an appropriate error if the audit log entry is not found or if there was an error generating the inclusion proof.
 func (s *LedgerService) GetInclusionProof(ctx context.Context, eventID uuid.UUID) (*model.InclusionProofResult, error) {
-	entry, err := s.auditLog.GetAuditLogEntryByEventID(ctx, eventID)
+	var result *model.InclusionProofResult
+
+	err := s.tx.Transact(ctx, func(r ports.Repositories) error {
+		entry, err := r.AuditLog.GetAuditLogEntryByEventID(ctx, eventID)
+		if err != nil {
+			s.logger.Error("failed to get audit log entry", "event_id", eventID, "error", err)
+			return svcerrors.ErrAuditLogEntryNotFound
+		}
+		proof, err := r.LedgerProver.GenerateInclusionProof(ctx, entry.LeafIndex)
+		if err != nil {
+			s.logger.Error("failed to generate inclusion proof", "leaf_index", entry.LeafIndex, "error", err)
+			return svcerrors.ErrInclusionProofFailed
+		}
+
+		result = &model.InclusionProofResult{
+			EventID:       entry.EventID,
+			LeafIndex:     entry.LeafIndex,
+			LeafEventHash: proof.LeafHash,
+			RootHash:      proof.RootHash,
+			LedgerSize:    proof.LedgerSize,
+			Proof:         proof.Proof,
+		}
+		return nil
+	})
+
 	if err != nil {
-		s.logger.Error("failed to get audit log entry", "event_id", eventID, "error", err)
-		return nil, svcerrors.ErrAuditLogEntryNotFound
-	}
-	proof, err := s.ledgerProver.GenerateInclusionProof(ctx, entry.LeafIndex)
-	if err != nil {
-		s.logger.Error("failed to generate inclusion proof", "leaf_index", entry.LeafIndex, "error", err)
-		return nil, svcerrors.ErrInclusionProofFailed
+		return nil, err
 	}
 
-	s.logger.Info("inclusion proof generated successfully", "event_id", eventID, "leaf_index", entry.LeafIndex)
-
-	return &model.InclusionProofResult{
-		EventID:       entry.EventID,
-		LeafIndex:     entry.LeafIndex,
-		LeafEventHash: proof.LeafHash,
-		RootHash:      proof.RootHash,
-		LedgerSize:    proof.LedgerSize,
-		Proof:         proof.Proof,
-	}, nil
+	s.logger.Info("inclusion proof generated successfully", "event_id", eventID)
+	return result, nil
 }
 
 // GetRootHash retrieves the current root hash of the MMR ledger. It returns the root hash if successful, or an appropriate error if there was an error retrieving the root hash.
 func (s *LedgerService) GetRootHash(ctx context.Context) ([]byte, error) {
-	root, err := s.ledgerProver.RootHash(ctx)
+	var root []byte
+	err := s.tx.Transact(ctx, func(r ports.Repositories) error {
+		var err error
+		root, err = r.LedgerProver.RootHash(ctx)
+		if err != nil {
+			s.logger.Error("failed to get root hash", "error", err)
+			return svcerrors.ErrRootHashFailed
+		}
+		return nil
+	})
+
 	if err != nil {
-		s.logger.Error("failed to get root hash", "error", err)
-		return nil, svcerrors.ErrRootHashFailed
+		return nil, err
 	}
 
 	s.logger.Info("root hash calculated successfully")
-
 	return root, nil
 }
 
@@ -71,20 +87,30 @@ func (s *LedgerService) GetConsistencyProof(ctx context.Context, fromSize int64,
 		return nil, svcerrors.ErrInvalidConsistencyProofRange
 	}
 
-	proof, err := s.ledgerProver.GenerateConsistencyProof(ctx, fromSize, toSize)
-	if err != nil {
-		if errors.Is(err, svcerrors.ErrInvalidConsistencyProofRange) {
-			s.logger.Warn("invalid consistency proof range", "from_size", fromSize, "to_size", toSize)
-			return nil, svcerrors.ErrInvalidConsistencyProofRange
+	var result *model.ConsistencyProofResult
+
+	err := s.tx.Transact(ctx, func(r ports.Repositories) error {
+		proof, err := r.LedgerProver.GenerateConsistencyProof(ctx, fromSize, toSize)
+		if err != nil {
+			if errors.Is(err, svcerrors.ErrInvalidConsistencyProofRange) {
+				s.logger.Warn("invalid consistency proof range", "from_size", fromSize, "to_size", toSize)
+				return svcerrors.ErrInvalidConsistencyProofRange
+			}
+
+			s.logger.Error("failed to generate consistency proof", "from_size", fromSize, "to_size", toSize, "error", err)
+			return svcerrors.ErrConsistencyProofFailed
 		}
 
-		s.logger.Error("failed to generate consistency proof", "from_size", fromSize, "to_size", toSize, "error", err)
-		return nil, svcerrors.ErrConsistencyProofFailed
+		result = &model.ConsistencyProofResult{
+			Proof: proof,
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
 	s.logger.Info("consistency proof generated successfully", "from_size", fromSize, "to_size", toSize)
-
-	return &model.ConsistencyProofResult{
-		Proof: proof,
-	}, nil
+	return result, nil
 }

@@ -6,6 +6,7 @@ type Repositories struct {
 	AuditLog     AuditLog
 	ProducerKeys ProducerKeyRegistry
 	Ledger       Ledger
+	LedgerProver LedgerProver
 }
 
 type TransactionProvider interface {

@@ -7,7 +7,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/andrlikjirka/dp-teals/pkg/hash"
 	pkgjws "github.com/andrlikjirka/dp-teals/pkg/jws"
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/bootstrap"
@@ -51,14 +50,12 @@ func run() error {
 	jcsSerializer := serializer.NewJcsSerializer()
 	txProvider := repository.NewTransactionProvider(pool)
 	keyRepo := repository.NewProducerKeyRepository(pool)
-	auditLogRepo := repository.NewAuditLogRepository(pool)
-	ledgerRepo := repository.NewLedgerRepository(pool, hash.SHA3HashFunc)
 
 	// Services
 	verifier := pkgjws.NewEd25519Verifier(keyRepo)
 	ingestionService := service.NewAuditService(txProvider, jcsSerializer, verifier, log)
 	keyService := service.NewKeyService(keyRepo, log)
-	ledgerService := service.NewLedgerService(auditLogRepo, ledgerRepo, log)
+	ledgerService := service.NewLedgerService(txProvider, log)
 
 	// Transport
 	ingestor := v1.NewIngestionServiceServer(ingestionService)
