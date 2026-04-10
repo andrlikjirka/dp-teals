@@ -41,15 +41,8 @@ func (r *LedgerRepository) RootHash(ctx context.Context) (rootHash []byte, err e
 	if err != nil {
 		return nil, fmt.Errorf("get current peaks: %w", err)
 	}
-	if len(peaks) == 0 {
-		return nil, nil // empty MMR has no root
-	}
 
-	root := peaks[len(peaks)-1].Hash // start with the rightmost peak
-	for i := len(peaks) - 2; i >= 0; i-- {
-		root = merkle.HashInternalNodes(peaks[i].Hash, root, r.hashFunc) // combine peaks from right to left
-	}
-	return root, nil
+	return r.bagPeaksRightToLeft(peaks), nil
 }
 
 // Size retrieves the current number of leaves in the MMR ledger. It executes a query to count the number of leaf nodes in the database and returns that count. If there is an error during the query execution, it wraps and returns the error.
