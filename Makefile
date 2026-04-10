@@ -41,22 +41,47 @@ run-keygen-tool:
 	@go run ./tools/keygen
 
 .PHONY: run-verify
-# Verifies the inclusion proof for a given audit event against the ledger.
-# Usage: make run-verify EVENT_ID=<uuid> PAYLOAD=<base64>
+# Verifies an inclusion or consistency proof against the ledger.
+#
+# Inclusion mode (default):
+#   make run-verify EVENT_ID=<uuid> PAYLOAD_FILE=path/to/event.json
+#
+# Consistency mode:
+#   make run-verify MODE=consistency FROM_SIZE=<n> TO_SIZE=<m> OLD_ROOT=<base64> NEW_ROOT=<base64>
+MODE ?= inclusion
 EVENT_ID ?=
 PAYLOAD_FILE ?=
+FROM_SIZE ?=
+TO_SIZE ?=
+OLD_ROOT ?=
+NEW_ROOT ?=
 
 run-verify:
-	@if [ -z "$(EVENT_ID)" ] || [ -z "$(PAYLOAD_FILE)" ]; then \
-		echo "Error: EVENT_ID and PAYLOAD_FILE are required."; \
-		echo "Usage: make run-verify EVENT_ID=<uuid> PAYLOAD_FILE=path/to/event.json"; \
-		exit 1; \
+	@if [ "$(MODE)" = "consistency" ]; then \
+		if [ -z "$(FROM_SIZE)" ] || [ -z "$(TO_SIZE)" ] || [ -z "$(OLD_ROOT)" ] || [ -z "$(NEW_ROOT)" ]; then \
+			echo "Error: FROM_SIZE, TO_SIZE, OLD_ROOT and NEW_ROOT are required for consistency mode."; \
+			echo "Usage: make run-verify MODE=consistency FROM_SIZE=<n> TO_SIZE=<m> OLD_ROOT=<base64> NEW_ROOT=<base64>"; \
+			exit 1; \
+		fi; \
+		go run ./tools/verifier \
+			--mode=consistency \
+			--from-size=$(FROM_SIZE) \
+			--to-size=$(TO_SIZE) \
+			--old-root=$(OLD_ROOT) \
+			--new-root=$(NEW_ROOT) \
+			--addr=$(ADDR); \
+	else \
+		if [ -z "$(EVENT_ID)" ] || [ -z "$(PAYLOAD_FILE)" ]; then \
+			echo "Error: EVENT_ID and PAYLOAD_FILE are required for inclusion mode."; \
+			echo "Usage: make run-verify EVENT_ID=<uuid> PAYLOAD_FILE=path/to/event.json"; \
+			exit 1; \
+		fi; \
+		go run ./tools/verifier \
+			--mode=inclusion \
+			--event-id=$(EVENT_ID) \
+			--payload-file=$(PAYLOAD_FILE) \
+			--addr=$(ADDR); \
 	fi
-	go run ./tools/verifier \
-		--event-id=$(EVENT_ID) \
-		--payload-file=$(PAYLOAD_FILE) \
-		--addr=$(ADDR)
-
 
 
 # ==== TEALS Database Migrations ====
