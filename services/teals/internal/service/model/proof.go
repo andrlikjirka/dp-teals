@@ -23,4 +23,5 @@ type InclusionProofResult struct {
 }
 
 type ConsistencyProofResult struct {
+	Proof *mmr.ConsistencyProof
 }

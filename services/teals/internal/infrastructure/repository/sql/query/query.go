@@ -31,4 +31,8 @@ var (
 	GetLeafToPeakPath string
 	//go:embed scripts/ledger/GetNodesByIDs.sql
 	GetNodesByIDs string
+	//go:embed scripts/ledger/GetAncestorAtLevel.sql
+	GetAncestorAtLevel string
+	//go:embed scripts/ledger/GetPathToClosestNewPeak.sql
+	GetPathToClosestNewPeak string
 )

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
 	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
@@ -58,5 +59,32 @@ func (s *LedgerService) GetRootHash(ctx context.Context) ([]byte, error) {
 		s.logger.Error("failed to get root hash", "error", err)
 		return nil, svcerrors.ErrRootHashFailed
 	}
+
+	s.logger.Info("root hash calculated successfully")
+
 	return root, nil
+}
+
+// GetConsistencyProof generates a consistency proof between two ledger sizes. It returns the consistency proof if successful, or an appropriate error if there was an error generating the consistency proof.
+func (s *LedgerService) GetConsistencyProof(ctx context.Context, fromSize int64, toSize int64) (*model.ConsistencyProofResult, error) {
+	if fromSize < 0 || fromSize > toSize {
+		return nil, svcerrors.ErrInvalidConsistencyProofRange
+	}
+
+	proof, err := s.ledgerProver.GenerateConsistencyProof(ctx, fromSize, toSize)
+	if err != nil {
+		if errors.Is(err, svcerrors.ErrInvalidConsistencyProofRange) {
+			s.logger.Warn("invalid consistency proof range", "from_size", fromSize, "to_size", toSize)
+			return nil, svcerrors.ErrInvalidConsistencyProofRange
+		}
+
+		s.logger.Error("failed to generate consistency proof", "from_size", fromSize, "to_size", toSize, "error", err)
+		return nil, svcerrors.ErrConsistencyProofFailed
+	}
+
+	s.logger.Info("consistency proof generated successfully", "from_size", fromSize, "to_size", toSize)
+
+	return &model.ConsistencyProofResult{
+		Proof: proof,
+	}, nil
 }

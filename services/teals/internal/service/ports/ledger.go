@@ -3,6 +3,7 @@ package ports
 import (
 	"context"
 
+	"github.com/andrlikjirka/dp-teals/pkg/mmr"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
 )
 
@@ -20,6 +21,6 @@ type LedgerProver interface {
 	RootHash(ctx context.Context) (rootHash []byte, err error)
 	// GenerateInclusionProof generates an inclusion proof for the leaf at the specified index in the MMR ledger.
 	GenerateInclusionProof(ctx context.Context, leafIndex int64) (proof *model.InclusionProofData, err error)
-	// GenerateConsistencyProof generates a consistency proof between two specified indices in the MMR ledger, demonstrating that the ledger has evolved correctly from the earlier state to the later state.
-	//GenerateConsistencyProof(ctx context.Context, fromIndex int64, toIndex int64) (proof *mmr.ConsistencyProof, err error)
+	// GenerateConsistencyProof generates a consistency proof between two sizes of the MMR ledger, fromSize and toSize, where fromSize is less than or equal to toSize. This proof can be used to verify that the ledger has been extended correctly without any tampering.
+	GenerateConsistencyProof(ctx context.Context, fromSize int64, toSize int64) (proof *mmr.ConsistencyProof, err error)
 }

@@ -7,7 +7,7 @@ option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1";
 
 service ProofService {
   rpc GetInclusionProof (GetInclusionProofRequest) returns (GetInclusionProofResponse) {}
-  // rpc GetConsistencyProof (GetConsistencyProofRequest) returns (GetConsistencyProofResponse) {}
+  rpc GetConsistencyProof (GetConsistencyProofRequest) returns (GetConsistencyProofResponse) {}
   rpc GetRootHash (GetRootHashRequest)returns (GetRootHashResponse) {}
 }
 
@@ -33,5 +33,26 @@ message GetRootHashRequest {}
 
 message GetRootHashResponse {
   bytes root_hash = 1;
-  int64 size      = 2;
+}
+
+message GetConsistencyProofRequest {
+  int64 from_size = 1 [(buf.validate.field).int64.gte = 0];
+  int64 to_size   = 2 [(buf.validate.field).int64.gte = 0];
+}
+
+message GetConsistencyProofResponse {
+  ConsistencyProof proof = 1;
+}
+
+message ConsistencyPath {
+  repeated bytes siblings = 1;
+  repeated bool left = 2;
+}
+
+message ConsistencyProof {
+  int64 old_size = 1;
+  int64 new_size = 2;
+  repeated bytes old_peaks_hashes = 3;
+  repeated ConsistencyPath consistency_paths = 4;
+  repeated bytes right_peaks = 5;
 }

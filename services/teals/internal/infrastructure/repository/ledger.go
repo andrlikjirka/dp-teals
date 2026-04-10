@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"math/bits"
 
 	"github.com/andrlikjirka/dp-teals/pkg/hash"
 	"github.com/andrlikjirka/dp-teals/pkg/merkle"
@@ -10,6 +11,7 @@ import (
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/model"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql/query"
+	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
 	svcmodel "github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
 	"github.com/georgysavva/scany/v2/pgxscan"
 )
@@ -32,6 +34,24 @@ func NewLedgerRepository(db sql.Db, hashFunc hash.Func) *LedgerRepository {
 	}
 }
 
+// RootHash computes the current root hash of the MMR ledger by retrieving all the current peaks from the database and combining their hashes from right to left. If there are no peaks (i.e., the MMR is empty), it returns nil. If there is an error during the retrieval of peaks, it wraps and returns the error.
+func (r *LedgerRepository) RootHash(ctx context.Context) (rootHash []byte, err error) {
+	var peaks []model.MmrNode
+	err = pgxscan.Select(ctx, r.db, &peaks, query.GetMmrPeaks)
+	if err != nil {
+		return nil, fmt.Errorf("get current peaks: %w", err)
+	}
+	if len(peaks) == 0 {
+		return nil, nil // empty MMR has no root
+	}
+
+	root := peaks[len(peaks)-1].Hash // start with the rightmost peak
+	for i := len(peaks) - 2; i >= 0; i-- {
+		root = merkle.HashInternalNodes(peaks[i].Hash, root, r.hashFunc) // combine peaks from right to left
+	}
+	return root, nil
+}
+
 // Size retrieves the current number of leaves in the MMR ledger. It executes a query to count the number of leaf nodes in the database and returns that count. If there is an error during the query execution, it wraps and returns the error.
 func (r *LedgerRepository) Size(ctx context.Context) (size int64, err error) {
 	var count int64
@@ -41,6 +61,8 @@ func (r *LedgerRepository) Size(ctx context.Context) (size int64, err error) {
 	}
 	return count, nil
 }
+
+// --- APPEND LEAF ---
 
 // AppendLeaf adds a new leaf node to the MMR ledger with the given payload.
 func (r *LedgerRepository) AppendLeaf(ctx context.Context, payload []byte) (nodeID int64, err error) {
@@ -105,24 +127,6 @@ func (r *LedgerRepository) AppendLeaf(ctx context.Context, payload []byte) (node
 	return leafNodeID, nil
 }
 
-// RootHash computes the current root hash of the MMR ledger by retrieving all the current peaks from the database and combining their hashes from right to left. If there are no peaks (i.e., the MMR is empty), it returns nil. If there is an error during the retrieval of peaks, it wraps and returns the error.
-func (r *LedgerRepository) RootHash(ctx context.Context) (rootHash []byte, err error) {
-	var peaks []model.MmrNode
-	err = pgxscan.Select(ctx, r.db, &peaks, query.GetMmrPeaks)
-	if err != nil {
-		return nil, fmt.Errorf("get current peaks: %w", err)
-	}
-	if len(peaks) == 0 {
-		return nil, nil // empty MMR has no root
-	}
-
-	root := peaks[len(peaks)-1].Hash // start with the rightmost peak
-	for i := len(peaks) - 2; i >= 0; i-- {
-		root = merkle.HashInternalNodes(peaks[i].Hash, root, r.hashFunc) // combine peaks from right to left
-	}
-	return root, nil
-}
-
 // insertNode inserts a new MMR node into the database and updates the node's ID field with the generated ID from the database. It takes a context and a pointer to an MmrNode struct, executes the insert query, and returns any error that occurs during the operation.
 func (r *LedgerRepository) insertNode(ctx context.Context, node *model.MmrNode) error {
 	return pgxscan.Get(ctx, r.db, &node.ID, query.InsertMmrNode,
@@ -154,6 +158,8 @@ func (r *LedgerRepository) setParent(ctx context.Context, parentID, leftChildID,
 	}
 	return nil
 }
+
+// --- INCLUSION PROOF ---
 
 // GenerateInclusionProof generates an inclusion proof for the leaf at the specified index in the MMR ledger. It first retrieves the path from the leaf to its peak, collecting sibling node IDs and their positions (left/right). Then it fetches the sibling hashes in a single query. Finally, it performs peak bagging by combining the peaks to the right and left of the leaf's peak to construct the full inclusion proof. If any error occurs during these steps, it wraps and returns the error.
 func (r *LedgerRepository) GenerateInclusionProof(ctx context.Context, leafIndex int64) (proof *svcmodel.InclusionProofData, err error) {
@@ -263,4 +269,148 @@ func (r *LedgerRepository) bagPeaksRightToLeft(peaks []model.MmrNode) []byte {
 		root = merkle.HashInternalNodes(peaks[i].Hash, root, r.hashFunc)
 	}
 	return root
+}
+
+// --- CONSISTENCY PROOF ---
+
+// GenerateConsistencyProof generates a consistency proof that demonstrates the growth of the MMR ledger from a previous size (fromSize) to a new size (toSize). It first validates the input sizes and retrieves the peaks for both sizes. Then it constructs the consistency paths for each old peak, which show how the old peaks evolve into the new peaks. Finally, it collects any new peaks that are strictly to the right of the old peaks. If any error occurs during these steps, it wraps and returns the error.
+func (r *LedgerRepository) GenerateConsistencyProof(ctx context.Context, fromSize int64, toSize int64) (proof *mmr.ConsistencyProof, err error) {
+	currentSize, err := r.Size(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get mmr size: %w", err)
+	}
+
+	if fromSize < 0 || toSize < 0 || fromSize > toSize || toSize > currentSize {
+		return nil, svcerrors.ErrInvalidConsistencyProofRange
+	}
+
+	proof = &mmr.ConsistencyProof{
+		OldSize:          int(fromSize),
+		NewSize:          int(toSize),
+		OldPeaksHashes:   make([][]byte, 0),
+		ConsistencyPaths: make([]*mmr.ConsistencyPath, 0),
+		RightPeaks:       make([][]byte, 0),
+	}
+
+	if fromSize == toSize {
+		return proof, nil // trivial: tree hasn't grown
+	}
+
+	oldPeaks, err := r.getPeaksAtSize(ctx, fromSize)
+	if err != nil {
+		return nil, fmt.Errorf("get old peaks: %w", err)
+	}
+	newPeaks, err := r.getPeaksAtSize(ctx, toSize)
+	if err != nil {
+		return nil, fmt.Errorf("get new peaks: %w", err)
+	}
+
+	// Collect the hashes of the old peaks for the proof
+	for _, p := range oldPeaks {
+		proof.OldPeaksHashes = append(proof.OldPeaksHashes, p.Hash)
+	}
+
+	newPeakIDs := make(map[int64]int, len(newPeaks))
+	for i, p := range newPeaks {
+		newPeakIDs[p.ID] = i
+	}
+	lastNewPeakIdx := -1
+
+	// Build the consistency paths for each old peak
+	for _, oldPeak := range oldPeaks {
+		path, newPeakIdx, err := r.buildConsistencyPath(ctx, oldPeak.ID, newPeakIDs)
+		if err != nil {
+			return nil, fmt.Errorf("build consistency path for peak %d: %w", oldPeak.ID, err)
+		}
+		proof.ConsistencyPaths = append(proof.ConsistencyPaths, path)
+		if newPeakIdx > lastNewPeakIdx {
+			lastNewPeakIdx = newPeakIdx
+		}
+	}
+
+	// Collect the right-peaks (any new peaks strictly to the right of the nodes affected by the old peaks)
+	for i := lastNewPeakIdx + 1; i < len(newPeaks); i++ {
+		proof.RightPeaks = append(proof.RightPeaks, newPeaks[i].Hash)
+	}
+
+	return proof, err
+}
+
+// getPeaksAtSize retrieves the peaks of the MMR ledger at a specific size. It calculates which peaks correspond to the given size by analyzing the binary representation of the size and retrieving the appropriate ancestor nodes from the database. If the size is zero or negative, it returns an empty slice. If there is an error during the retrieval of peaks, it wraps and returns the error.
+func (r *LedgerRepository) getPeaksAtSize(ctx context.Context, size int64) ([]model.MmrNode, error) {
+	if size <= 0 {
+		return nil, nil
+	}
+
+	var peaks []model.MmrNode
+	var offset int64
+
+	bitLen := bits.Len(uint(size))
+	for bit := bitLen - 1; bit >= 0; bit-- {
+		if size&(1<<bit) != 0 {
+			// rightmost leaf index in this 2^bit subtree
+			leafIdx := offset + (1 << bit) - 1
+			targetLevel := bit
+
+			var peak model.MmrNode
+			if targetLevel == 0 {
+				if err := pgxscan.Get(ctx, r.db, &peak, query.GetAncestorAtLevel, leafIdx, 0); err != nil {
+					return nil, fmt.Errorf("get leaf peak at index %d: %w", leafIdx, err)
+				}
+			} else {
+				if err := pgxscan.Get(ctx, r.db, &peak, query.GetAncestorAtLevel, leafIdx, targetLevel); err != nil {
+					return nil, fmt.Errorf("get ancestor at level %d for leaf %d: %w", targetLevel, leafIdx, err)
+				}
+			}
+			peaks = append(peaks, peak)
+			offset += 1 << bit
+		}
+	}
+	return peaks, nil
+}
+
+// buildConsistencyPath constructs the consistency path from an old peak to the closest new peak in the MMR ledger. It traverses from the old peak up to the new peak, collecting sibling node IDs and their positions (left/right). Then it fetches the sibling hashes in a single query and constructs the ConsistencyPath struct. It also returns the index of the new peak that this path leads to. If any error occurs during these steps, it wraps and returns the error.
+func (r *LedgerRepository) buildConsistencyPath(ctx context.Context, oldPeakID int64, newPeakIDs map[int64]int) (*mmr.ConsistencyPath, int, error) {
+	peakIDslice := make([]int64, 0, len(newPeakIDs))
+	for id := range newPeakIDs {
+		peakIDslice = append(peakIDslice, id)
+	}
+	var path []model.MmrNode
+	err := pgxscan.Select(ctx, r.db, &path, query.GetPathToClosestNewPeak, oldPeakID, peakIDslice)
+	if err != nil {
+		return nil, -1, fmt.Errorf("get consistency path from node %d: %w", oldPeakID, err)
+	}
+	if len(path) == 0 {
+		return nil, -1, fmt.Errorf("empty path from node %d", oldPeakID)
+	}
+
+	newPeakNode := path[len(path)-1] // last node is the new peak the traversal stopped at
+	newPeakIdx, ok := newPeakIDs[newPeakNode.ID]
+	if !ok {
+		return nil, -1, fmt.Errorf("traversal ended at node %d which is not a new peak (internal state error)", newPeakNode.ID)
+	}
+
+	var siblingIDs []int64
+	var left []bool
+	for i := 0; i < len(path)-1; i++ {
+		child, parent := path[i], path[i+1]
+		if parent.LeftChildID != nil && *parent.LeftChildID == child.ID { // child is the left child → sibling is on the right
+			siblingIDs = append(siblingIDs, *parent.RightChildID)
+			left = append(left, false)
+		} else { // child is the right child → sibling is on the left
+			siblingIDs = append(siblingIDs, *parent.LeftChildID)
+			left = append(left, true)
+		}
+	}
+
+	hashMap, err := r.getNodeHashes(ctx, siblingIDs)
+	if err != nil {
+		return nil, -1, fmt.Errorf("get sibling hashes for consistency path: %w", err)
+	}
+	siblings := make([][]byte, len(siblingIDs))
+	for i, id := range siblingIDs {
+		siblings[i] = hashMap[id]
+	}
+
+	return &mmr.ConsistencyPath{Siblings: siblings, Left: left}, newPeakIdx, nil
 }

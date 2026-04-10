@@ -31,7 +31,9 @@ var (
 	ErrEmptyLeafData      = errors.New("empty leaf data not allowed")
 	ErrInsertNodeFailed   = errors.New("failed to insert node into ledger")
 
-	ErrAuditLogEntryNotFound = errors.New("audit log entry not found")
-	ErrInclusionProofFailed  = errors.New("failed to generate inclusion proof")
-	ErrRootHashFailed        = errors.New("failed to get ledger root hash")
+	ErrAuditLogEntryNotFound        = errors.New("audit log entry not found")
+	ErrInclusionProofFailed         = errors.New("failed to generate inclusion proof")
+	ErrRootHashFailed               = errors.New("failed to get ledger root hash")
+	ErrInvalidConsistencyProofRange = errors.New("invalid consistency proof range: from_size must be less than to_size and both must be less than or equal to the current ledger size")
+	ErrConsistencyProofFailed       = errors.New("failed to generate consistency proof")
 )
