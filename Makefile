@@ -44,13 +44,15 @@ run-keygen-tool:
 # Verifies an inclusion or consistency proof against the ledger.
 #
 # Inclusion mode (default):
-#   make run-verify EVENT_ID=<uuid> PAYLOAD_FILE=path/to/event.json
+#   make run-verify EVENT_ID=<uuid> PAYLOAD_FILE=path/to/event.json TREE_SIZE=<n> TRUSTED_ROOT=<base64>
 #
 # Consistency mode:
 #   make run-verify MODE=consistency FROM_SIZE=<n> TO_SIZE=<m> OLD_ROOT=<base64> NEW_ROOT=<base64>
 MODE ?= inclusion
 EVENT_ID ?=
 PAYLOAD_FILE ?=
+TREE_SIZE ?=
+TRUSTED_ROOT ?=
 FROM_SIZE ?=
 TO_SIZE ?=
 OLD_ROOT ?=
@@ -80,6 +82,8 @@ run-verify:
 			--mode=inclusion \
 			--event-id=$(EVENT_ID) \
 			--payload-file=$(PAYLOAD_FILE) \
+			$(if $(TREE_SIZE),--tree-size=$(TREE_SIZE)) \
+			$(if $(TRUSTED_ROOT),--trusted-root=$(TRUSTED_ROOT)) \
 			--addr=$(ADDR); \
 	fi
 

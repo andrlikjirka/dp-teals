@@ -25,6 +25,8 @@ func main() {
 
 	// inclusion flags
 	eventID := flag.String("event-id", "", "UUID of the audit event to verify")
+	treeSize := flag.Int64("tree-size", 0, "tree size to anchor inclusion proof against (0 = current)")
+	trustedRoot := flag.String("trusted-root", "", "trusted root hash at tree-size (base64); if omitted, verifies against server-returned root only")
 	payloadFile := flag.String("payload-file", "", "path to JSON payload file; use '-' for stdin")
 
 	// consistency flags
@@ -47,7 +49,7 @@ func main() {
 
 	switch *mode {
 	case "inclusion":
-		runInclusionProofVerification(ctx, client, *eventID, *payloadFile)
+		runInclusionProofVerification(ctx, client, *eventID, *payloadFile, *treeSize, *trustedRoot)
 	case "consistency":
 		runConsistencyProofVerification(ctx, client, *fromSize, *toSize, *oldRootB64, *newRootB64)
 	default:
@@ -56,7 +58,7 @@ func main() {
 	}
 }
 
-func runInclusionProofVerification(ctx context.Context, client auditv1.ProofServiceClient, eventID, payloadFile string) {
+func runInclusionProofVerification(ctx context.Context, client auditv1.ProofServiceClient, eventID, payloadFile string, size int64, rootB64 string) {
 	if eventID == "" || payloadFile == "" {
 		fmt.Printf("error: -event-id and -payload-file are required for inclusion mode")
 		flag.Usage()
@@ -72,7 +74,7 @@ func runInclusionProofVerification(ctx context.Context, client auditv1.ProofServ
 		log.Fatalf("jcs canonicalize: %v", err)
 	}
 
-	resp, err := client.GetInclusionProof(ctx, &auditv1.GetInclusionProofRequest{EventId: eventID})
+	resp, err := client.GetInclusionProof(ctx, &auditv1.GetInclusionProofRequest{EventId: eventID, LedgerSize: size})
 	if err != nil {
 		log.Fatalf("GetInclusionProof: %v", err)
 	}
@@ -82,7 +84,15 @@ func runInclusionProofVerification(ctx context.Context, client auditv1.ProofServ
 		Left:     resp.Proof.Left,
 	}
 
-	valid := mmr.VerifyInclusionProof(canonical, proof, resp.RootHash, hash.SHA3HashFunc)
+	verifyRoot := resp.RootHash
+	if rootB64 != "" {
+		verifyRoot, err = base64.StdEncoding.DecodeString(rootB64)
+		if err != nil {
+			log.Fatalf("decode -trusted-root: %v", err)
+		}
+	}
+
+	valid := mmr.VerifyInclusionProof(canonical, proof, verifyRoot, hash.SHA3HashFunc)
 
 	fmt.Printf("event_id:    %s\n", resp.EventId)
 	fmt.Printf("leaf_index:  %d\n", resp.LeafIndex)
@@ -90,6 +100,9 @@ func runInclusionProofVerification(ctx context.Context, client auditv1.ProofServ
 	fmt.Printf("leaf_hash:   %s\n", hex.EncodeToString(resp.LeafHash))
 	fmt.Printf("root_hash:   %s\n", hex.EncodeToString(resp.RootHash))
 	fmt.Printf("siblings:    %d\n", len(proof.Siblings))
+	if rootB64 == "" {
+		fmt.Println("(warning: no -trusted-root provided, verifying against server-returned root only)")
+	}
 	fmt.Println()
 	if valid {
 		fmt.Println("PROOF VALID — payload is committed to this root")
@@ -149,6 +162,6 @@ func runConsistencyProofVerification(ctx context.Context, client auditv1.ProofSe
 		fmt.Println("PROOF VALID — tree grew consistently")
 	} else {
 		fmt.Println("PROOF INVALID — tree history may have been tampered")
-		os.Exit(1)
+		return
 	}
 }

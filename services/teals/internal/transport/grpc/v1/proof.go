@@ -32,10 +32,13 @@ func (s *ProofServiceServer) GetInclusionProof(ctx context.Context, req *auditv1
 		return nil, status.Errorf(codes.InvalidArgument, "invalid event_id: %v", err)
 	}
 
-	proof, err := s.service.GetInclusionProof(ctx, id)
+	proof, err := s.service.GetInclusionProof(ctx, id, req.GetLedgerSize())
 	if err != nil {
 		if errors.Is(err, svcerrors.ErrAuditLogEntryNotFound) {
 			return nil, status.Errorf(codes.NotFound, "audit event %s not found", req.GetEventId())
+		}
+		if errors.Is(err, svcerrors.ErrInvalidInclusionProofLedgerSize) {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid inclusion proof ledger size: size must be gte leaf position and lte current ledger size")
 		}
 		return nil, status.Errorf(codes.Internal, "failed to generate inclusion proof for event %s", req.GetEventId())
 	}

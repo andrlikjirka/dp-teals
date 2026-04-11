@@ -77,6 +77,7 @@ func (x *InclusionProof) GetLeft() []bool {
 type GetInclusionProofRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	EventId       string                 `protobuf:"bytes,1,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`
+	LedgerSize    int64                  `protobuf:"varint,2,opt,name=ledger_size,json=ledgerSize,proto3" json:"ledger_size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -116,6 +117,13 @@ func (x *GetInclusionProofRequest) GetEventId() string {
 		return x.EventId
 	}
 	return ""
+}
+
+func (x *GetInclusionProofRequest) GetLedgerSize() int64 {
+	if x != nil {
+		return x.LedgerSize
+	}
+	return 0
 }
 
 type GetInclusionProofResponse struct {
@@ -513,9 +521,11 @@ const file_audit_v1_proof_proto_rawDesc = "" +
 	"\x14audit/v1/proof.proto\x12\baudit.v1\x1a\x1bbuf/validate/validate.proto\"@\n" +
 	"\x0eInclusionProof\x12\x1a\n" +
 	"\bsiblings\x18\x04 \x03(\fR\bsiblings\x12\x12\n" +
-	"\x04left\x18\x05 \x03(\bR\x04left\"?\n" +
+	"\x04left\x18\x05 \x03(\bR\x04left\"i\n" +
 	"\x18GetInclusionProofRequest\x12#\n" +
-	"\bevent_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\aeventId\"\xe0\x01\n" +
+	"\bevent_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\aeventId\x12(\n" +
+	"\vledger_size\x18\x02 \x01(\x03B\a\xbaH\x04\"\x02(\x00R\n" +
+	"ledgerSize\"\xe0\x01\n" +
 	"\x19GetInclusionProofResponse\x12\x19\n" +
 	"\bevent_id\x18\x01 \x01(\tR\aeventId\x12\x1d\n" +
 	"\n" +

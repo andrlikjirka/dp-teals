@@ -18,6 +18,7 @@ message InclusionProof {
 
 message GetInclusionProofRequest {
   string event_id = 1 [(buf.validate.field).string.uuid = true];
+  int64  ledger_size = 2 [(buf.validate.field).int64.gte = 0];
 }
 
 message GetInclusionProofResponse {

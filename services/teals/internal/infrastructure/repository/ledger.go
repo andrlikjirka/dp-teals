@@ -155,7 +155,17 @@ func (r *LedgerRepository) setParent(ctx context.Context, parentID, leftChildID,
 // --- INCLUSION PROOF ---
 
 // GenerateInclusionProof generates an inclusion proof for the leaf at the specified index in the MMR ledger. It first retrieves the path from the leaf to its peak, collecting sibling node IDs and their positions (left/right). Then it fetches the sibling hashes in a single query. Finally, it performs peak bagging by combining the peaks to the right and left of the leaf's peak to construct the full inclusion proof. If any error occurs during these steps, it wraps and returns the error.
-func (r *LedgerRepository) GenerateInclusionProof(ctx context.Context, leafIndex int64) (proof *svcmodel.InclusionProofData, err error) {
+func (r *LedgerRepository) GenerateInclusionProof(ctx context.Context, leafIndex int64, size int64) (proof *svcmodel.InclusionProofData, err error) {
+	// Get historical peaks first — needed to know where Phase 1 should stop
+	historicalPeaks, err := r.getPeaksAtSize(ctx, size)
+	if err != nil {
+		return nil, fmt.Errorf("get peaks at size %d: %w", size, err)
+	}
+	historicalPeakIDs := make(map[int64]int, len(historicalPeaks))
+	for i, p := range historicalPeaks {
+		historicalPeakIDs[p.ID] = i
+	}
+
 	// phase 1: traverse from leaf up to its peak
 	var path []model.MmrNode
 	err = pgxscan.Select(ctx, r.db, &path, query.GetLeafToPeakPath, leafIndex)
@@ -164,6 +174,13 @@ func (r *LedgerRepository) GenerateInclusionProof(ctx context.Context, leafIndex
 	}
 	if len(path) == 0 {
 		return nil, fmt.Errorf("leaf at index %d not found", leafIndex)
+	}
+	// truncate path at the historical peak
+	for i, node := range path {
+		if _, ok := historicalPeakIDs[node.ID]; ok {
+			path = path[:i+1]
+			break
+		}
 	}
 
 	var siblingIDs []int64
@@ -193,12 +210,8 @@ func (r *LedgerRepository) GenerateInclusionProof(ctx context.Context, leafIndex
 
 	// phase 2: peak bagging
 	peak := path[len(path)-1]
-	var allPeaks []model.MmrNode
-	if err := pgxscan.Select(ctx, r.db, &allPeaks, query.GetMmrPeaks); err != nil {
-		return nil, fmt.Errorf("get peaks: %w", err)
-	}
 	peakIdx := -1
-	for i, p := range allPeaks {
+	for i, p := range historicalPeaks {
 		if p.ID == peak.ID {
 			peakIdx = i
 			break
@@ -207,25 +220,21 @@ func (r *LedgerRepository) GenerateInclusionProof(ctx context.Context, leafIndex
 	if peakIdx == -1 {
 		return nil, fmt.Errorf("peak not found (internal state error)")
 	}
-	if peakIdx < len(allPeaks)-1 {
-		rightBag := r.bagPeaksRightToLeft(allPeaks[peakIdx+1:])
+	if peakIdx < len(historicalPeaks)-1 {
+		rightBag := r.bagPeaksRightToLeft(historicalPeaks[peakIdx+1:])
 		siblings = append(siblings, rightBag)
 		siblingLeft = append(siblingLeft, false)
 	}
 	for i := peakIdx - 1; i >= 0; i-- {
-		siblings = append(siblings, allPeaks[i].Hash)
+		siblings = append(siblings, historicalPeaks[i].Hash)
 		siblingLeft = append(siblingLeft, true)
 	}
 
-	rootHash := r.bagPeaksRightToLeft(allPeaks)
-	treeSize, err := r.Size(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("get tree size: %w", err)
-	}
+	rootHash := r.bagPeaksRightToLeft(historicalPeaks)
 
 	return &svcmodel.InclusionProofData{
 		LeafIndex:  leafIndex,
-		LedgerSize: treeSize,
+		LedgerSize: size,
 		LeafHash:   path[0].Hash,
 		RootHash:   rootHash,
 		Proof:      &mmr.InclusionProof{Siblings: siblings, Left: siblingLeft},
