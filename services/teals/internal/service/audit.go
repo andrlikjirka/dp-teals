@@ -28,7 +28,7 @@ func NewAuditService(tx ports.TransactionProvider, s ports.Serializer, v ports.S
 	}
 }
 
-// IngestAuditEvent handles the ingestion of an audit event by serializing the event, retrieving the associated producer key, and storing the event in the database within a transaction. It returns the event ID if successful, or an appropriate error if any step of the process fails, including serialization errors, producer key retrieval failures, or database insertion issues such as duplicate event IDs.
+// IngestAuditEvent handles the ingestion of an audit event by serializing the event, retrieving the associated producer key, and storing the event in the database within a transaction. It returns the event ID, ledger size and timestamp if successful, or an appropriate error if any step of the process fails, including serialization errors, producer key retrieval failures, or database insertion issues such as duplicate event IDs.
 func (s *AuditService) IngestAuditEvent(ctx context.Context, event *model.AuditEvent, sigToken string) (*model.IngestAuditEventResult, error) {
 	// 1. Serialize to canonical form — this is the exact bytes that were signed and the exact bytes that will be stored.
 	payloadBytes, err := s.serializer.SerializeCanonicalAuditEvent(event)
