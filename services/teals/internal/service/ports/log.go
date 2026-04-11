@@ -12,5 +12,5 @@ import (
 type AuditLog interface {
 	// StoreAuditLogEntry stores an audit log entry with the given event ID, payload, signature token, producer key ID, and node ID.
 	StoreAuditLogEntry(ctx context.Context, eventId uuid.UUID, payload json.RawMessage, sigToken string, producerKeyId uuid.UUID, nodeID int64) error
-	GetAuditLogEntryByEventID(ctx context.Context, eventID uuid.UUID) (*model.AuditLogEntry, error)
+	GetAuditLogEntryByEventID(ctx context.Context, eventID uuid.UUID) (*model.AuditLogEntryRaw, error)
 }

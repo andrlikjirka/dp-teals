@@ -50,8 +50,11 @@ func (s *LedgerService) GetInclusionProof(ctx context.Context, eventID uuid.UUID
 
 		entry, err := r.AuditLog.GetAuditLogEntryByEventID(ctx, eventID)
 		if err != nil {
+			if errors.Is(err, svcerrors.ErrAuditLogEntryNotFound) {
+				return svcerrors.ErrAuditLogEntryNotFound
+			}
 			s.logger.Error("failed to get audit log entry", "event_id", eventID, "error", err)
-			return svcerrors.ErrAuditLogEntryNotFound
+			return err
 		}
 		if entry.LeafIndex+1 > resolvedSize {
 			s.logger.Warn("ledger size is too small for leaf", "leaf_index", entry.LeafIndex, "tree_size", resolvedSize)

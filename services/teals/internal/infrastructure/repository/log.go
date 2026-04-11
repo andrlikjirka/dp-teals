@@ -43,8 +43,8 @@ func (r *AuditLogRepository) StoreAuditLogEntry(ctx context.Context, eventId uui
 	return nil
 }
 
-// GetAuditLogEntryByEventID retrieves the audit log entry and its MMR leaf index for a given event ID.
-func (r *AuditLogRepository) GetAuditLogEntryByEventID(ctx context.Context, eventID uuid.UUID) (*svcmodel.AuditLogEntry, error) {
+// GetAuditLogEntryByEventID retrieves the raw audit log entry and its MMR leaf index for a given event ID.
+func (r *AuditLogRepository) GetAuditLogEntryByEventID(ctx context.Context, eventID uuid.UUID) (*svcmodel.AuditLogEntryRaw, error) {
 	var record model.AuditLogEntryRecord
 	err := pgxscan.Get(ctx, r.db, &record, query.GetAuditLogEntryByEventID, eventID)
 	if err != nil {
@@ -54,13 +54,13 @@ func (r *AuditLogRepository) GetAuditLogEntryByEventID(ctx context.Context, even
 		return nil, fmt.Errorf("get audit log entry by event id: %w", err)
 	}
 
-	return &svcmodel.AuditLogEntry{
+	return &svcmodel.AuditLogEntryRaw{
 		ID:             &record.ID,
 		EventID:        record.EventID,
 		ProducerKeyID:  record.ProducerKeyID,
 		SignatureToken: record.SignatureToken,
 		LeafIndex:      record.LeafIndex,
 		CreatedAt:      record.CreatedAt,
-		// TODO: Payload deserialization
+		Payload:        record.Payload,
 	}, nil
 }

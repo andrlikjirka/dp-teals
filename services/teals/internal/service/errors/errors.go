@@ -13,9 +13,10 @@ var (
 	ErrInvalidResource     = errors.New("invalid resource: missing ID or name")
 	ErrMissingSubjectID    = errors.New("invalid subject: missing ID")
 
-	ErrEventSerializationFailed = errors.New("failed to serialize audit event")
-	ErrDuplicateEventID         = errors.New("duplicate event ID")
-	ErrEventAppendFailed        = errors.New("failed to append audit event")
+	ErrEventSerializationFailed   = errors.New("failed to serialize audit event")
+	ErrEventDeserializationFailed = errors.New("failed to deserialize audit event")
+	ErrDuplicateEventID           = errors.New("duplicate event ID")
+	ErrEventAppendFailed          = errors.New("failed to append audit event")
 
 	ErrInvalidSignature = errors.New("invalid event signature")
 
