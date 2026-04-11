@@ -109,3 +109,10 @@ func NewAuditEvent(params CreateAuditEventParams) (*AuditEvent, error) {
 		Metadata:    params.Metadata,
 	}, nil
 }
+
+// IngestAuditEventResult represents the result of ingesting an audit event, including the assigned EventID, updated ledger size, and ingestion timestamp.
+type IngestAuditEventResult struct {
+	EventID    uuid.UUID
+	LedgerSize int64
+	IngestedAt time.Time
+}

@@ -58,28 +58,28 @@ func (r *LedgerRepository) Size(ctx context.Context) (size int64, err error) {
 // --- APPEND LEAF ---
 
 // AppendLeaf adds a new leaf node to the MMR ledger with the given payload.
-func (r *LedgerRepository) AppendLeaf(ctx context.Context, payload []byte) (nodeID int64, err error) {
+func (r *LedgerRepository) AppendLeaf(ctx context.Context, payload []byte) (nodeID int64, size int64, err error) {
 	if len(payload) == 0 {
-		return 0, fmt.Errorf("payload cannot be empty")
+		return 0, 0, fmt.Errorf("payload cannot be empty")
 	}
 
 	// 1. Hash the audit event payload to create the leaf node hash
 	leafHash := merkle.HashLeafData(payload, r.hashFunc)
 
 	// 2. Get the current size of the MMR to determine the new leaf index
-	size, err := r.Size(ctx)
+	s, err := r.Size(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("determine next leaf index: %w", err)
+		return 0, 0, fmt.Errorf("determine next leaf index: %w", err)
 	}
 
 	// 3. Insert the new leaf node into the ledger and get its ID
 	leaf := &model.MmrNode{
 		Hash:      leafHash,
 		Level:     0,
-		LeafIndex: &size,
+		LeafIndex: &s,
 	}
 	if err := r.insertNode(ctx, leaf); err != nil {
-		return 0, fmt.Errorf("insert leaf node: %w", err)
+		return 0, 0, fmt.Errorf("insert leaf node: %w", err)
 	}
 	leafNodeID := leaf.ID // populated by insertNode (returning the ID of the newly inserted node)
 
@@ -90,7 +90,7 @@ func (r *LedgerRepository) AppendLeaf(ctx context.Context, payload []byte) (node
 	for {
 		peak, err := r.getRightmostPeakAtLevel(ctx, currentLevel, currentID)
 		if err != nil {
-			return 0, fmt.Errorf("get peak at level %d: %w", currentLevel, err)
+			return 0, 0, fmt.Errorf("get peak at level %d: %w", currentLevel, err)
 		}
 		if peak == nil {
 			break // no merge possible
@@ -104,12 +104,12 @@ func (r *LedgerRepository) AppendLeaf(ctx context.Context, payload []byte) (node
 			RightChildID: &currentID,
 		}
 		if err := r.insertNode(ctx, newNode); err != nil {
-			return 0, fmt.Errorf("insert internal node: %w", err)
+			return 0, 0, fmt.Errorf("insert internal node: %w", err)
 		}
 
 		mergedID := newNode.ID
 		if err := r.setParent(ctx, mergedID, peak.ID, currentID); err != nil {
-			return 0, fmt.Errorf("set parent for node %d: %w", mergedID, err)
+			return 0, 0, fmt.Errorf("set parent for node %d: %w", mergedID, err)
 		}
 
 		currentID = mergedID
@@ -117,7 +117,7 @@ func (r *LedgerRepository) AppendLeaf(ctx context.Context, payload []byte) (node
 		currentHash = mergedHash
 	}
 
-	return leafNodeID, nil
+	return leafNodeID, s, nil
 }
 
 // insertNode inserts a new MMR node into the database and updates the node's ID field with the generated ID from the database. It takes a context and a pointer to an MmrNode struct, executes the insert query, and returns any error that occurs during the operation.

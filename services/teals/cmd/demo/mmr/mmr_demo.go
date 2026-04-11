@@ -12,14 +12,14 @@ func main() {
 	data := [][]byte{
 		[]byte("event1"),
 		[]byte("event2"),
-		[]byte("event3"),
-		[]byte("event4"),
-		[]byte("event5"),
-		[]byte("event6"),
-		[]byte("event7"),
-		[]byte("event8"),
-		[]byte("event9"),
-		[]byte("event10"),
+		//[]byte("event3"),
+		//[]byte("event4"),
+		//[]byte("event5"),
+		//[]byte("event6"),
+		//[]byte("event7"),
+		//[]byte("event8"),
+		//[]byte("event9"),
+		//[]byte("event10"),
 	}
 
 	m := mmr.NewMMR(nil)
@@ -32,30 +32,32 @@ func main() {
 			panic(err)
 		}
 	}
+
+	// 2. Test Inclusion Proof (Existing Data)
+	oldRoot := m.RootHash()
+	oldSize := len(m.Leaves)
+	//demoInclusionProof(m, oldRoot, []byte("event4"))
+
+	// 3. Test Append
+	err := m.Append([]byte("event3"))
+	err = m.Append([]byte("event4"))
+	err = m.Append([]byte("event5"))
+	err = m.Append([]byte("event6"))
+	err = m.Append([]byte("event7"))
+	err = m.Append([]byte("event8"))
+	//err = m.Append([]byte("event9"))
+	if err != nil {
+		panic(err)
+	}
 	m.PrintSummary()
 	m.PrintPeaks()
 	m.PrintTree()
 
-	// 2. Test Inclusion Proof (Existing Data)
-	oldRoot := m.RootHash()
-	//oldSize := len(m.Leaves)
-	demoInclusionProof(m, oldRoot, []byte("event4"))
+	newRoot := m.RootHash()
+	newSize := len(m.Leaves)
 
-	/*
-		// 3. Test Append
-			err := m.Append([]byte("tx6"))
-			err = m.Append([]byte("tx7"))
-			err = m.Append([]byte("tx8"))
-			err = m.Append([]byte("tx9"))
-			if err != nil {
-				panic(err)
-			}
-			newRoot := m.RootHash()
-			newSize := len(m.Leaves)
-
-			// 4. Test Consistency Proof (Old Tree vs New Tree)
-			demoConsistencyProof(m, oldSize, newSize, oldRoot, newRoot)
-	*/
+	// 4. Test Consistency Proof (Old Tree vs New Tree)
+	demoConsistencyProof(m, oldSize, newSize, oldRoot, newRoot)
 
 }
 
@@ -88,8 +90,20 @@ func demoConsistencyProof(m *mmr.MMR, oldSize int, newSize int, oldRoot []byte, 
 	}
 
 	fmt.Println("Proof generated successfully:")
-	fmt.Printf("  Consistency Paths (Old Peaks advancing): %d\n", len(proof.ConsistencyPaths))
-	fmt.Printf("  Right Peaks (New Peaks appended): %d\n", len(proof.RightPeaks))
+
+	fmt.Printf("Old Peaks Hashes: %d\n", len(proof.OldPeaksHashes))
+	fmt.Printf("Consistency Paths: %d\n", len(proof.ConsistencyPaths))
+	for i, path := range proof.ConsistencyPaths {
+		fmt.Printf("  Path %d: Lefts=%v, Siblings=%d\n", i, len(path.Left), len(path.Siblings))
+		for j, sibling := range path.Siblings {
+			fmt.Printf("    Sibling %d: %x, %v\n", j, sibling[:4], path.Left[j])
+		}
+	}
+
+	fmt.Printf("Right Peaks (New Peaks appended): %d\n", len(proof.RightPeaks))
+	for i, peak := range proof.RightPeaks {
+		fmt.Printf("  Right Peak %d: %x\n", i, peak[:4])
+	}
 
 	// 2. Verify the proof using OldPeaksHashes from the proof
 	valid := mmr.VerifyConsistencyProof(proof, oldRoot, newRoot, hash.DefaultHashFunc)

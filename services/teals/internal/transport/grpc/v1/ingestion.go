@@ -10,6 +10,7 @@ import (
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/transport/grpc/interceptor"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // IngestionServiceServer implements the gRPC server for the IngestionService defined in the protobuf.
@@ -48,5 +49,9 @@ func (s *IngestionServiceServer) Append(ctx context.Context, req *auditv1.Append
 		return nil, status.Errorf(codes.Internal, "failed to append the audit event with ID %s", e.ID)
 	}
 
-	return &auditv1.AppendResponse{EventId: o.String()}, nil
+	return &auditv1.AppendResponse{
+		EventId:    o.EventID.String(),
+		LedgerSize: o.LedgerSize,
+		AppendedAt: timestamppb.New(o.IngestedAt),
+	}, nil
 }

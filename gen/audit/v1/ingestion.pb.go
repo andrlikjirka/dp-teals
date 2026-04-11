@@ -10,6 +10,7 @@ import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -71,6 +72,8 @@ func (x *AppendRequest) GetEvent() *AuditEvent {
 type AppendResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	EventId       string                 `protobuf:"bytes,1,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`
+	LedgerSize    int64                  `protobuf:"varint,2,opt,name=ledger_size,json=ledgerSize,proto3" json:"ledger_size,omitempty"`
+	AppendedAt    *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=appended_at,json=appendedAt,proto3" json:"appended_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -112,15 +115,33 @@ func (x *AppendResponse) GetEventId() string {
 	return ""
 }
 
+func (x *AppendResponse) GetLedgerSize() int64 {
+	if x != nil {
+		return x.LedgerSize
+	}
+	return 0
+}
+
+func (x *AppendResponse) GetAppendedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AppendedAt
+	}
+	return nil
+}
+
 var File_audit_v1_ingestion_proto protoreflect.FileDescriptor
 
 const file_audit_v1_ingestion_proto_rawDesc = "" +
 	"\n" +
-	"\x18audit/v1/ingestion.proto\x12\baudit.v1\x1a\x1bbuf/validate/validate.proto\x1a\x14audit/v1/event.proto\"C\n" +
+	"\x18audit/v1/ingestion.proto\x12\baudit.v1\x1a\x1bbuf/validate/validate.proto\x1a\x14audit/v1/event.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"C\n" +
 	"\rAppendRequest\x122\n" +
-	"\x05event\x18\x01 \x01(\v2\x14.audit.v1.AuditEventB\x06\xbaH\x03\xc8\x01\x01R\x05event\"+\n" +
+	"\x05event\x18\x01 \x01(\v2\x14.audit.v1.AuditEventB\x06\xbaH\x03\xc8\x01\x01R\x05event\"\x89\x01\n" +
 	"\x0eAppendResponse\x12\x19\n" +
-	"\bevent_id\x18\x01 \x01(\tR\aeventId2Q\n" +
+	"\bevent_id\x18\x01 \x01(\tR\aeventId\x12\x1f\n" +
+	"\vledger_size\x18\x02 \x01(\x03R\n" +
+	"ledgerSize\x12;\n" +
+	"\vappended_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"appendedAt2Q\n" +
 	"\x10IngestionService\x12=\n" +
 	"\x06Append\x12\x17.audit.v1.AppendRequest\x1a\x18.audit.v1.AppendResponse\"\x00B\x98\x01\n" +
 	"\fcom.audit.v1B\x0eIngestionProtoP\x01Z7github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1\xa2\x02\x03AXX\xaa\x02\bAudit.V1\xca\x02\bAudit\\V1\xe2\x02\x14Audit\\V1\\GPBMetadata\xea\x02\tAudit::V1b\x06proto3"
@@ -139,19 +160,21 @@ func file_audit_v1_ingestion_proto_rawDescGZIP() []byte {
 
 var file_audit_v1_ingestion_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_audit_v1_ingestion_proto_goTypes = []any{
-	(*AppendRequest)(nil),  // 0: audit.v1.AppendRequest
-	(*AppendResponse)(nil), // 1: audit.v1.AppendResponse
-	(*AuditEvent)(nil),     // 2: audit.v1.AuditEvent
+	(*AppendRequest)(nil),         // 0: audit.v1.AppendRequest
+	(*AppendResponse)(nil),        // 1: audit.v1.AppendResponse
+	(*AuditEvent)(nil),            // 2: audit.v1.AuditEvent
+	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
 }
 var file_audit_v1_ingestion_proto_depIdxs = []int32{
 	2, // 0: audit.v1.AppendRequest.event:type_name -> audit.v1.AuditEvent
-	0, // 1: audit.v1.IngestionService.Append:input_type -> audit.v1.AppendRequest
-	1, // 2: audit.v1.IngestionService.Append:output_type -> audit.v1.AppendResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	3, // 1: audit.v1.AppendResponse.appended_at:type_name -> google.protobuf.Timestamp
+	0, // 2: audit.v1.IngestionService.Append:input_type -> audit.v1.AppendRequest
+	1, // 3: audit.v1.IngestionService.Append:output_type -> audit.v1.AppendResponse
+	3, // [3:4] is the sub-list for method output_type
+	2, // [2:3] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_audit_v1_ingestion_proto_init() }

@@ -4,6 +4,7 @@ package audit.v1;
 
 import "buf/validate/validate.proto";
 import "audit/v1/event.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1";
 
@@ -20,4 +21,6 @@ message AppendRequest {
 // The response message containing the ID of the appended audit event.
 message AppendResponse {
   string event_id = 1;
+  int64  ledger_size = 2;
+  google.protobuf.Timestamp appended_at = 3;
 }

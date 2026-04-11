@@ -55,7 +55,7 @@ func (g *Generator) Run(ctx context.Context, count int, delayMs int) error {
 		}
 
 		sendStart := time.Now()
-		err = g.sender.send(ctx, event, token)
+		res, err := g.sender.send(ctx, event, token)
 		m.sendDur += time.Since(sendStart)
 
 		if err != nil {
@@ -65,7 +65,11 @@ func (g *Generator) Run(ctx context.Context, count int, delayMs int) error {
 		}
 
 		m.succeeded++
-		g.log.Info("event sent", "progress", fmt.Sprintf("%d/%d", i+1, count), "event_id", event.ID)
+		g.log.Info("event sent", "progress", fmt.Sprintf("%d/%d", i+1, count),
+			"event_id", event.ID,
+			"ledger_size", res.LedgerSize,
+			"appended_at", res.Timestamp.Format(time.RFC3339),
+		)
 
 		if delayMs > 0 {
 			time.Sleep(time.Duration(delayMs) * time.Millisecond)
