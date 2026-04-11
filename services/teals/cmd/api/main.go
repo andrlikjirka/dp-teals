@@ -14,6 +14,7 @@ import (
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/serializer"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service"
 	v1 "github.com/andrlikjirka/dp-teals/services/teals/internal/transport/grpc/v1"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/transport/worker"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -37,6 +38,12 @@ func run() error {
 	}
 	log := logger.New(config.Env)
 
+	signer, err := bootstrap.NewServerSigner(config)
+	if err != nil {
+		log.Error("failed to setup server signer", "error", err)
+		return err
+	}
+
 	dbCtx, dbCancel := context.WithTimeout(context.Background(), config.DBConnectTimeout)
 	defer dbCancel()
 	pool, err := bootstrap.NewPgxPool(dbCtx, config.DatabaseURL)
@@ -56,11 +63,13 @@ func run() error {
 	ingestionService := service.NewAuditService(txProvider, jcsSerializer, verifier, log)
 	keyService := service.NewKeyService(keyRepo, log)
 	ledgerService := service.NewLedgerService(txProvider, log)
+	checkpointService := service.NewCheckpointService(txProvider, signer, log)
 
 	// Transport
+	cpWorker := worker.NewCheckpointWorker(checkpointService, config.CheckpointInterval, log)
 	ingestor := v1.NewIngestionServiceServer(ingestionService)
 	keys := v1.NewKeyRegistrationServiceServer(keyService)
-	proofServer := v1.NewProofServiceServer(ledgerService)
+	proofServer := v1.NewProofServiceServer(ledgerService, checkpointService)
 
 	server, err := bootstrap.NewServer(config, log, ingestor, keys, proofServer)
 	if err != nil {
@@ -69,7 +78,9 @@ func run() error {
 	}
 
 	// 2. Create an errgroup with context
-	g, ctx := errgroup.WithContext(context.Background())
+	appCtx, appCancel := context.WithCancel(context.Background())
+	defer appCancel()
+	g, ctx := errgroup.WithContext(appCtx)
 
 	// 3. Run the gRPC Server
 	g.Go(func() error {
@@ -77,9 +88,15 @@ func run() error {
 		return server.Run()
 	})
 
+	g.Go(func() error {
+		return cpWorker.Start(ctx)
+	})
+
 	// 4. Listen for shutdown signals in a separate goroutine
 	g.Go(func() error {
 		interceptSignals(ctx, log)
+
+		appCancel()
 
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), config.ShutdownTimeout)
 		defer shutdownCancel()

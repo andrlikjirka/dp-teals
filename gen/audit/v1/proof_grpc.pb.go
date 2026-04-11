@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ProofService_GetInclusionProof_FullMethodName   = "/audit.v1.ProofService/GetInclusionProof"
-	ProofService_GetConsistencyProof_FullMethodName = "/audit.v1.ProofService/GetConsistencyProof"
-	ProofService_GetRootHash_FullMethodName         = "/audit.v1.ProofService/GetRootHash"
+	ProofService_GetInclusionProof_FullMethodName         = "/audit.v1.ProofService/GetInclusionProof"
+	ProofService_GetConsistencyProof_FullMethodName       = "/audit.v1.ProofService/GetConsistencyProof"
+	ProofService_GetLatestSignedCheckpoint_FullMethodName = "/audit.v1.ProofService/GetLatestSignedCheckpoint"
+	ProofService_GetServerPublicKey_FullMethodName        = "/audit.v1.ProofService/GetServerPublicKey"
 )
 
 // ProofServiceClient is the client API for ProofService service.
@@ -30,7 +31,8 @@ const (
 type ProofServiceClient interface {
 	GetInclusionProof(ctx context.Context, in *GetInclusionProofRequest, opts ...grpc.CallOption) (*GetInclusionProofResponse, error)
 	GetConsistencyProof(ctx context.Context, in *GetConsistencyProofRequest, opts ...grpc.CallOption) (*GetConsistencyProofResponse, error)
-	GetRootHash(ctx context.Context, in *GetRootHashRequest, opts ...grpc.CallOption) (*GetRootHashResponse, error)
+	GetLatestSignedCheckpoint(ctx context.Context, in *GetLatestSignedCheckpointRequest, opts ...grpc.CallOption) (*GetLatestSignedCheckpointResponse, error)
+	GetServerPublicKey(ctx context.Context, in *GetServerPublicKeyRequest, opts ...grpc.CallOption) (*GetServerPublicKeyResponse, error)
 }
 
 type proofServiceClient struct {
@@ -61,10 +63,20 @@ func (c *proofServiceClient) GetConsistencyProof(ctx context.Context, in *GetCon
 	return out, nil
 }
 
-func (c *proofServiceClient) GetRootHash(ctx context.Context, in *GetRootHashRequest, opts ...grpc.CallOption) (*GetRootHashResponse, error) {
+func (c *proofServiceClient) GetLatestSignedCheckpoint(ctx context.Context, in *GetLatestSignedCheckpointRequest, opts ...grpc.CallOption) (*GetLatestSignedCheckpointResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetRootHashResponse)
-	err := c.cc.Invoke(ctx, ProofService_GetRootHash_FullMethodName, in, out, cOpts...)
+	out := new(GetLatestSignedCheckpointResponse)
+	err := c.cc.Invoke(ctx, ProofService_GetLatestSignedCheckpoint_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *proofServiceClient) GetServerPublicKey(ctx context.Context, in *GetServerPublicKeyRequest, opts ...grpc.CallOption) (*GetServerPublicKeyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetServerPublicKeyResponse)
+	err := c.cc.Invoke(ctx, ProofService_GetServerPublicKey_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +89,8 @@ func (c *proofServiceClient) GetRootHash(ctx context.Context, in *GetRootHashReq
 type ProofServiceServer interface {
 	GetInclusionProof(context.Context, *GetInclusionProofRequest) (*GetInclusionProofResponse, error)
 	GetConsistencyProof(context.Context, *GetConsistencyProofRequest) (*GetConsistencyProofResponse, error)
-	GetRootHash(context.Context, *GetRootHashRequest) (*GetRootHashResponse, error)
+	GetLatestSignedCheckpoint(context.Context, *GetLatestSignedCheckpointRequest) (*GetLatestSignedCheckpointResponse, error)
+	GetServerPublicKey(context.Context, *GetServerPublicKeyRequest) (*GetServerPublicKeyResponse, error)
 	mustEmbedUnimplementedProofServiceServer()
 }
 
@@ -94,8 +107,11 @@ func (UnimplementedProofServiceServer) GetInclusionProof(context.Context, *GetIn
 func (UnimplementedProofServiceServer) GetConsistencyProof(context.Context, *GetConsistencyProofRequest) (*GetConsistencyProofResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetConsistencyProof not implemented")
 }
-func (UnimplementedProofServiceServer) GetRootHash(context.Context, *GetRootHashRequest) (*GetRootHashResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetRootHash not implemented")
+func (UnimplementedProofServiceServer) GetLatestSignedCheckpoint(context.Context, *GetLatestSignedCheckpointRequest) (*GetLatestSignedCheckpointResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLatestSignedCheckpoint not implemented")
+}
+func (UnimplementedProofServiceServer) GetServerPublicKey(context.Context, *GetServerPublicKeyRequest) (*GetServerPublicKeyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetServerPublicKey not implemented")
 }
 func (UnimplementedProofServiceServer) mustEmbedUnimplementedProofServiceServer() {}
 func (UnimplementedProofServiceServer) testEmbeddedByValue()                      {}
@@ -154,20 +170,38 @@ func _ProofService_GetConsistencyProof_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProofService_GetRootHash_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRootHashRequest)
+func _ProofService_GetLatestSignedCheckpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLatestSignedCheckpointRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProofServiceServer).GetRootHash(ctx, in)
+		return srv.(ProofServiceServer).GetLatestSignedCheckpoint(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ProofService_GetRootHash_FullMethodName,
+		FullMethod: ProofService_GetLatestSignedCheckpoint_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProofServiceServer).GetRootHash(ctx, req.(*GetRootHashRequest))
+		return srv.(ProofServiceServer).GetLatestSignedCheckpoint(ctx, req.(*GetLatestSignedCheckpointRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProofService_GetServerPublicKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetServerPublicKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProofServiceServer).GetServerPublicKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProofService_GetServerPublicKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProofServiceServer).GetServerPublicKey(ctx, req.(*GetServerPublicKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -188,8 +222,12 @@ var ProofService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ProofService_GetConsistencyProof_Handler,
 		},
 		{
-			MethodName: "GetRootHash",
-			Handler:    _ProofService_GetRootHash_Handler,
+			MethodName: "GetLatestSignedCheckpoint",
+			Handler:    _ProofService_GetLatestSignedCheckpoint_Handler,
+		},
+		{
+			MethodName: "GetServerPublicKey",
+			Handler:    _ProofService_GetServerPublicKey_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -68,8 +68,7 @@ func (s *AuditService) IngestAuditEvent(ctx context.Context, event *model.AuditE
 			s.logger.Warn("duplicate audit event rejected", "event_id", event.ID)
 			return nil, svcerrors.ErrDuplicateEventID
 		}
-		s.logger.Error("failed to append audit event", "error", err)
-		return nil, svcerrors.ErrEventAppendFailed
+		return nil, err
 	}
 	s.logger.Info("successfully appended audit event", "event_id", event.ID)
 

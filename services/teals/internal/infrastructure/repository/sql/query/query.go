@@ -35,4 +35,9 @@ var (
 	GetAncestorAtLevel string
 	//go:embed scripts/ledger/GetPathToClosestNewPeak.sql
 	GetPathToClosestNewPeak string
+
+	//go:embed scripts/checkpoint/Insert.sql
+	InsertCheckpoint string
+	//go:embed scripts/checkpoint/GetLatestCheckpoint.sql
+	GetLatestCheckpoint string
 )

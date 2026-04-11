@@ -47,3 +47,13 @@ func (s *Ed25519Signer) Sign(payload []byte) (string, error) {
 	}
 	return string(token), nil
 }
+
+// Kid returns the key ID (kid) associated with this signer, which is used in the JWS header to identify the signing key.
+func (s *Ed25519Signer) Kid() string {
+	return s.kid
+}
+
+// PublicKey returns the public key corresponding to the Ed25519 private key used for signing. This public key can be used by clients to verify the signatures produced by this signer.
+func (s *Ed25519Signer) PublicKey() []byte {
+	return s.key.Public().(ed25519.PublicKey)
+}

@@ -13,12 +13,14 @@ const defaultDotEnvPath = ".env"
 
 // Config holds the server configuration loaded from environment variables.
 type Config struct {
-	Env              string        `env:"ENV" envDefault:"development"`
-	Port             int           `env:"PORT" validate:"required"`
-	EnableReflection bool          `env:"ENABLE_REFLECTION" envDefault:"false"`
-	DatabaseURL      string        `env:"POSTGRES_URL" validate:"required"`
-	DBConnectTimeout time.Duration `env:"DB_CONNECT_TIMEOUT" envDefault:"10s"`
-	ShutdownTimeout  time.Duration `env:"SHUTDOWN_TIMEOUT"   envDefault:"30s"`
+	Env                 string        `env:"ENV" envDefault:"development"`
+	Port                int           `env:"PORT" validate:"required"`
+	EnableReflection    bool          `env:"ENABLE_REFLECTION" envDefault:"false"`
+	DatabaseURL         string        `env:"POSTGRES_URL" validate:"required"`
+	DBConnectTimeout    time.Duration `env:"DB_CONNECT_TIMEOUT" envDefault:"10s"`
+	ShutdownTimeout     time.Duration `env:"SHUTDOWN_TIMEOUT"   envDefault:"30s"`
+	ServerPrivateKeyB64 string        `env:"SERVER_PRIVATE_KEY_B64" validate:"required"`
+	CheckpointInterval  time.Duration `env:"CHECKPOINT_INTERVAL" envDefault:"10s"`
 }
 
 // LoadEnvFile loads environment variables from the specified .env file.

@@ -27,10 +27,11 @@ func (tp *TransactionProvider) Transact(ctx context.Context, txFunc func(ports.R
 	return runInTransaction(ctx, tp.pool, func(tx pgx.Tx) error {
 		ledgerRepo := NewLedgerRepository(tx, hash.SHA3HashFunc)
 		r := ports.Repositories{
-			AuditLog:     NewAuditLogRepository(tx),
-			ProducerKeys: NewProducerKeyRepository(tx),
-			Ledger:       ledgerRepo,
-			LedgerProver: ledgerRepo,
+			AuditLog:        NewAuditLogRepository(tx),
+			ProducerKeys:    NewProducerKeyRepository(tx),
+			Ledger:          ledgerRepo,
+			LedgerProver:    ledgerRepo,
+			CheckpointStore: NewCheckpointRepository(tx),
 		}
 
 		return txFunc(r)

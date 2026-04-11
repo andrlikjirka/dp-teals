@@ -514,6 +514,266 @@ func (x *ConsistencyProof) GetRightPeaks() [][]byte {
 	return nil
 }
 
+type GetLatestSignedCheckpointRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLatestSignedCheckpointRequest) Reset() {
+	*x = GetLatestSignedCheckpointRequest{}
+	mi := &file_audit_v1_proof_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLatestSignedCheckpointRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLatestSignedCheckpointRequest) ProtoMessage() {}
+
+func (x *GetLatestSignedCheckpointRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_audit_v1_proof_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLatestSignedCheckpointRequest.ProtoReflect.Descriptor instead.
+func (*GetLatestSignedCheckpointRequest) Descriptor() ([]byte, []int) {
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{9}
+}
+
+type GetLatestSignedCheckpointResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Checkpoint    *Checkpoint            `protobuf:"bytes,1,opt,name=checkpoint,proto3" json:"checkpoint,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetLatestSignedCheckpointResponse) Reset() {
+	*x = GetLatestSignedCheckpointResponse{}
+	mi := &file_audit_v1_proof_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetLatestSignedCheckpointResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLatestSignedCheckpointResponse) ProtoMessage() {}
+
+func (x *GetLatestSignedCheckpointResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_audit_v1_proof_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLatestSignedCheckpointResponse.ProtoReflect.Descriptor instead.
+func (*GetLatestSignedCheckpointResponse) Descriptor() ([]byte, []int) {
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetLatestSignedCheckpointResponse) GetCheckpoint() *Checkpoint {
+	if x != nil {
+		return x.Checkpoint
+	}
+	return nil
+}
+
+type Checkpoint struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Size           int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	RootHash       []byte                 `protobuf:"bytes,3,opt,name=root_hash,json=rootHash,proto3" json:"root_hash,omitempty"`
+	AnchoredAt     string                 `protobuf:"bytes,4,opt,name=anchored_at,json=anchoredAt,proto3" json:"anchored_at,omitempty"`
+	Kid            string                 `protobuf:"bytes,5,opt,name=kid,proto3" json:"kid,omitempty"`
+	SignatureToken string                 `protobuf:"bytes,6,opt,name=signature_token,json=signatureToken,proto3" json:"signature_token,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *Checkpoint) Reset() {
+	*x = Checkpoint{}
+	mi := &file_audit_v1_proof_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Checkpoint) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Checkpoint) ProtoMessage() {}
+
+func (x *Checkpoint) ProtoReflect() protoreflect.Message {
+	mi := &file_audit_v1_proof_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Checkpoint.ProtoReflect.Descriptor instead.
+func (*Checkpoint) Descriptor() ([]byte, []int) {
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *Checkpoint) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Checkpoint) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *Checkpoint) GetRootHash() []byte {
+	if x != nil {
+		return x.RootHash
+	}
+	return nil
+}
+
+func (x *Checkpoint) GetAnchoredAt() string {
+	if x != nil {
+		return x.AnchoredAt
+	}
+	return ""
+}
+
+func (x *Checkpoint) GetKid() string {
+	if x != nil {
+		return x.Kid
+	}
+	return ""
+}
+
+func (x *Checkpoint) GetSignatureToken() string {
+	if x != nil {
+		return x.SignatureToken
+	}
+	return ""
+}
+
+type GetServerPublicKeyRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Kid           string                 `protobuf:"bytes,1,opt,name=kid,proto3" json:"kid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetServerPublicKeyRequest) Reset() {
+	*x = GetServerPublicKeyRequest{}
+	mi := &file_audit_v1_proof_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetServerPublicKeyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetServerPublicKeyRequest) ProtoMessage() {}
+
+func (x *GetServerPublicKeyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_audit_v1_proof_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetServerPublicKeyRequest.ProtoReflect.Descriptor instead.
+func (*GetServerPublicKeyRequest) Descriptor() ([]byte, []int) {
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetServerPublicKeyRequest) GetKid() string {
+	if x != nil {
+		return x.Kid
+	}
+	return ""
+}
+
+type GetServerPublicKeyResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Kid           string                 `protobuf:"bytes,1,opt,name=kid,proto3" json:"kid,omitempty"`
+	PublicKey     []byte                 `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetServerPublicKeyResponse) Reset() {
+	*x = GetServerPublicKeyResponse{}
+	mi := &file_audit_v1_proof_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetServerPublicKeyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetServerPublicKeyResponse) ProtoMessage() {}
+
+func (x *GetServerPublicKeyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_audit_v1_proof_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetServerPublicKeyResponse.ProtoReflect.Descriptor instead.
+func (*GetServerPublicKeyResponse) Descriptor() ([]byte, []int) {
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetServerPublicKeyResponse) GetKid() string {
+	if x != nil {
+		return x.Kid
+	}
+	return ""
+}
+
+func (x *GetServerPublicKeyResponse) GetPublicKey() []byte {
+	if x != nil {
+		return x.PublicKey
+	}
+	return nil
+}
+
 var File_audit_v1_proof_proto protoreflect.FileDescriptor
 
 const file_audit_v1_proof_proto_rawDesc = "" +
@@ -552,11 +812,32 @@ const file_audit_v1_proof_proto_rawDesc = "" +
 	"\x10old_peaks_hashes\x18\x03 \x03(\fR\x0eoldPeaksHashes\x12F\n" +
 	"\x11consistency_paths\x18\x04 \x03(\v2\x19.audit.v1.ConsistencyPathR\x10consistencyPaths\x12\x1f\n" +
 	"\vright_peaks\x18\x05 \x03(\fR\n" +
-	"rightPeaks2\xa2\x02\n" +
+	"rightPeaks\"\"\n" +
+	" GetLatestSignedCheckpointRequest\"Y\n" +
+	"!GetLatestSignedCheckpointResponse\x124\n" +
+	"\n" +
+	"checkpoint\x18\x01 \x01(\v2\x14.audit.v1.CheckpointR\n" +
+	"checkpoint\"\xa9\x01\n" +
+	"\n" +
+	"Checkpoint\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x1b\n" +
+	"\troot_hash\x18\x03 \x01(\fR\brootHash\x12\x1f\n" +
+	"\vanchored_at\x18\x04 \x01(\tR\n" +
+	"anchoredAt\x12\x10\n" +
+	"\x03kid\x18\x05 \x01(\tR\x03kid\x12'\n" +
+	"\x0fsignature_token\x18\x06 \x01(\tR\x0esignatureToken\"-\n" +
+	"\x19GetServerPublicKeyRequest\x12\x10\n" +
+	"\x03kid\x18\x01 \x01(\tR\x03kid\"M\n" +
+	"\x1aGetServerPublicKeyResponse\x12\x10\n" +
+	"\x03kid\x18\x01 \x01(\tR\x03kid\x12\x1d\n" +
+	"\n" +
+	"public_key\x18\x02 \x01(\fR\tpublicKey2\xaf\x03\n" +
 	"\fProofService\x12^\n" +
 	"\x11GetInclusionProof\x12\".audit.v1.GetInclusionProofRequest\x1a#.audit.v1.GetInclusionProofResponse\"\x00\x12d\n" +
-	"\x13GetConsistencyProof\x12$.audit.v1.GetConsistencyProofRequest\x1a%.audit.v1.GetConsistencyProofResponse\"\x00\x12L\n" +
-	"\vGetRootHash\x12\x1c.audit.v1.GetRootHashRequest\x1a\x1d.audit.v1.GetRootHashResponse\"\x00B\x94\x01\n" +
+	"\x13GetConsistencyProof\x12$.audit.v1.GetConsistencyProofRequest\x1a%.audit.v1.GetConsistencyProofResponse\"\x00\x12v\n" +
+	"\x19GetLatestSignedCheckpoint\x12*.audit.v1.GetLatestSignedCheckpointRequest\x1a+.audit.v1.GetLatestSignedCheckpointResponse\"\x00\x12a\n" +
+	"\x12GetServerPublicKey\x12#.audit.v1.GetServerPublicKeyRequest\x1a$.audit.v1.GetServerPublicKeyResponse\"\x00B\x94\x01\n" +
 	"\fcom.audit.v1B\n" +
 	"ProofProtoP\x01Z7github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1\xa2\x02\x03AXX\xaa\x02\bAudit.V1\xca\x02\bAudit\\V1\xe2\x02\x14Audit\\V1\\GPBMetadata\xea\x02\tAudit::V1b\x06proto3"
 
@@ -572,33 +853,41 @@ func file_audit_v1_proof_proto_rawDescGZIP() []byte {
 	return file_audit_v1_proof_proto_rawDescData
 }
 
-var file_audit_v1_proof_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_audit_v1_proof_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_audit_v1_proof_proto_goTypes = []any{
-	(*InclusionProof)(nil),              // 0: audit.v1.InclusionProof
-	(*GetInclusionProofRequest)(nil),    // 1: audit.v1.GetInclusionProofRequest
-	(*GetInclusionProofResponse)(nil),   // 2: audit.v1.GetInclusionProofResponse
-	(*GetRootHashRequest)(nil),          // 3: audit.v1.GetRootHashRequest
-	(*GetRootHashResponse)(nil),         // 4: audit.v1.GetRootHashResponse
-	(*GetConsistencyProofRequest)(nil),  // 5: audit.v1.GetConsistencyProofRequest
-	(*GetConsistencyProofResponse)(nil), // 6: audit.v1.GetConsistencyProofResponse
-	(*ConsistencyPath)(nil),             // 7: audit.v1.ConsistencyPath
-	(*ConsistencyProof)(nil),            // 8: audit.v1.ConsistencyProof
+	(*InclusionProof)(nil),                    // 0: audit.v1.InclusionProof
+	(*GetInclusionProofRequest)(nil),          // 1: audit.v1.GetInclusionProofRequest
+	(*GetInclusionProofResponse)(nil),         // 2: audit.v1.GetInclusionProofResponse
+	(*GetRootHashRequest)(nil),                // 3: audit.v1.GetRootHashRequest
+	(*GetRootHashResponse)(nil),               // 4: audit.v1.GetRootHashResponse
+	(*GetConsistencyProofRequest)(nil),        // 5: audit.v1.GetConsistencyProofRequest
+	(*GetConsistencyProofResponse)(nil),       // 6: audit.v1.GetConsistencyProofResponse
+	(*ConsistencyPath)(nil),                   // 7: audit.v1.ConsistencyPath
+	(*ConsistencyProof)(nil),                  // 8: audit.v1.ConsistencyProof
+	(*GetLatestSignedCheckpointRequest)(nil),  // 9: audit.v1.GetLatestSignedCheckpointRequest
+	(*GetLatestSignedCheckpointResponse)(nil), // 10: audit.v1.GetLatestSignedCheckpointResponse
+	(*Checkpoint)(nil),                        // 11: audit.v1.Checkpoint
+	(*GetServerPublicKeyRequest)(nil),         // 12: audit.v1.GetServerPublicKeyRequest
+	(*GetServerPublicKeyResponse)(nil),        // 13: audit.v1.GetServerPublicKeyResponse
 }
 var file_audit_v1_proof_proto_depIdxs = []int32{
-	0, // 0: audit.v1.GetInclusionProofResponse.proof:type_name -> audit.v1.InclusionProof
-	8, // 1: audit.v1.GetConsistencyProofResponse.proof:type_name -> audit.v1.ConsistencyProof
-	7, // 2: audit.v1.ConsistencyProof.consistency_paths:type_name -> audit.v1.ConsistencyPath
-	1, // 3: audit.v1.ProofService.GetInclusionProof:input_type -> audit.v1.GetInclusionProofRequest
-	5, // 4: audit.v1.ProofService.GetConsistencyProof:input_type -> audit.v1.GetConsistencyProofRequest
-	3, // 5: audit.v1.ProofService.GetRootHash:input_type -> audit.v1.GetRootHashRequest
-	2, // 6: audit.v1.ProofService.GetInclusionProof:output_type -> audit.v1.GetInclusionProofResponse
-	6, // 7: audit.v1.ProofService.GetConsistencyProof:output_type -> audit.v1.GetConsistencyProofResponse
-	4, // 8: audit.v1.ProofService.GetRootHash:output_type -> audit.v1.GetRootHashResponse
-	6, // [6:9] is the sub-list for method output_type
-	3, // [3:6] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	0,  // 0: audit.v1.GetInclusionProofResponse.proof:type_name -> audit.v1.InclusionProof
+	8,  // 1: audit.v1.GetConsistencyProofResponse.proof:type_name -> audit.v1.ConsistencyProof
+	7,  // 2: audit.v1.ConsistencyProof.consistency_paths:type_name -> audit.v1.ConsistencyPath
+	11, // 3: audit.v1.GetLatestSignedCheckpointResponse.checkpoint:type_name -> audit.v1.Checkpoint
+	1,  // 4: audit.v1.ProofService.GetInclusionProof:input_type -> audit.v1.GetInclusionProofRequest
+	5,  // 5: audit.v1.ProofService.GetConsistencyProof:input_type -> audit.v1.GetConsistencyProofRequest
+	9,  // 6: audit.v1.ProofService.GetLatestSignedCheckpoint:input_type -> audit.v1.GetLatestSignedCheckpointRequest
+	12, // 7: audit.v1.ProofService.GetServerPublicKey:input_type -> audit.v1.GetServerPublicKeyRequest
+	2,  // 8: audit.v1.ProofService.GetInclusionProof:output_type -> audit.v1.GetInclusionProofResponse
+	6,  // 9: audit.v1.ProofService.GetConsistencyProof:output_type -> audit.v1.GetConsistencyProofResponse
+	10, // 10: audit.v1.ProofService.GetLatestSignedCheckpoint:output_type -> audit.v1.GetLatestSignedCheckpointResponse
+	13, // 11: audit.v1.ProofService.GetServerPublicKey:output_type -> audit.v1.GetServerPublicKeyResponse
+	8,  // [8:12] is the sub-list for method output_type
+	4,  // [4:8] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_audit_v1_proof_proto_init() }
@@ -612,7 +901,7 @@ func file_audit_v1_proof_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_audit_v1_proof_proto_rawDesc), len(file_audit_v1_proof_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

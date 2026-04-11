@@ -83,27 +83,6 @@ func (s *LedgerService) GetInclusionProof(ctx context.Context, eventID uuid.UUID
 	return result, nil
 }
 
-// GetRootHash retrieves the current root hash of the MMR ledger. It returns the root hash if successful, or an appropriate error if there was an error retrieving the root hash.
-func (s *LedgerService) GetRootHash(ctx context.Context) ([]byte, error) {
-	var root []byte
-	err := s.tx.Transact(ctx, func(r ports.Repositories) error {
-		var err error
-		root, err = r.LedgerProver.RootHash(ctx)
-		if err != nil {
-			s.logger.Error("failed to get root hash", "error", err)
-			return svcerrors.ErrRootHashFailed
-		}
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	s.logger.Info("root hash calculated successfully")
-	return root, nil
-}
-
 // GetConsistencyProof generates a consistency proof between two ledger sizes. It returns the consistency proof if successful, or an appropriate error if there was an error generating the consistency proof.
 func (s *LedgerService) GetConsistencyProof(ctx context.Context, fromSize int64, toSize int64) (*model.ConsistencyProofResult, error) {
 	if fromSize < 0 || fromSize > toSize {

@@ -8,7 +8,8 @@ option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1";
 service ProofService {
   rpc GetInclusionProof (GetInclusionProofRequest) returns (GetInclusionProofResponse) {}
   rpc GetConsistencyProof (GetConsistencyProofRequest) returns (GetConsistencyProofResponse) {}
-  rpc GetRootHash (GetRootHashRequest)returns (GetRootHashResponse) {}
+  rpc GetLatestSignedCheckpoint (GetLatestSignedCheckpointRequest) returns (GetLatestSignedCheckpointResponse) {}
+  rpc GetServerPublicKey  (GetServerPublicKeyRequest)  returns (GetServerPublicKeyResponse)  {}
 }
 
 message InclusionProof {
@@ -56,4 +57,28 @@ message ConsistencyProof {
   repeated bytes old_peaks_hashes = 3;
   repeated ConsistencyPath consistency_paths = 4;
   repeated bytes right_peaks = 5;
+}
+
+message GetLatestSignedCheckpointRequest {}
+
+message GetLatestSignedCheckpointResponse {
+  Checkpoint checkpoint = 1;
+}
+
+message Checkpoint {
+  string id = 1;
+  int64  size = 2;
+  bytes  root_hash = 3;
+  string anchored_at = 4;
+  string kid = 5;
+  string signature_token = 6;
+}
+
+message GetServerPublicKeyRequest {
+  string kid = 1;
+}
+
+message GetServerPublicKeyResponse {
+  string kid = 1;
+  bytes  public_key = 2;
 }
