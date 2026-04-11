@@ -19,7 +19,7 @@ func NewJcsSerializer() ports.Serializer {
 // SerializeCanonicalAuditEvent maps a service model AuditEvent to the shared canonical DTO and delegates serialization to pkg/canonicalizer.
 func (js *JcsSerializer) SerializeCanonicalAuditEvent(event *model.AuditEvent) ([]byte, error) {
 	payload := toPayload(event)
-	return pkgcanon.Canonicalize(payload)
+	return pkgcanon.CanonicalizeAuditEvent(payload)
 }
 
 // toPayload converts an AuditEvent to a payload object suitable for canonization.

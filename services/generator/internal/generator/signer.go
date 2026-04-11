@@ -32,7 +32,7 @@ func (s *EventSigner) Sign(event *model.AuditEvent) (string, error) {
 		return "", fmt.Errorf("sign: map to canonical payload: %w", err)
 	}
 
-	bytes, err := pkgcanon.Canonicalize(payload)
+	bytes, err := pkgcanon.CanonicalizeAuditEvent(payload)
 	if err != nil {
 		return "", fmt.Errorf("sign: canonicalize: %w", err)
 	}

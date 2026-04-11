@@ -1,21 +1,5 @@
 package canonicalizer
 
-import (
-	"encoding/json"
-
-	"github.com/gowebpki/jcs"
-)
-
-// Canonicalize serializes the payload to canonical JSON using JCS (RFC 8785).
-// The resulting bytes are deterministic and suitable for signing and storage.
-func Canonicalize(payload *AuditEventPayload) ([]byte, error) {
-	data, err := json.Marshal(payload)
-	if err != nil {
-		return nil, err
-	}
-	return jcs.Transform(data)
-}
-
 // AuditEventPayload is the canonical, transport-independent representation of an audit event used as the JWS signing payload.
 type AuditEventPayload struct {
 	ID          string              `json:"id"`
