@@ -99,8 +99,12 @@ func buildAuditEvent() (*model.AuditEvent, error) {
 		return nil, fmt.Errorf("build metadata: %w", err)
 	}
 
+	id, err := uuid.NewV7()
+	if err != nil {
+		return nil, fmt.Errorf("generate event ID: %w", err)
+	}
 	return &model.AuditEvent{
-		ID:          uuid.New(),
+		ID:          id,
 		Timestamp:   time.Now().UTC(),
 		Environment: e,
 		Actor:       *act,
