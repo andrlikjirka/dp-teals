@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/model"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql/query"
@@ -43,7 +44,7 @@ func (r *AuditLogRepository) StoreAuditLogEntry(ctx context.Context, eventId uui
 	return nil
 }
 
-// GetAuditLogEntryByEventID retrieves the raw audit log entry and its MMR leaf index for a given event ID.
+// GetAuditLogEntryByEventID retrieves an audit log entry from the database by its event ID. It executes an SQL query to fetch the entry details, and handles any errors that may occur during the operation. If no entry is found with the given event ID, it returns a specific error indicating that the audit log entry was not found.
 func (r *AuditLogRepository) GetAuditLogEntryByEventID(ctx context.Context, eventID uuid.UUID) (*svcmodel.AuditLogEntryRaw, error) {
 	var record model.AuditLogEntryRecord
 	err := pgxscan.Get(ctx, r.db, &record, query.GetAuditLogEntryByEventID, eventID)
@@ -63,4 +64,81 @@ func (r *AuditLogRepository) GetAuditLogEntryByEventID(ctx context.Context, even
 		CreatedAt:      record.CreatedAt,
 		Payload:        record.Payload,
 	}, nil
+}
+
+// ListAuditLogEntries retrieves a list of audit log entries from the database based on the provided filter criteria. It constructs an SQL query dynamically using the squirrel library, applying the appropriate WHERE clauses for each filter parameter. The function returns a slice of audit log entries that match the filter criteria, or an error if any issues occur during the retrieval process.
+func (r *AuditLogRepository) ListAuditLogEntries(ctx context.Context, filter *svcmodel.AuditEventFilter) ([]*svcmodel.AuditLogEntryRaw, error) {
+	sqlSelect, args, err := buildListAuditLogEntriesQuery(filter)
+	if err != nil {
+		return nil, fmt.Errorf("build list audit log entries query: %w", err)
+	}
+
+	var records []model.AuditLogEntryRecord
+	err = pgxscan.Select(ctx, r.db, &records, sqlSelect, args...)
+	if err != nil {
+		return nil, fmt.Errorf("list audit log entries: %w", err)
+	}
+
+	results := make([]*svcmodel.AuditLogEntryRaw, len(records))
+	for i, rec := range records {
+		results[i] = &svcmodel.AuditLogEntryRaw{
+			ID:             &rec.ID,
+			EventID:        rec.EventID,
+			ProducerKeyID:  rec.ProducerKeyID,
+			SignatureToken: rec.SignatureToken,
+			LeafIndex:      rec.LeafIndex,
+			CreatedAt:      rec.CreatedAt,
+			Payload:        rec.Payload,
+		}
+	}
+	return results, nil
+}
+
+// toStringSlice is a helper function that converts a slice of any type that is based on string (e.g., string, custom string types) to a slice of strings. This is useful for preparing arguments for SQL queries that expect text arrays.
+func toStringSlice[T ~string](vals []T) []string {
+	out := make([]string, len(vals))
+	for i, v := range vals {
+		out[i] = string(v)
+	}
+	return out
+}
+
+// buildListAuditLogEntriesQuery constructs an SQL query for listing audit log entries based on the provided filter criteria. It uses the squirrel library to build the query dynamically, applying the appropriate WHERE clauses for each filter parameter. The function returns the final SQL query string, a slice of arguments for the query, and any error that may occur during query construction.
+func buildListAuditLogEntriesQuery(filter *svcmodel.AuditEventFilter) (string, []any, error) {
+	q := squirrel.StatementBuilder.
+		PlaceholderFormat(squirrel.Dollar).
+		Select("le.id", "le.event_id", "le.mmr_node_id", "le.producer_key_id",
+			"le.signature_token", "le.created_at", "le.payload", "mn.leaf_index").
+		From("teals.log_entry le").
+		Join("teals.mmr_node mn ON mn.id = le.mmr_node_id")
+
+	if len(filter.Actions) > 0 {
+		q = q.Where("payload->>'action' = ANY(?::text[])", toStringSlice(filter.Actions))
+	}
+	if len(filter.ActorTypes) > 0 {
+		q = q.Where("payload->'actor'->>'type' = ANY(?::text[])", toStringSlice(filter.ActorTypes))
+	}
+	if filter.ActorID != "" {
+		q = q.Where("payload @> jsonb_build_object('actor', jsonb_build_object('id', ?::text))", filter.ActorID)
+	}
+	if filter.SubjectID != "" {
+		q = q.Where("payload @> jsonb_build_object('subject', jsonb_build_object('id', ?::text))", filter.SubjectID)
+	}
+	if filter.ResourceID != "" {
+		q = q.Where("payload @> jsonb_build_object('resource', jsonb_build_object('id', ?::text))", filter.ResourceID)
+	}
+	if filter.ResourceName != "" {
+		q = q.Where("payload @> jsonb_build_object('resource', jsonb_build_object('name', ?::text))", filter.ResourceName)
+	}
+	if len(filter.ResultStatuses) > 0 {
+		q = q.Where("payload->'result'->>'status' = ANY(?::text[])", toStringSlice(filter.ResultStatuses))
+	}
+	if filter.TimestampFrom != nil {
+		q = q.Where("(payload->>'timestamp')::timestamptz >= ?", filter.TimestampFrom)
+	}
+	if filter.TimestampTo != nil {
+		q = q.Where("(payload->>'timestamp')::timestamptz <= ?", filter.TimestampTo)
+	}
+
+	return q.ToSql()
 }

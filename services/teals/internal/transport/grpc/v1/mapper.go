@@ -8,6 +8,8 @@ import (
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model/enum"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // MapToAuditEvent converts an AppendRequest to an AuditEvent model.
@@ -161,4 +163,142 @@ func toResult(result *auditv1.Result) (model.Result, error) {
 		Status: status,
 		Reason: result.GetReason(),
 	}, nil
+}
+
+// mapToProtoAuditEvent converts a service model AuditEvent to the proto AuditEvent message.
+func mapToProtoAuditEvent(event *model.AuditEvent) *auditv1.AuditEvent {
+	if event == nil {
+		return nil
+	}
+
+	proto := &auditv1.AuditEvent{
+		Id:        event.ID.String(),
+		Timestamp: timestamppb.New(event.Timestamp),
+		Actor: &auditv1.Actor{
+			Type: fromActorType(event.Actor.Type),
+			Id:   event.Actor.ID,
+		},
+		Subject: &auditv1.Subject{Id: event.Subject.ID},
+		Action:  fromActionType(event.Action),
+		Resource: &auditv1.Resource{
+			Id:     event.Resource.ID,
+			Name:   event.Resource.Name,
+			Fields: event.Resource.Fields,
+		},
+		Result: &auditv1.Result{
+			Status: fromResultStatus(event.Result.Status),
+			Reason: event.Result.Reason,
+		},
+	}
+
+	if event.Environment != nil {
+		proto.Environment = &auditv1.Environment{
+			Service: event.Environment.Service,
+			TraceId: event.Environment.TraceID,
+			SpanId:  event.Environment.SpanID,
+		}
+	}
+
+	if len(event.Metadata) > 0 {
+		if s, err := structpb.NewStruct(event.Metadata); err == nil {
+			proto.Metadata = s
+		}
+	}
+
+	return proto
+}
+
+func fromActorType(t enum.ActorType) auditv1.Actor_Type {
+	switch t {
+	case enum.ActorTypeUser:
+		return auditv1.Actor_TYPE_USER
+	case enum.ActorTypeSystem:
+		return auditv1.Actor_TYPE_SYSTEM
+	default:
+		return auditv1.Actor_TYPE_UNSPECIFIED
+	}
+}
+
+func fromActionType(a enum.ActionType) auditv1.Action {
+	switch a {
+	case enum.ActionTypeAccess:
+		return auditv1.Action_ACTION_ACCESS
+	case enum.ActionTypeCreate:
+		return auditv1.Action_ACTION_CREATE
+	case enum.ActionTypeUpdate:
+		return auditv1.Action_ACTION_UPDATE
+	case enum.ActionTypeDelete:
+		return auditv1.Action_ACTION_DELETE
+	case enum.ActionTypeShare:
+		return auditv1.Action_ACTION_SHARE
+	case enum.ActionTypeExport:
+		return auditv1.Action_ACTION_EXPORT
+	case enum.ActionTypeLogin:
+		return auditv1.Action_ACTION_LOGIN
+	case enum.ActionTypeLogout:
+		return auditv1.Action_ACTION_LOGOUT
+	default:
+		return auditv1.Action_ACTION_UNSPECIFIED
+	}
+}
+
+func fromResultStatus(s enum.ResultStatusType) auditv1.Result_Status {
+	switch s {
+	case enum.ResultStatusSuccess:
+		return auditv1.Result_STATUS_SUCCESS
+	case enum.ResultStatusFailure:
+		return auditv1.Result_STATUS_FAILURE
+	default:
+		return auditv1.Result_STATUS_UNSPECIFIED
+	}
+}
+
+// mapToAuditEventFilter converts a proto AuditEventFilter message to the service model AuditEventFilter.
+func mapToAuditEventFilter(f *auditv1.AuditEventFilter) model.AuditEventFilter {
+	if f == nil {
+		return model.AuditEventFilter{}
+	}
+
+	filter := model.AuditEventFilter{
+		ActorID:      f.GetActorId(),
+		SubjectID:    f.GetSubjectId(),
+		ResourceID:   f.GetResourceId(),
+		ResourceName: f.GetResourceName(),
+	}
+
+	for _, a := range f.GetActions() {
+		if at, err := toAction(a); err == nil {
+			filter.Actions = append(filter.Actions, at)
+		}
+	}
+
+	for _, t := range f.GetActorTypes() {
+		switch t {
+		case auditv1.Actor_TYPE_USER:
+			filter.ActorTypes = append(filter.ActorTypes, enum.ActorTypeUser)
+		case auditv1.Actor_TYPE_SYSTEM:
+			filter.ActorTypes = append(filter.ActorTypes, enum.ActorTypeSystem)
+		}
+	}
+
+	for _, s := range f.GetResultStatuses() {
+		switch s {
+		case auditv1.Result_STATUS_SUCCESS:
+			filter.ResultStatuses = append(filter.ResultStatuses, enum.ResultStatusSuccess)
+		case auditv1.Result_STATUS_FAILURE:
+			filter.ResultStatuses = append(filter.ResultStatuses, enum.ResultStatusFailure)
+		}
+	}
+
+	if ts := f.GetTimestampFrom(); ts != nil {
+		t := ts.AsTime()
+		filter.TimestampFrom = &t
+	}
+
+	if ts := f.GetTimestampTo(); ts != nil {
+		t := ts.AsTime()
+		filter.TimestampTo = &t
+	}
+
+	return filter
 }

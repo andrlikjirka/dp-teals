@@ -19,101 +19,139 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuditQueryService_GetAuditEvent_FullMethodName = "/audit.v1.AuditQueryService/GetAuditEvent"
+	QueryService_GetAuditEvent_FullMethodName   = "/audit.v1.QueryService/GetAuditEvent"
+	QueryService_ListAuditEvents_FullMethodName = "/audit.v1.QueryService/ListAuditEvents"
 )
 
-// AuditQueryServiceClient is the client API for AuditQueryService service.
+// QueryServiceClient is the client API for QueryService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AuditQueryServiceClient interface {
+type QueryServiceClient interface {
 	GetAuditEvent(ctx context.Context, in *GetAuditEventRequest, opts ...grpc.CallOption) (*GetAuditEventResponse, error)
+	ListAuditEvents(ctx context.Context, in *ListAuditEventsRequest, opts ...grpc.CallOption) (*ListAuditEventsResponse, error)
 }
 
-type auditQueryServiceClient struct {
+type queryServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAuditQueryServiceClient(cc grpc.ClientConnInterface) AuditQueryServiceClient {
-	return &auditQueryServiceClient{cc}
+func NewQueryServiceClient(cc grpc.ClientConnInterface) QueryServiceClient {
+	return &queryServiceClient{cc}
 }
 
-func (c *auditQueryServiceClient) GetAuditEvent(ctx context.Context, in *GetAuditEventRequest, opts ...grpc.CallOption) (*GetAuditEventResponse, error) {
+func (c *queryServiceClient) GetAuditEvent(ctx context.Context, in *GetAuditEventRequest, opts ...grpc.CallOption) (*GetAuditEventResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetAuditEventResponse)
-	err := c.cc.Invoke(ctx, AuditQueryService_GetAuditEvent_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, QueryService_GetAuditEvent_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AuditQueryServiceServer is the server API for AuditQueryService service.
-// All implementations must embed UnimplementedAuditQueryServiceServer
-// for forward compatibility.
-type AuditQueryServiceServer interface {
-	GetAuditEvent(context.Context, *GetAuditEventRequest) (*GetAuditEventResponse, error)
-	mustEmbedUnimplementedAuditQueryServiceServer()
+func (c *queryServiceClient) ListAuditEvents(ctx context.Context, in *ListAuditEventsRequest, opts ...grpc.CallOption) (*ListAuditEventsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAuditEventsResponse)
+	err := c.cc.Invoke(ctx, QueryService_ListAuditEvents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// UnimplementedAuditQueryServiceServer must be embedded to have
+// QueryServiceServer is the server API for QueryService service.
+// All implementations must embed UnimplementedQueryServiceServer
+// for forward compatibility.
+type QueryServiceServer interface {
+	GetAuditEvent(context.Context, *GetAuditEventRequest) (*GetAuditEventResponse, error)
+	ListAuditEvents(context.Context, *ListAuditEventsRequest) (*ListAuditEventsResponse, error)
+	mustEmbedUnimplementedQueryServiceServer()
+}
+
+// UnimplementedQueryServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedAuditQueryServiceServer struct{}
+type UnimplementedQueryServiceServer struct{}
 
-func (UnimplementedAuditQueryServiceServer) GetAuditEvent(context.Context, *GetAuditEventRequest) (*GetAuditEventResponse, error) {
+func (UnimplementedQueryServiceServer) GetAuditEvent(context.Context, *GetAuditEventRequest) (*GetAuditEventResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAuditEvent not implemented")
 }
-func (UnimplementedAuditQueryServiceServer) mustEmbedUnimplementedAuditQueryServiceServer() {}
-func (UnimplementedAuditQueryServiceServer) testEmbeddedByValue()                           {}
+func (UnimplementedQueryServiceServer) ListAuditEvents(context.Context, *ListAuditEventsRequest) (*ListAuditEventsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAuditEvents not implemented")
+}
+func (UnimplementedQueryServiceServer) mustEmbedUnimplementedQueryServiceServer() {}
+func (UnimplementedQueryServiceServer) testEmbeddedByValue()                      {}
 
-// UnsafeAuditQueryServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AuditQueryServiceServer will
+// UnsafeQueryServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to QueryServiceServer will
 // result in compilation errors.
-type UnsafeAuditQueryServiceServer interface {
-	mustEmbedUnimplementedAuditQueryServiceServer()
+type UnsafeQueryServiceServer interface {
+	mustEmbedUnimplementedQueryServiceServer()
 }
 
-func RegisterAuditQueryServiceServer(s grpc.ServiceRegistrar, srv AuditQueryServiceServer) {
-	// If the following call panics, it indicates UnimplementedAuditQueryServiceServer was
+func RegisterQueryServiceServer(s grpc.ServiceRegistrar, srv QueryServiceServer) {
+	// If the following call panics, it indicates UnimplementedQueryServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&AuditQueryService_ServiceDesc, srv)
+	s.RegisterService(&QueryService_ServiceDesc, srv)
 }
 
-func _AuditQueryService_GetAuditEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _QueryService_GetAuditEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAuditEventRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuditQueryServiceServer).GetAuditEvent(ctx, in)
+		return srv.(QueryServiceServer).GetAuditEvent(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuditQueryService_GetAuditEvent_FullMethodName,
+		FullMethod: QueryService_GetAuditEvent_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuditQueryServiceServer).GetAuditEvent(ctx, req.(*GetAuditEventRequest))
+		return srv.(QueryServiceServer).GetAuditEvent(ctx, req.(*GetAuditEventRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// AuditQueryService_ServiceDesc is the grpc.ServiceDesc for AuditQueryService service.
+func _QueryService_ListAuditEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAuditEventsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServiceServer).ListAuditEvents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: QueryService_ListAuditEvents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServiceServer).ListAuditEvents(ctx, req.(*ListAuditEventsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// QueryService_ServiceDesc is the grpc.ServiceDesc for QueryService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var AuditQueryService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "audit.v1.AuditQueryService",
-	HandlerType: (*AuditQueryServiceServer)(nil),
+var QueryService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "audit.v1.QueryService",
+	HandlerType: (*QueryServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetAuditEvent",
-			Handler:    _AuditQueryService_GetAuditEvent_Handler,
+			Handler:    _QueryService_GetAuditEvent_Handler,
+		},
+		{
+			MethodName: "ListAuditEvents",
+			Handler:    _QueryService_ListAuditEvents_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

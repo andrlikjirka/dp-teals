@@ -7,6 +7,8 @@ import (
 var (
 	//go:embed scripts/audit_log/Insert.sql
 	InsertAuditEvent string
+	//go:embed scripts/audit_log/GetAuditLogEntryByEventID.sql
+	GetAuditLogEntryByEventID string
 
 	//go:embed scripts/producer/AddPublicKey.sql
 	AddProducerPublicKey string
@@ -25,8 +27,6 @@ var (
 	SetMmrNodeParent string
 	//go:embed scripts/ledger/GetMmrPeaks.sql
 	GetMmrPeaks string
-	//go:embed scripts/audit_log/GetAuditLogEntryByEventID.sql
-	GetAuditLogEntryByEventID string
 	//go:embed scripts/ledger/GetLeafToPeakPath.sql
 	GetLeafToPeakPath string
 	//go:embed scripts/ledger/GetNodesByIDs.sql

@@ -8,9 +8,9 @@ import "audit/v1/proof.proto";
 
 option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1";
 
-service AuditQueryService {
+service QueryService {
   rpc GetAuditEvent (GetAuditEventRequest) returns (GetAuditEventResponse) {}
-  // rpc ListAuditEvents (ListAuditEventsRequest) returns (ListAuditEventsResponse) {}
+  rpc ListAuditEvents (ListAuditEventsRequest) returns (ListAuditEventsResponse) {}
 }
 
 message GetAuditEventRequest {
@@ -18,6 +18,34 @@ message GetAuditEventRequest {
 }
 
 message GetAuditEventResponse {
-  AuditEvent     event           = 1;
-  InclusionProof inclusion_proof = 2;
+  AuditEvent event = 1;
+  int64 leaf_index = 2;
+  string producer_sign_token = 3;
+}
+
+message ListAuditEventsRequest {
+  AuditEventFilter filter = 1;
+}
+
+message ListAuditEventsResponse {
+  repeated ListAuditEventsItem items = 1;
+  int64 ledger_size = 2;
+}
+
+message AuditEventFilter {
+  repeated Action actions = 1; // any of the listed actions, empty = all actions
+  repeated Actor.Type actor_types = 2; // any of the listed actor types, empty = all types
+  string actor_id = 3;
+  string subject_id = 4;
+  string resource_id = 5;
+  string resource_name = 6;
+  repeated Result.Status result_statuses = 7; // any of the listed result statuses, empty = all statuses
+  google.protobuf.Timestamp timestamp_from = 8; // inclusive lower bound on event timestamp
+  google.protobuf.Timestamp timestamp_to = 9;  // inclusive upper bound on event timestamp.
+}
+
+message ListAuditEventsItem {
+  AuditEvent event = 1;
+  int64 leaf_index = 2;
+  string producer_sign_token = 3;
 }

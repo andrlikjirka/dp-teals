@@ -10,7 +10,7 @@ import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/timestamppb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -68,11 +68,12 @@ func (x *GetAuditEventRequest) GetEventId() string {
 }
 
 type GetAuditEventResponse struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Event          *AuditEvent            `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
-	InclusionProof *InclusionProof        `protobuf:"bytes,2,opt,name=inclusion_proof,json=inclusionProof,proto3" json:"inclusion_proof,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Event             *AuditEvent            `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
+	LeafIndex         int64                  `protobuf:"varint,2,opt,name=leaf_index,json=leafIndex,proto3" json:"leaf_index,omitempty"`
+	ProducerSignToken string                 `protobuf:"bytes,3,opt,name=producer_sign_token,json=producerSignToken,proto3" json:"producer_sign_token,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *GetAuditEventResponse) Reset() {
@@ -112,11 +113,282 @@ func (x *GetAuditEventResponse) GetEvent() *AuditEvent {
 	return nil
 }
 
-func (x *GetAuditEventResponse) GetInclusionProof() *InclusionProof {
+func (x *GetAuditEventResponse) GetLeafIndex() int64 {
 	if x != nil {
-		return x.InclusionProof
+		return x.LeafIndex
+	}
+	return 0
+}
+
+func (x *GetAuditEventResponse) GetProducerSignToken() string {
+	if x != nil {
+		return x.ProducerSignToken
+	}
+	return ""
+}
+
+type ListAuditEventsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filter        *AuditEventFilter      `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAuditEventsRequest) Reset() {
+	*x = ListAuditEventsRequest{}
+	mi := &file_audit_v1_query_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAuditEventsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAuditEventsRequest) ProtoMessage() {}
+
+func (x *ListAuditEventsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_audit_v1_query_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAuditEventsRequest.ProtoReflect.Descriptor instead.
+func (*ListAuditEventsRequest) Descriptor() ([]byte, []int) {
+	return file_audit_v1_query_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ListAuditEventsRequest) GetFilter() *AuditEventFilter {
+	if x != nil {
+		return x.Filter
 	}
 	return nil
+}
+
+type ListAuditEventsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Items         []*ListAuditEventsItem `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	LedgerSize    int64                  `protobuf:"varint,2,opt,name=ledger_size,json=ledgerSize,proto3" json:"ledger_size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAuditEventsResponse) Reset() {
+	*x = ListAuditEventsResponse{}
+	mi := &file_audit_v1_query_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAuditEventsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAuditEventsResponse) ProtoMessage() {}
+
+func (x *ListAuditEventsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_audit_v1_query_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAuditEventsResponse.ProtoReflect.Descriptor instead.
+func (*ListAuditEventsResponse) Descriptor() ([]byte, []int) {
+	return file_audit_v1_query_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ListAuditEventsResponse) GetItems() []*ListAuditEventsItem {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+func (x *ListAuditEventsResponse) GetLedgerSize() int64 {
+	if x != nil {
+		return x.LedgerSize
+	}
+	return 0
+}
+
+type AuditEventFilter struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Actions        []Action               `protobuf:"varint,1,rep,packed,name=actions,proto3,enum=audit.v1.Action" json:"actions,omitempty"`                             // any of the listed actions, empty = all actions
+	ActorTypes     []Actor_Type           `protobuf:"varint,2,rep,packed,name=actor_types,json=actorTypes,proto3,enum=audit.v1.Actor_Type" json:"actor_types,omitempty"` // any of the listed actor types, empty = all types
+	ActorId        string                 `protobuf:"bytes,3,opt,name=actor_id,json=actorId,proto3" json:"actor_id,omitempty"`
+	SubjectId      string                 `protobuf:"bytes,4,opt,name=subject_id,json=subjectId,proto3" json:"subject_id,omitempty"`
+	ResourceId     string                 `protobuf:"bytes,5,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
+	ResourceName   string                 `protobuf:"bytes,6,opt,name=resource_name,json=resourceName,proto3" json:"resource_name,omitempty"`
+	ResultStatuses []Result_Status        `protobuf:"varint,7,rep,packed,name=result_statuses,json=resultStatuses,proto3,enum=audit.v1.Result_Status" json:"result_statuses,omitempty"` // any of the listed result statuses, empty = all statuses
+	TimestampFrom  *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=timestamp_from,json=timestampFrom,proto3" json:"timestamp_from,omitempty"`                                        // inclusive lower bound on event timestamp
+	TimestampTo    *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=timestamp_to,json=timestampTo,proto3" json:"timestamp_to,omitempty"`                                              // inclusive upper bound on event timestamp.
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *AuditEventFilter) Reset() {
+	*x = AuditEventFilter{}
+	mi := &file_audit_v1_query_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AuditEventFilter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuditEventFilter) ProtoMessage() {}
+
+func (x *AuditEventFilter) ProtoReflect() protoreflect.Message {
+	mi := &file_audit_v1_query_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuditEventFilter.ProtoReflect.Descriptor instead.
+func (*AuditEventFilter) Descriptor() ([]byte, []int) {
+	return file_audit_v1_query_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *AuditEventFilter) GetActions() []Action {
+	if x != nil {
+		return x.Actions
+	}
+	return nil
+}
+
+func (x *AuditEventFilter) GetActorTypes() []Actor_Type {
+	if x != nil {
+		return x.ActorTypes
+	}
+	return nil
+}
+
+func (x *AuditEventFilter) GetActorId() string {
+	if x != nil {
+		return x.ActorId
+	}
+	return ""
+}
+
+func (x *AuditEventFilter) GetSubjectId() string {
+	if x != nil {
+		return x.SubjectId
+	}
+	return ""
+}
+
+func (x *AuditEventFilter) GetResourceId() string {
+	if x != nil {
+		return x.ResourceId
+	}
+	return ""
+}
+
+func (x *AuditEventFilter) GetResourceName() string {
+	if x != nil {
+		return x.ResourceName
+	}
+	return ""
+}
+
+func (x *AuditEventFilter) GetResultStatuses() []Result_Status {
+	if x != nil {
+		return x.ResultStatuses
+	}
+	return nil
+}
+
+func (x *AuditEventFilter) GetTimestampFrom() *timestamppb.Timestamp {
+	if x != nil {
+		return x.TimestampFrom
+	}
+	return nil
+}
+
+func (x *AuditEventFilter) GetTimestampTo() *timestamppb.Timestamp {
+	if x != nil {
+		return x.TimestampTo
+	}
+	return nil
+}
+
+type ListAuditEventsItem struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Event             *AuditEvent            `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
+	LeafIndex         int64                  `protobuf:"varint,2,opt,name=leaf_index,json=leafIndex,proto3" json:"leaf_index,omitempty"`
+	ProducerSignToken string                 `protobuf:"bytes,3,opt,name=producer_sign_token,json=producerSignToken,proto3" json:"producer_sign_token,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ListAuditEventsItem) Reset() {
+	*x = ListAuditEventsItem{}
+	mi := &file_audit_v1_query_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAuditEventsItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAuditEventsItem) ProtoMessage() {}
+
+func (x *ListAuditEventsItem) ProtoReflect() protoreflect.Message {
+	mi := &file_audit_v1_query_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAuditEventsItem.ProtoReflect.Descriptor instead.
+func (*ListAuditEventsItem) Descriptor() ([]byte, []int) {
+	return file_audit_v1_query_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ListAuditEventsItem) GetEvent() *AuditEvent {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *ListAuditEventsItem) GetLeafIndex() int64 {
+	if x != nil {
+		return x.LeafIndex
+	}
+	return 0
+}
+
+func (x *ListAuditEventsItem) GetProducerSignToken() string {
+	if x != nil {
+		return x.ProducerSignToken
+	}
+	return ""
 }
 
 var File_audit_v1_query_proto protoreflect.FileDescriptor
@@ -125,12 +397,39 @@ const file_audit_v1_query_proto_rawDesc = "" +
 	"\n" +
 	"\x14audit/v1/query.proto\x12\baudit.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bbuf/validate/validate.proto\x1a\x14audit/v1/event.proto\x1a\x14audit/v1/proof.proto\";\n" +
 	"\x14GetAuditEventRequest\x12#\n" +
-	"\bevent_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\aeventId\"\x86\x01\n" +
+	"\bevent_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\aeventId\"\x92\x01\n" +
 	"\x15GetAuditEventResponse\x12*\n" +
-	"\x05event\x18\x01 \x01(\v2\x14.audit.v1.AuditEventR\x05event\x12A\n" +
-	"\x0finclusion_proof\x18\x02 \x01(\v2\x18.audit.v1.InclusionProofR\x0einclusionProof2g\n" +
-	"\x11AuditQueryService\x12R\n" +
-	"\rGetAuditEvent\x12\x1e.audit.v1.GetAuditEventRequest\x1a\x1f.audit.v1.GetAuditEventResponse\"\x00B\x94\x01\n" +
+	"\x05event\x18\x01 \x01(\v2\x14.audit.v1.AuditEventR\x05event\x12\x1d\n" +
+	"\n" +
+	"leaf_index\x18\x02 \x01(\x03R\tleafIndex\x12.\n" +
+	"\x13producer_sign_token\x18\x03 \x01(\tR\x11producerSignToken\"L\n" +
+	"\x16ListAuditEventsRequest\x122\n" +
+	"\x06filter\x18\x01 \x01(\v2\x1a.audit.v1.AuditEventFilterR\x06filter\"o\n" +
+	"\x17ListAuditEventsResponse\x123\n" +
+	"\x05items\x18\x01 \x03(\v2\x1d.audit.v1.ListAuditEventsItemR\x05items\x12\x1f\n" +
+	"\vledger_size\x18\x02 \x01(\x03R\n" +
+	"ledgerSize\"\xb9\x03\n" +
+	"\x10AuditEventFilter\x12*\n" +
+	"\aactions\x18\x01 \x03(\x0e2\x10.audit.v1.ActionR\aactions\x125\n" +
+	"\vactor_types\x18\x02 \x03(\x0e2\x14.audit.v1.Actor.TypeR\n" +
+	"actorTypes\x12\x19\n" +
+	"\bactor_id\x18\x03 \x01(\tR\aactorId\x12\x1d\n" +
+	"\n" +
+	"subject_id\x18\x04 \x01(\tR\tsubjectId\x12\x1f\n" +
+	"\vresource_id\x18\x05 \x01(\tR\n" +
+	"resourceId\x12#\n" +
+	"\rresource_name\x18\x06 \x01(\tR\fresourceName\x12@\n" +
+	"\x0fresult_statuses\x18\a \x03(\x0e2\x17.audit.v1.Result.StatusR\x0eresultStatuses\x12A\n" +
+	"\x0etimestamp_from\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\rtimestampFrom\x12=\n" +
+	"\ftimestamp_to\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\vtimestampTo\"\x90\x01\n" +
+	"\x13ListAuditEventsItem\x12*\n" +
+	"\x05event\x18\x01 \x01(\v2\x14.audit.v1.AuditEventR\x05event\x12\x1d\n" +
+	"\n" +
+	"leaf_index\x18\x02 \x01(\x03R\tleafIndex\x12.\n" +
+	"\x13producer_sign_token\x18\x03 \x01(\tR\x11producerSignToken2\xbc\x01\n" +
+	"\fQueryService\x12R\n" +
+	"\rGetAuditEvent\x12\x1e.audit.v1.GetAuditEventRequest\x1a\x1f.audit.v1.GetAuditEventResponse\"\x00\x12X\n" +
+	"\x0fListAuditEvents\x12 .audit.v1.ListAuditEventsRequest\x1a!.audit.v1.ListAuditEventsResponse\"\x00B\x94\x01\n" +
 	"\fcom.audit.v1B\n" +
 	"QueryProtoP\x01Z7github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1\xa2\x02\x03AXX\xaa\x02\bAudit.V1\xca\x02\bAudit\\V1\xe2\x02\x14Audit\\V1\\GPBMetadata\xea\x02\tAudit::V1b\x06proto3"
 
@@ -146,23 +445,39 @@ func file_audit_v1_query_proto_rawDescGZIP() []byte {
 	return file_audit_v1_query_proto_rawDescData
 }
 
-var file_audit_v1_query_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_audit_v1_query_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_audit_v1_query_proto_goTypes = []any{
-	(*GetAuditEventRequest)(nil),  // 0: audit.v1.GetAuditEventRequest
-	(*GetAuditEventResponse)(nil), // 1: audit.v1.GetAuditEventResponse
-	(*AuditEvent)(nil),            // 2: audit.v1.AuditEvent
-	(*InclusionProof)(nil),        // 3: audit.v1.InclusionProof
+	(*GetAuditEventRequest)(nil),    // 0: audit.v1.GetAuditEventRequest
+	(*GetAuditEventResponse)(nil),   // 1: audit.v1.GetAuditEventResponse
+	(*ListAuditEventsRequest)(nil),  // 2: audit.v1.ListAuditEventsRequest
+	(*ListAuditEventsResponse)(nil), // 3: audit.v1.ListAuditEventsResponse
+	(*AuditEventFilter)(nil),        // 4: audit.v1.AuditEventFilter
+	(*ListAuditEventsItem)(nil),     // 5: audit.v1.ListAuditEventsItem
+	(*AuditEvent)(nil),              // 6: audit.v1.AuditEvent
+	(Action)(0),                     // 7: audit.v1.Action
+	(Actor_Type)(0),                 // 8: audit.v1.Actor.Type
+	(Result_Status)(0),              // 9: audit.v1.Result.Status
+	(*timestamppb.Timestamp)(nil),   // 10: google.protobuf.Timestamp
 }
 var file_audit_v1_query_proto_depIdxs = []int32{
-	2, // 0: audit.v1.GetAuditEventResponse.event:type_name -> audit.v1.AuditEvent
-	3, // 1: audit.v1.GetAuditEventResponse.inclusion_proof:type_name -> audit.v1.InclusionProof
-	0, // 2: audit.v1.AuditQueryService.GetAuditEvent:input_type -> audit.v1.GetAuditEventRequest
-	1, // 3: audit.v1.AuditQueryService.GetAuditEvent:output_type -> audit.v1.GetAuditEventResponse
-	3, // [3:4] is the sub-list for method output_type
-	2, // [2:3] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	6,  // 0: audit.v1.GetAuditEventResponse.event:type_name -> audit.v1.AuditEvent
+	4,  // 1: audit.v1.ListAuditEventsRequest.filter:type_name -> audit.v1.AuditEventFilter
+	5,  // 2: audit.v1.ListAuditEventsResponse.items:type_name -> audit.v1.ListAuditEventsItem
+	7,  // 3: audit.v1.AuditEventFilter.actions:type_name -> audit.v1.Action
+	8,  // 4: audit.v1.AuditEventFilter.actor_types:type_name -> audit.v1.Actor.Type
+	9,  // 5: audit.v1.AuditEventFilter.result_statuses:type_name -> audit.v1.Result.Status
+	10, // 6: audit.v1.AuditEventFilter.timestamp_from:type_name -> google.protobuf.Timestamp
+	10, // 7: audit.v1.AuditEventFilter.timestamp_to:type_name -> google.protobuf.Timestamp
+	6,  // 8: audit.v1.ListAuditEventsItem.event:type_name -> audit.v1.AuditEvent
+	0,  // 9: audit.v1.QueryService.GetAuditEvent:input_type -> audit.v1.GetAuditEventRequest
+	2,  // 10: audit.v1.QueryService.ListAuditEvents:input_type -> audit.v1.ListAuditEventsRequest
+	1,  // 11: audit.v1.QueryService.GetAuditEvent:output_type -> audit.v1.GetAuditEventResponse
+	3,  // 12: audit.v1.QueryService.ListAuditEvents:output_type -> audit.v1.ListAuditEventsResponse
+	11, // [11:13] is the sub-list for method output_type
+	9,  // [9:11] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_audit_v1_query_proto_init() }
@@ -178,7 +493,7 @@ func file_audit_v1_query_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_audit_v1_query_proto_rawDesc), len(file_audit_v1_query_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

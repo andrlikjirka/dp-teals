@@ -27,7 +27,7 @@ type Server struct {
 }
 
 // NewServer creates a new Server instance with the given configuration
-func NewServer(cfg Config, log *logger.Logger, ingestor auditv1.IngestionServiceServer, keys auditv1.KeyRegistrationServiceServer, prover auditv1.ProofServiceServer) (*Server, error) {
+func NewServer(cfg Config, log *logger.Logger, ingestor auditv1.IngestionServiceServer, keys auditv1.KeyRegistrationServiceServer, prover auditv1.ProofServiceServer, querier auditv1.QueryServiceServer) (*Server, error) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Port))
 	if err != nil {
 		return nil, fmt.Errorf("failed to listen on port %d: %w", cfg.Port, err)
@@ -55,6 +55,7 @@ func NewServer(cfg Config, log *logger.Logger, ingestor auditv1.IngestionService
 	auditv1.RegisterIngestionServiceServer(grpcSrv, ingestor)
 	auditv1.RegisterKeyRegistrationServiceServer(grpcSrv, keys)
 	auditv1.RegisterProofServiceServer(grpcSrv, prover)
+	auditv1.RegisterQueryServiceServer(grpcSrv, querier)
 
 	healthServer := health.NewServer()
 	grpc_health_v1.RegisterHealthServer(grpcSrv, healthServer)
