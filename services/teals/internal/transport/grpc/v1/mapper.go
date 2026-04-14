@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"encoding/base64"
+	"encoding/binary"
 	"fmt"
 	"time"
 
@@ -301,4 +303,23 @@ func mapToAuditEventFilter(f *auditv1.AuditEventFilter) model.AuditEventFilter {
 	}
 
 	return filter
+}
+
+// encodeCursor encodes an int64 ID into a base64 string for use as a pagination cursor.
+func encodeCursor(id int64) string {
+	b := make([]byte, 8)
+	binary.BigEndian.PutUint64(b, uint64(id))
+	return base64.RawURLEncoding.EncodeToString(b)
+}
+
+// decodeCursor decodes a base64 string cursor back into an int64 ID. It returns an error if the input is not a valid base64 string or if the decoded byte length is not 8.
+func decodeCursor(s string) (int64, error) {
+	b, err := base64.RawURLEncoding.DecodeString(s)
+	if err != nil {
+		return 0, fmt.Errorf("invalid cursor: %w", err)
+	}
+	if len(b) != 8 {
+		return 0, fmt.Errorf("invalid cursor: unexpected length %d", len(b))
+	}
+	return int64(binary.BigEndian.Uint64(b)), nil
 }

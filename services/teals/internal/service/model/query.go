@@ -18,7 +18,6 @@ type AuditEventFilter struct {
 	ResultStatuses []enum.ResultStatusType
 	TimestampFrom  *time.Time
 	TimestampTo    *time.Time
-	AtLedgerSize   int64
 }
 
 // GetAuditEventResult encapsulates the result of retrieving a single audit event, including the event details and associated metadata.
@@ -32,6 +31,7 @@ type GetAuditEventResult struct {
 type ListAuditEventsResult struct {
 	Items      []*AuditEventListItem
 	LedgerSize int64
+	NextCursor *int64
 }
 
 // AuditEventListItem represents an individual audit event in the list of events returned by a query, including the event details and associated metadata such as the leaf index and signature token.

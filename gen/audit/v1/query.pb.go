@@ -130,6 +130,7 @@ func (x *GetAuditEventResponse) GetProducerSignToken() string {
 type ListAuditEventsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Filter        *AuditEventFilter      `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
+	Cursor        *string                `protobuf:"bytes,2,opt,name=cursor,proto3,oneof" json:"cursor,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -171,10 +172,18 @@ func (x *ListAuditEventsRequest) GetFilter() *AuditEventFilter {
 	return nil
 }
 
+func (x *ListAuditEventsRequest) GetCursor() string {
+	if x != nil && x.Cursor != nil {
+		return *x.Cursor
+	}
+	return ""
+}
+
 type ListAuditEventsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Items         []*ListAuditEventsItem `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
 	LedgerSize    int64                  `protobuf:"varint,2,opt,name=ledger_size,json=ledgerSize,proto3" json:"ledger_size,omitempty"`
+	NextCursor    *string                `protobuf:"bytes,3,opt,name=next_cursor,json=nextCursor,proto3,oneof" json:"next_cursor,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -221,6 +230,13 @@ func (x *ListAuditEventsResponse) GetLedgerSize() int64 {
 		return x.LedgerSize
 	}
 	return 0
+}
+
+func (x *ListAuditEventsResponse) GetNextCursor() string {
+	if x != nil && x.NextCursor != nil {
+		return *x.NextCursor
+	}
+	return ""
 }
 
 type AuditEventFilter struct {
@@ -402,13 +418,18 @@ const file_audit_v1_query_proto_rawDesc = "" +
 	"\x05event\x18\x01 \x01(\v2\x14.audit.v1.AuditEventR\x05event\x12\x1d\n" +
 	"\n" +
 	"leaf_index\x18\x02 \x01(\x03R\tleafIndex\x12.\n" +
-	"\x13producer_sign_token\x18\x03 \x01(\tR\x11producerSignToken\"L\n" +
+	"\x13producer_sign_token\x18\x03 \x01(\tR\x11producerSignToken\"t\n" +
 	"\x16ListAuditEventsRequest\x122\n" +
-	"\x06filter\x18\x01 \x01(\v2\x1a.audit.v1.AuditEventFilterR\x06filter\"o\n" +
+	"\x06filter\x18\x01 \x01(\v2\x1a.audit.v1.AuditEventFilterR\x06filter\x12\x1b\n" +
+	"\x06cursor\x18\x02 \x01(\tH\x00R\x06cursor\x88\x01\x01B\t\n" +
+	"\a_cursor\"\xa5\x01\n" +
 	"\x17ListAuditEventsResponse\x123\n" +
 	"\x05items\x18\x01 \x03(\v2\x1d.audit.v1.ListAuditEventsItemR\x05items\x12\x1f\n" +
 	"\vledger_size\x18\x02 \x01(\x03R\n" +
-	"ledgerSize\"\xb9\x03\n" +
+	"ledgerSize\x12$\n" +
+	"\vnext_cursor\x18\x03 \x01(\tH\x00R\n" +
+	"nextCursor\x88\x01\x01B\x0e\n" +
+	"\f_next_cursor\"\xb9\x03\n" +
 	"\x10AuditEventFilter\x12*\n" +
 	"\aactions\x18\x01 \x03(\x0e2\x10.audit.v1.ActionR\aactions\x125\n" +
 	"\vactor_types\x18\x02 \x03(\x0e2\x14.audit.v1.Actor.TypeR\n" +
@@ -487,6 +508,8 @@ func file_audit_v1_query_proto_init() {
 	}
 	file_audit_v1_event_proto_init()
 	file_audit_v1_proof_proto_init()
+	file_audit_v1_query_proto_msgTypes[2].OneofWrappers = []any{}
+	file_audit_v1_query_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -51,7 +51,16 @@ func (s *QueryServiceServer) GetAuditEvent(ctx context.Context, req *auditv1.Get
 func (s *QueryServiceServer) ListAuditEvents(ctx context.Context, req *auditv1.ListAuditEventsRequest) (*auditv1.ListAuditEventsResponse, error) {
 	filter := mapToAuditEventFilter(req.Filter)
 
-	result, err := s.service.ListAuditEvents(ctx, &filter)
+	var cursor *int64
+	if req.Cursor != nil {
+		decoded, err := decodeCursor(*req.Cursor)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid cursor: %v", err)
+		}
+		cursor = &decoded
+	}
+
+	result, err := s.service.ListAuditEvents(ctx, &filter, cursor)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to list audit events: %v", err)
 	}
@@ -65,8 +74,14 @@ func (s *QueryServiceServer) ListAuditEvents(ctx context.Context, req *auditv1.L
 		}
 	}
 
-	return &auditv1.ListAuditEventsResponse{
+	resp := &auditv1.ListAuditEventsResponse{
 		Items:      items,
 		LedgerSize: result.LedgerSize,
-	}, nil
+	}
+	if result.NextCursor != nil {
+		next := encodeCursor(*result.NextCursor)
+		resp.NextCursor = &next
+	}
+
+	return resp, nil
 }

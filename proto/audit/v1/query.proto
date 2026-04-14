@@ -25,11 +25,13 @@ message GetAuditEventResponse {
 
 message ListAuditEventsRequest {
   AuditEventFilter filter = 1;
+  optional string cursor = 2;
 }
 
 message ListAuditEventsResponse {
   repeated ListAuditEventsItem items = 1;
   int64 ledger_size = 2;
+  optional string next_cursor = 3;
 }
 
 message AuditEventFilter {

@@ -10,6 +10,9 @@ import (
 	"github.com/google/uuid"
 )
 
+// auditEventPageSize defines the maximum number of audit events to return in a single page when listing audit events. If more than this number of events are available, a next cursor will be provided for pagination.
+const auditEventPageSize = 100
+
 // QueryService provides methods to query audit events and their inclusion proofs.
 type QueryService struct {
 	tx         ports.TransactionProvider
@@ -60,7 +63,7 @@ func (s *QueryService) GetAuditEvent(ctx context.Context, eventID uuid.UUID) (*m
 }
 
 // ListAuditEvents retrieves a list of audit events based on the provided filter, along with the current ledger size. It returns an error if there was an issue during retrieval or deserialization of any of the events.
-func (s *QueryService) ListAuditEvents(ctx context.Context, filter *model.AuditEventFilter) (*model.ListAuditEventsResult, error) {
+func (s *QueryService) ListAuditEvents(ctx context.Context, filter *model.AuditEventFilter, cursor *int64) (*model.ListAuditEventsResult, error) {
 	var result *model.ListAuditEventsResult
 
 	err := s.tx.Transact(ctx, func(r ports.Repositories) error {
@@ -70,10 +73,16 @@ func (s *QueryService) ListAuditEvents(ctx context.Context, filter *model.AuditE
 			return svcerrors.ErrLedgerSizeFailed
 		}
 
-		entries, err := r.AuditLog.ListAuditLogEntries(ctx, filter)
+		entries, err := r.AuditLog.ListAuditLogEntries(ctx, filter, cursor, auditEventPageSize+1)
 		if err != nil {
 			s.logger.Error("failed to list audit log entries", "error", err)
 			return svcerrors.ErrAuditLogEntryNotFound
+		}
+
+		var nextCursor *int64
+		if len(entries) == auditEventPageSize+1 {
+			entries = entries[:auditEventPageSize]
+			nextCursor = entries[auditEventPageSize-1].ID
 		}
 
 		items := make([]*model.AuditEventListItem, len(entries))
@@ -90,7 +99,7 @@ func (s *QueryService) ListAuditEvents(ctx context.Context, filter *model.AuditE
 			}
 		}
 
-		result = &model.ListAuditEventsResult{Items: items, LedgerSize: size}
+		result = &model.ListAuditEventsResult{Items: items, LedgerSize: size, NextCursor: nextCursor}
 		return nil
 	})
 	if err != nil {

@@ -66,9 +66,9 @@ func (r *AuditLogRepository) GetAuditLogEntryByEventID(ctx context.Context, even
 	}, nil
 }
 
-// ListAuditLogEntries retrieves a list of audit log entries from the database based on the provided filter criteria. It constructs an SQL query dynamically using the squirrel library, applying the appropriate WHERE clauses for each filter parameter. The function returns a slice of audit log entries that match the filter criteria, or an error if any issues occur during the retrieval process.
-func (r *AuditLogRepository) ListAuditLogEntries(ctx context.Context, filter *svcmodel.AuditEventFilter) ([]*svcmodel.AuditLogEntryRaw, error) {
-	sqlSelect, args, err := buildListAuditLogEntriesQuery(filter)
+// ListAuditLogEntries retrieves a list of audit log entries from the database based on the provided filter criteria and pagination cursor. It constructs an SQL query dynamically using the squirrel library, executes the query to fetch matching entries, and handles any errors that may occur during the operation. The results are returned as a slice of AuditLogEntryRaw objects.
+func (r *AuditLogRepository) ListAuditLogEntries(ctx context.Context, filter *svcmodel.AuditEventFilter, cursor *int64, size int) ([]*svcmodel.AuditLogEntryRaw, error) {
+	sqlSelect, args, err := buildListAuditLogEntriesQuery(filter, cursor, size)
 	if err != nil {
 		return nil, fmt.Errorf("build list audit log entries query: %w", err)
 	}
@@ -81,8 +81,9 @@ func (r *AuditLogRepository) ListAuditLogEntries(ctx context.Context, filter *sv
 
 	results := make([]*svcmodel.AuditLogEntryRaw, len(records))
 	for i, rec := range records {
+		id := rec.ID
 		results[i] = &svcmodel.AuditLogEntryRaw{
-			ID:             &rec.ID,
+			ID:             &id,
 			EventID:        rec.EventID,
 			ProducerKeyID:  rec.ProducerKeyID,
 			SignatureToken: rec.SignatureToken,
@@ -104,13 +105,15 @@ func toStringSlice[T ~string](vals []T) []string {
 }
 
 // buildListAuditLogEntriesQuery constructs an SQL query for listing audit log entries based on the provided filter criteria. It uses the squirrel library to build the query dynamically, applying the appropriate WHERE clauses for each filter parameter. The function returns the final SQL query string, a slice of arguments for the query, and any error that may occur during query construction.
-func buildListAuditLogEntriesQuery(filter *svcmodel.AuditEventFilter) (string, []any, error) {
+func buildListAuditLogEntriesQuery(filter *svcmodel.AuditEventFilter, cursor *int64, size int) (string, []any, error) {
 	q := squirrel.StatementBuilder.
 		PlaceholderFormat(squirrel.Dollar).
 		Select("le.id", "le.event_id", "le.mmr_node_id", "le.producer_key_id",
 			"le.signature_token", "le.created_at", "le.payload", "mn.leaf_index").
 		From("teals.log_entry le").
-		Join("teals.mmr_node mn ON mn.id = le.mmr_node_id")
+		Join("teals.mmr_node mn ON mn.id = le.mmr_node_id").
+		OrderBy("le.id ASC").
+		Limit(uint64(size))
 
 	if len(filter.Actions) > 0 {
 		q = q.Where("payload->>'action' = ANY(?::text[])", toStringSlice(filter.Actions))
@@ -134,10 +137,13 @@ func buildListAuditLogEntriesQuery(filter *svcmodel.AuditEventFilter) (string, [
 		q = q.Where("payload->'result'->>'status' = ANY(?::text[])", toStringSlice(filter.ResultStatuses))
 	}
 	if filter.TimestampFrom != nil {
-		q = q.Where("(payload->>'timestamp')::timestamptz >= ?", filter.TimestampFrom)
+		q = q.Where("(payload->>'timestamp') >= ?", filter.TimestampFrom.Format("2006-01-02T15:04:05.000000Z"))
 	}
 	if filter.TimestampTo != nil {
-		q = q.Where("(payload->>'timestamp')::timestamptz <= ?", filter.TimestampTo)
+		q = q.Where("(payload->>'timestamp') <= ?", filter.TimestampTo.Format("2006-01-02T15:04:05.000000Z"))
+	}
+	if cursor != nil {
+		q = q.Where("le.id > ?", *cursor)
 	}
 
 	return q.ToSql()
