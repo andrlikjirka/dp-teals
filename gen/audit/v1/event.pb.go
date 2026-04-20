@@ -36,6 +36,7 @@ const (
 	Action_ACTION_EXPORT      Action = 6
 	Action_ACTION_LOGIN       Action = 7
 	Action_ACTION_LOGOUT      Action = 8
+	Action_ACTION_AUTHORIZE   Action = 9
 )
 
 // Enum value maps for Action.
@@ -50,6 +51,7 @@ var (
 		6: "ACTION_EXPORT",
 		7: "ACTION_LOGIN",
 		8: "ACTION_LOGOUT",
+		9: "ACTION_AUTHORIZE",
 	}
 	Action_value = map[string]int32{
 		"ACTION_UNSPECIFIED": 0,
@@ -61,6 +63,7 @@ var (
 		"ACTION_EXPORT":      6,
 		"ACTION_LOGIN":       7,
 		"ACTION_LOGOUT":      8,
+		"ACTION_AUTHORIZE":   9,
 	}
 )
 
@@ -613,7 +616,7 @@ const file_audit_v1_event_proto_rawDesc = "" +
 	"\x06Status\x12\x16\n" +
 	"\x12STATUS_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSTATUS_SUCCESS\x10\x01\x12\x12\n" +
-	"\x0eSTATUS_FAILURE\x10\x02*\xb6\x01\n" +
+	"\x0eSTATUS_FAILURE\x10\x02*\xcc\x01\n" +
 	"\x06Action\x12\x16\n" +
 	"\x12ACTION_UNSPECIFIED\x10\x00\x12\x11\n" +
 	"\rACTION_ACCESS\x10\x01\x12\x11\n" +
@@ -623,7 +626,8 @@ const file_audit_v1_event_proto_rawDesc = "" +
 	"\fACTION_SHARE\x10\x05\x12\x11\n" +
 	"\rACTION_EXPORT\x10\x06\x12\x10\n" +
 	"\fACTION_LOGIN\x10\a\x12\x11\n" +
-	"\rACTION_LOGOUT\x10\bB\x94\x01\n" +
+	"\rACTION_LOGOUT\x10\b\x12\x14\n" +
+	"\x10ACTION_AUTHORIZE\x10\tB\x94\x01\n" +
 	"\fcom.audit.v1B\n" +
 	"EventProtoP\x01Z7github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1\xa2\x02\x03AXX\xaa\x02\bAudit.V1\xca\x02\bAudit\\V1\xe2\x02\x14Audit\\V1\\GPBMetadata\xea\x02\tAudit::V1b\x06proto3"
 

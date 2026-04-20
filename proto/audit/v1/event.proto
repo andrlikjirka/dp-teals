@@ -62,6 +62,7 @@ enum Action {
   ACTION_EXPORT = 6;
   ACTION_LOGIN = 7;
   ACTION_LOGOUT = 8;
+  ACTION_AUTHORIZE = 9;
 }
 
 // The result message containing information about the result of the audit event.
