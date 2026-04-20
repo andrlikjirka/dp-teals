@@ -82,6 +82,8 @@ func toProtoAction(a model.ActionType) (ingestionv1.Action, error) {
 		return ingestionv1.Action_ACTION_LOGIN, nil
 	case model.ActionLogout:
 		return ingestionv1.Action_ACTION_LOGOUT, nil
+	case model.ActionAuthorize:
+		return ingestionv1.Action_ACTION_AUTHORIZE, nil
 	default:
 		return 0, fmt.Errorf("toProto: unsupported action: %q", a)
 	}

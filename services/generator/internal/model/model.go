@@ -48,14 +48,15 @@ type Result struct {
 type ActionType string
 
 const (
-	ActionAccess ActionType = "ACCESS"
-	ActionCreate ActionType = "CREATE"
-	ActionUpdate ActionType = "UPDATE"
-	ActionDelete ActionType = "DELETE"
-	ActionShare  ActionType = "SHARE"
-	ActionExport ActionType = "EXPORT"
-	ActionLogin  ActionType = "LOGIN"
-	ActionLogout ActionType = "LOGOUT"
+	ActionAccess    ActionType = "ACCESS"
+	ActionCreate    ActionType = "CREATE"
+	ActionUpdate    ActionType = "UPDATE"
+	ActionDelete    ActionType = "DELETE"
+	ActionShare     ActionType = "SHARE"
+	ActionExport    ActionType = "EXPORT"
+	ActionLogin     ActionType = "LOGIN"
+	ActionLogout    ActionType = "LOGOUT"
+	ActionAuthorize ActionType = "AUTHORIZE"
 )
 
 // ActorType represents whether the actor is a human user or an automated system.

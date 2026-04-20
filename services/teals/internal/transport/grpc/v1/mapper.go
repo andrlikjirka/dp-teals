@@ -119,6 +119,8 @@ func toAction(action auditv1.Action) (enum.ActionType, error) {
 		return enum.ActionTypeLogin, nil
 	case auditv1.Action_ACTION_LOGOUT:
 		return enum.ActionTypeLogout, nil
+	case auditv1.Action_ACTION_AUTHORIZE:
+		return enum.ActionTypeAuthorize, nil
 	default:
 		return "", fmt.Errorf("unsupported action type: %v", action)
 	}
@@ -239,6 +241,8 @@ func fromActionType(a enum.ActionType) auditv1.Action {
 		return auditv1.Action_ACTION_LOGIN
 	case enum.ActionTypeLogout:
 		return auditv1.Action_ACTION_LOGOUT
+	case enum.ActionTypeAuthorize:
+		return auditv1.Action_ACTION_AUTHORIZE
 	default:
 		return auditv1.Action_ACTION_UNSPECIFIED
 	}

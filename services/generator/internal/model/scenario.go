@@ -19,7 +19,7 @@ type Scenario struct {
 var Scenarios = []Scenario{
 	{
 		Name:        "crm_auth",
-		Actions:     []ActionType{ActionLogin, ActionLogout},
+		Actions:     []ActionType{ActionLogin, ActionLogout, ActionAuthorize},
 		ActorTypes:  []ActorType{ActorTypeUser},
 		Resources:   []*Resource{resCRMSession},
 		MetaTmpl:    tmplAuthAttempt,
