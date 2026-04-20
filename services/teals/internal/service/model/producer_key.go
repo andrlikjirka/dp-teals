@@ -25,3 +25,11 @@ type ProducerKey struct {
 	Status     KeyStatus
 	CreatedAt  time.Time
 }
+
+// Producer represents an entity that produces audit events, identified by a unique ID and associated with one or more producer keys. It includes metadata such as the producer's name and the timestamp of when it was created.
+type Producer struct {
+	ID        uuid.UUID
+	Name      string
+	Keys      []ProducerKey
+	CreatedAt time.Time
+}
