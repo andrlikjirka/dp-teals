@@ -210,86 +210,6 @@ func (x *GetInclusionProofResponse) GetProof() *InclusionProof {
 	return nil
 }
 
-type GetRootHashRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetRootHashRequest) Reset() {
-	*x = GetRootHashRequest{}
-	mi := &file_audit_v1_proof_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetRootHashRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetRootHashRequest) ProtoMessage() {}
-
-func (x *GetRootHashRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_proof_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetRootHashRequest.ProtoReflect.Descriptor instead.
-func (*GetRootHashRequest) Descriptor() ([]byte, []int) {
-	return file_audit_v1_proof_proto_rawDescGZIP(), []int{3}
-}
-
-type GetRootHashResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RootHash      []byte                 `protobuf:"bytes,1,opt,name=root_hash,json=rootHash,proto3" json:"root_hash,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetRootHashResponse) Reset() {
-	*x = GetRootHashResponse{}
-	mi := &file_audit_v1_proof_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetRootHashResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetRootHashResponse) ProtoMessage() {}
-
-func (x *GetRootHashResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_proof_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetRootHashResponse.ProtoReflect.Descriptor instead.
-func (*GetRootHashResponse) Descriptor() ([]byte, []int) {
-	return file_audit_v1_proof_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *GetRootHashResponse) GetRootHash() []byte {
-	if x != nil {
-		return x.RootHash
-	}
-	return nil
-}
-
 type GetConsistencyProofRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	FromSize      int64                  `protobuf:"varint,1,opt,name=from_size,json=fromSize,proto3" json:"from_size,omitempty"`
@@ -300,7 +220,7 @@ type GetConsistencyProofRequest struct {
 
 func (x *GetConsistencyProofRequest) Reset() {
 	*x = GetConsistencyProofRequest{}
-	mi := &file_audit_v1_proof_proto_msgTypes[5]
+	mi := &file_audit_v1_proof_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -312,7 +232,7 @@ func (x *GetConsistencyProofRequest) String() string {
 func (*GetConsistencyProofRequest) ProtoMessage() {}
 
 func (x *GetConsistencyProofRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_proof_proto_msgTypes[5]
+	mi := &file_audit_v1_proof_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -325,7 +245,7 @@ func (x *GetConsistencyProofRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetConsistencyProofRequest.ProtoReflect.Descriptor instead.
 func (*GetConsistencyProofRequest) Descriptor() ([]byte, []int) {
-	return file_audit_v1_proof_proto_rawDescGZIP(), []int{5}
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetConsistencyProofRequest) GetFromSize() int64 {
@@ -351,7 +271,7 @@ type GetConsistencyProofResponse struct {
 
 func (x *GetConsistencyProofResponse) Reset() {
 	*x = GetConsistencyProofResponse{}
-	mi := &file_audit_v1_proof_proto_msgTypes[6]
+	mi := &file_audit_v1_proof_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -363,7 +283,7 @@ func (x *GetConsistencyProofResponse) String() string {
 func (*GetConsistencyProofResponse) ProtoMessage() {}
 
 func (x *GetConsistencyProofResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_proof_proto_msgTypes[6]
+	mi := &file_audit_v1_proof_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -376,7 +296,7 @@ func (x *GetConsistencyProofResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetConsistencyProofResponse.ProtoReflect.Descriptor instead.
 func (*GetConsistencyProofResponse) Descriptor() ([]byte, []int) {
-	return file_audit_v1_proof_proto_rawDescGZIP(), []int{6}
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetConsistencyProofResponse) GetProof() *ConsistencyProof {
@@ -396,7 +316,7 @@ type ConsistencyPath struct {
 
 func (x *ConsistencyPath) Reset() {
 	*x = ConsistencyPath{}
-	mi := &file_audit_v1_proof_proto_msgTypes[7]
+	mi := &file_audit_v1_proof_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -408,7 +328,7 @@ func (x *ConsistencyPath) String() string {
 func (*ConsistencyPath) ProtoMessage() {}
 
 func (x *ConsistencyPath) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_proof_proto_msgTypes[7]
+	mi := &file_audit_v1_proof_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -421,7 +341,7 @@ func (x *ConsistencyPath) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConsistencyPath.ProtoReflect.Descriptor instead.
 func (*ConsistencyPath) Descriptor() ([]byte, []int) {
-	return file_audit_v1_proof_proto_rawDescGZIP(), []int{7}
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ConsistencyPath) GetSiblings() [][]byte {
@@ -451,7 +371,7 @@ type ConsistencyProof struct {
 
 func (x *ConsistencyProof) Reset() {
 	*x = ConsistencyProof{}
-	mi := &file_audit_v1_proof_proto_msgTypes[8]
+	mi := &file_audit_v1_proof_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -463,7 +383,7 @@ func (x *ConsistencyProof) String() string {
 func (*ConsistencyProof) ProtoMessage() {}
 
 func (x *ConsistencyProof) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_proof_proto_msgTypes[8]
+	mi := &file_audit_v1_proof_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -476,7 +396,7 @@ func (x *ConsistencyProof) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConsistencyProof.ProtoReflect.Descriptor instead.
 func (*ConsistencyProof) Descriptor() ([]byte, []int) {
-	return file_audit_v1_proof_proto_rawDescGZIP(), []int{8}
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ConsistencyProof) GetOldSize() int64 {
@@ -522,7 +442,7 @@ type GetLatestSignedCheckpointRequest struct {
 
 func (x *GetLatestSignedCheckpointRequest) Reset() {
 	*x = GetLatestSignedCheckpointRequest{}
-	mi := &file_audit_v1_proof_proto_msgTypes[9]
+	mi := &file_audit_v1_proof_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -534,7 +454,7 @@ func (x *GetLatestSignedCheckpointRequest) String() string {
 func (*GetLatestSignedCheckpointRequest) ProtoMessage() {}
 
 func (x *GetLatestSignedCheckpointRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_proof_proto_msgTypes[9]
+	mi := &file_audit_v1_proof_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -547,7 +467,7 @@ func (x *GetLatestSignedCheckpointRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLatestSignedCheckpointRequest.ProtoReflect.Descriptor instead.
 func (*GetLatestSignedCheckpointRequest) Descriptor() ([]byte, []int) {
-	return file_audit_v1_proof_proto_rawDescGZIP(), []int{9}
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{7}
 }
 
 type GetLatestSignedCheckpointResponse struct {
@@ -559,7 +479,7 @@ type GetLatestSignedCheckpointResponse struct {
 
 func (x *GetLatestSignedCheckpointResponse) Reset() {
 	*x = GetLatestSignedCheckpointResponse{}
-	mi := &file_audit_v1_proof_proto_msgTypes[10]
+	mi := &file_audit_v1_proof_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -571,7 +491,7 @@ func (x *GetLatestSignedCheckpointResponse) String() string {
 func (*GetLatestSignedCheckpointResponse) ProtoMessage() {}
 
 func (x *GetLatestSignedCheckpointResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_proof_proto_msgTypes[10]
+	mi := &file_audit_v1_proof_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -584,7 +504,7 @@ func (x *GetLatestSignedCheckpointResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use GetLatestSignedCheckpointResponse.ProtoReflect.Descriptor instead.
 func (*GetLatestSignedCheckpointResponse) Descriptor() ([]byte, []int) {
-	return file_audit_v1_proof_proto_rawDescGZIP(), []int{10}
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetLatestSignedCheckpointResponse) GetCheckpoint() *Checkpoint {
@@ -608,7 +528,7 @@ type Checkpoint struct {
 
 func (x *Checkpoint) Reset() {
 	*x = Checkpoint{}
-	mi := &file_audit_v1_proof_proto_msgTypes[11]
+	mi := &file_audit_v1_proof_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -620,7 +540,7 @@ func (x *Checkpoint) String() string {
 func (*Checkpoint) ProtoMessage() {}
 
 func (x *Checkpoint) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_proof_proto_msgTypes[11]
+	mi := &file_audit_v1_proof_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -633,7 +553,7 @@ func (x *Checkpoint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Checkpoint.ProtoReflect.Descriptor instead.
 func (*Checkpoint) Descriptor() ([]byte, []int) {
-	return file_audit_v1_proof_proto_rawDescGZIP(), []int{11}
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *Checkpoint) GetId() string {
@@ -687,7 +607,7 @@ type GetServerPublicKeyRequest struct {
 
 func (x *GetServerPublicKeyRequest) Reset() {
 	*x = GetServerPublicKeyRequest{}
-	mi := &file_audit_v1_proof_proto_msgTypes[12]
+	mi := &file_audit_v1_proof_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -699,7 +619,7 @@ func (x *GetServerPublicKeyRequest) String() string {
 func (*GetServerPublicKeyRequest) ProtoMessage() {}
 
 func (x *GetServerPublicKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_proof_proto_msgTypes[12]
+	mi := &file_audit_v1_proof_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -712,7 +632,7 @@ func (x *GetServerPublicKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetServerPublicKeyRequest.ProtoReflect.Descriptor instead.
 func (*GetServerPublicKeyRequest) Descriptor() ([]byte, []int) {
-	return file_audit_v1_proof_proto_rawDescGZIP(), []int{12}
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetServerPublicKeyRequest) GetKid() string {
@@ -732,7 +652,7 @@ type GetServerPublicKeyResponse struct {
 
 func (x *GetServerPublicKeyResponse) Reset() {
 	*x = GetServerPublicKeyResponse{}
-	mi := &file_audit_v1_proof_proto_msgTypes[13]
+	mi := &file_audit_v1_proof_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -744,7 +664,7 @@ func (x *GetServerPublicKeyResponse) String() string {
 func (*GetServerPublicKeyResponse) ProtoMessage() {}
 
 func (x *GetServerPublicKeyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_proof_proto_msgTypes[13]
+	mi := &file_audit_v1_proof_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -757,7 +677,7 @@ func (x *GetServerPublicKeyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetServerPublicKeyResponse.ProtoReflect.Descriptor instead.
 func (*GetServerPublicKeyResponse) Descriptor() ([]byte, []int) {
-	return file_audit_v1_proof_proto_rawDescGZIP(), []int{13}
+	return file_audit_v1_proof_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetServerPublicKeyResponse) GetKid() string {
@@ -794,10 +714,7 @@ const file_audit_v1_proof_proto_rawDesc = "" +
 	"ledgerSize\x12\x1b\n" +
 	"\tleaf_hash\x18\x04 \x01(\fR\bleafHash\x12\x1b\n" +
 	"\troot_hash\x18\x05 \x01(\fR\brootHash\x12.\n" +
-	"\x05proof\x18\x06 \x01(\v2\x18.audit.v1.InclusionProofR\x05proof\"\x14\n" +
-	"\x12GetRootHashRequest\"2\n" +
-	"\x13GetRootHashResponse\x12\x1b\n" +
-	"\troot_hash\x18\x01 \x01(\fR\brootHash\"d\n" +
+	"\x05proof\x18\x06 \x01(\v2\x18.audit.v1.InclusionProofR\x05proof\"d\n" +
 	"\x1aGetConsistencyProofRequest\x12$\n" +
 	"\tfrom_size\x18\x01 \x01(\x03B\a\xbaH\x04\"\x02(\x00R\bfromSize\x12 \n" +
 	"\ato_size\x18\x02 \x01(\x03B\a\xbaH\x04\"\x02(\x00R\x06toSize\"O\n" +
@@ -853,36 +770,34 @@ func file_audit_v1_proof_proto_rawDescGZIP() []byte {
 	return file_audit_v1_proof_proto_rawDescData
 }
 
-var file_audit_v1_proof_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_audit_v1_proof_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_audit_v1_proof_proto_goTypes = []any{
 	(*InclusionProof)(nil),                    // 0: audit.v1.InclusionProof
 	(*GetInclusionProofRequest)(nil),          // 1: audit.v1.GetInclusionProofRequest
 	(*GetInclusionProofResponse)(nil),         // 2: audit.v1.GetInclusionProofResponse
-	(*GetRootHashRequest)(nil),                // 3: audit.v1.GetRootHashRequest
-	(*GetRootHashResponse)(nil),               // 4: audit.v1.GetRootHashResponse
-	(*GetConsistencyProofRequest)(nil),        // 5: audit.v1.GetConsistencyProofRequest
-	(*GetConsistencyProofResponse)(nil),       // 6: audit.v1.GetConsistencyProofResponse
-	(*ConsistencyPath)(nil),                   // 7: audit.v1.ConsistencyPath
-	(*ConsistencyProof)(nil),                  // 8: audit.v1.ConsistencyProof
-	(*GetLatestSignedCheckpointRequest)(nil),  // 9: audit.v1.GetLatestSignedCheckpointRequest
-	(*GetLatestSignedCheckpointResponse)(nil), // 10: audit.v1.GetLatestSignedCheckpointResponse
-	(*Checkpoint)(nil),                        // 11: audit.v1.Checkpoint
-	(*GetServerPublicKeyRequest)(nil),         // 12: audit.v1.GetServerPublicKeyRequest
-	(*GetServerPublicKeyResponse)(nil),        // 13: audit.v1.GetServerPublicKeyResponse
+	(*GetConsistencyProofRequest)(nil),        // 3: audit.v1.GetConsistencyProofRequest
+	(*GetConsistencyProofResponse)(nil),       // 4: audit.v1.GetConsistencyProofResponse
+	(*ConsistencyPath)(nil),                   // 5: audit.v1.ConsistencyPath
+	(*ConsistencyProof)(nil),                  // 6: audit.v1.ConsistencyProof
+	(*GetLatestSignedCheckpointRequest)(nil),  // 7: audit.v1.GetLatestSignedCheckpointRequest
+	(*GetLatestSignedCheckpointResponse)(nil), // 8: audit.v1.GetLatestSignedCheckpointResponse
+	(*Checkpoint)(nil),                        // 9: audit.v1.Checkpoint
+	(*GetServerPublicKeyRequest)(nil),         // 10: audit.v1.GetServerPublicKeyRequest
+	(*GetServerPublicKeyResponse)(nil),        // 11: audit.v1.GetServerPublicKeyResponse
 }
 var file_audit_v1_proof_proto_depIdxs = []int32{
 	0,  // 0: audit.v1.GetInclusionProofResponse.proof:type_name -> audit.v1.InclusionProof
-	8,  // 1: audit.v1.GetConsistencyProofResponse.proof:type_name -> audit.v1.ConsistencyProof
-	7,  // 2: audit.v1.ConsistencyProof.consistency_paths:type_name -> audit.v1.ConsistencyPath
-	11, // 3: audit.v1.GetLatestSignedCheckpointResponse.checkpoint:type_name -> audit.v1.Checkpoint
+	6,  // 1: audit.v1.GetConsistencyProofResponse.proof:type_name -> audit.v1.ConsistencyProof
+	5,  // 2: audit.v1.ConsistencyProof.consistency_paths:type_name -> audit.v1.ConsistencyPath
+	9,  // 3: audit.v1.GetLatestSignedCheckpointResponse.checkpoint:type_name -> audit.v1.Checkpoint
 	1,  // 4: audit.v1.ProofService.GetInclusionProof:input_type -> audit.v1.GetInclusionProofRequest
-	5,  // 5: audit.v1.ProofService.GetConsistencyProof:input_type -> audit.v1.GetConsistencyProofRequest
-	9,  // 6: audit.v1.ProofService.GetLatestSignedCheckpoint:input_type -> audit.v1.GetLatestSignedCheckpointRequest
-	12, // 7: audit.v1.ProofService.GetServerPublicKey:input_type -> audit.v1.GetServerPublicKeyRequest
+	3,  // 5: audit.v1.ProofService.GetConsistencyProof:input_type -> audit.v1.GetConsistencyProofRequest
+	7,  // 6: audit.v1.ProofService.GetLatestSignedCheckpoint:input_type -> audit.v1.GetLatestSignedCheckpointRequest
+	10, // 7: audit.v1.ProofService.GetServerPublicKey:input_type -> audit.v1.GetServerPublicKeyRequest
 	2,  // 8: audit.v1.ProofService.GetInclusionProof:output_type -> audit.v1.GetInclusionProofResponse
-	6,  // 9: audit.v1.ProofService.GetConsistencyProof:output_type -> audit.v1.GetConsistencyProofResponse
-	10, // 10: audit.v1.ProofService.GetLatestSignedCheckpoint:output_type -> audit.v1.GetLatestSignedCheckpointResponse
-	13, // 11: audit.v1.ProofService.GetServerPublicKey:output_type -> audit.v1.GetServerPublicKeyResponse
+	4,  // 9: audit.v1.ProofService.GetConsistencyProof:output_type -> audit.v1.GetConsistencyProofResponse
+	8,  // 10: audit.v1.ProofService.GetLatestSignedCheckpoint:output_type -> audit.v1.GetLatestSignedCheckpointResponse
+	11, // 11: audit.v1.ProofService.GetServerPublicKey:output_type -> audit.v1.GetServerPublicKeyResponse
 	8,  // [8:12] is the sub-list for method output_type
 	4,  // [4:8] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
@@ -901,7 +816,7 @@ func file_audit_v1_proof_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_audit_v1_proof_proto_rawDesc), len(file_audit_v1_proof_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

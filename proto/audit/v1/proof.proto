@@ -31,12 +31,6 @@ message GetInclusionProofResponse {
   InclusionProof proof        = 6;
 }
 
-message GetRootHashRequest {}
-
-message GetRootHashResponse {
-  bytes root_hash = 1;
-}
-
 message GetConsistencyProofRequest {
   int64 from_size = 1 [(buf.validate.field).int64.gte = 0];
   int64 to_size   = 2 [(buf.validate.field).int64.gte = 0];
