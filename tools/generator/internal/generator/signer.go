@@ -6,7 +6,7 @@ import (
 
 	pkgcanon "github.com/andrlikjirka/dp-teals/pkg/canonicalizer"
 	"github.com/andrlikjirka/dp-teals/pkg/jws"
-	"github.com/andrlikjirka/dp-teals/services/generator/internal/model"
+	"github.com/andrlikjirka/dp-teals/tools/generator/internal/model"
 )
 
 // signer defines the interface for signing audit events before sending them to the ingestion service. It abstracts the signing mechanism, allowing for different implementations (e.g., using JWS or other signing methods) without affecting the rest of the event generation and sending logic.

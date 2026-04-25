@@ -12,7 +12,7 @@ import (
 	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
 	"github.com/andrlikjirka/dp-teals/pkg/jws"
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
-	"github.com/andrlikjirka/dp-teals/services/generator/internal/generator"
+	generator2 "github.com/andrlikjirka/dp-teals/tools/generator/internal/generator"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
@@ -57,9 +57,9 @@ func run() error {
 	}
 
 	client := ingestionv1.NewIngestionServiceClient(conn)
-	sender := generator.NewGrpcSender(client)
-	eventSigner := generator.NewEventSigner(signer)
-	gen := generator.NewGenerator(eventSigner, sender, log)
+	sender := generator2.NewGrpcSender(client)
+	eventSigner := generator2.NewEventSigner(signer)
+	gen := generator2.NewGenerator(eventSigner, sender, log)
 
 	if err = gen.Run(context.Background(), *count, *delayMs); err != nil {
 		if errors.Is(err, context.Canceled) {

@@ -28,7 +28,7 @@ DELAY ?= 0
 
 run-generator:
 	@echo "Running generator: $(COUNT) events → $(ADDR)..."
-	go run ./services/generator/cmd \
+	go run ./tools/generator/cmd \
 		--count=$(COUNT) \
 		--addr=$(ADDR) \
 		--delay=$(DELAY) \

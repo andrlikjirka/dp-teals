@@ -6,7 +6,6 @@ import (
 	"math/bits"
 
 	"github.com/andrlikjirka/dp-teals/pkg/hash"
-	"github.com/andrlikjirka/dp-teals/pkg/merkle"
 	"github.com/andrlikjirka/dp-teals/pkg/mmr"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/model"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql"
@@ -64,7 +63,7 @@ func (r *LedgerRepository) AppendLeaf(ctx context.Context, payload []byte) (node
 	}
 
 	// 1. Hash the audit event payload to create the leaf node hash
-	leafHash := merkle.HashLeafData(payload, r.hashFunc)
+	leafHash := mmr.HashLeafData(payload, r.hashFunc)
 
 	// 2. Get the current size of the MMR to determine the new leaf index
 	s, err := r.Size(ctx)
@@ -96,7 +95,7 @@ func (r *LedgerRepository) AppendLeaf(ctx context.Context, payload []byte) (node
 			break // no merge possible
 		}
 
-		mergedHash := merkle.HashInternalNodes(peak.Hash, currentHash, r.hashFunc)
+		mergedHash := mmr.HashInternalNodes(peak.Hash, currentHash, r.hashFunc)
 		newNode := &model.MmrNode{
 			Hash:         mergedHash,
 			Level:        currentLevel + 1,
@@ -268,7 +267,7 @@ func (r *LedgerRepository) bagPeaksRightToLeft(peaks []model.MmrNode) []byte {
 	}
 	root := peaks[len(peaks)-1].Hash
 	for i := len(peaks) - 2; i >= 0; i-- {
-		root = merkle.HashInternalNodes(peaks[i].Hash, root, r.hashFunc)
+		root = mmr.HashInternalNodes(peaks[i].Hash, root, r.hashFunc)
 	}
 	return root
 }

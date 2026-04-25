@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	ingestionv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
-	"github.com/andrlikjirka/dp-teals/services/generator/internal/model"
+	"github.com/andrlikjirka/dp-teals/tools/generator/internal/model"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

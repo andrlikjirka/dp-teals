@@ -13,7 +13,7 @@ import (
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/serializer"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service"
-	v1 "github.com/andrlikjirka/dp-teals/services/teals/internal/transport/grpc/v1"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/transport/grpc/v1"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/transport/worker"
 	"golang.org/x/sync/errgroup"
 )

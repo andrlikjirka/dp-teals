@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	auditv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
-	"github.com/andrlikjirka/dp-teals/services/teals/internal/service"
+	service3 "github.com/andrlikjirka/dp-teals/services/teals/internal/service"
 	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
@@ -15,12 +15,12 @@ import (
 // ProofServiceServer implements the gRPC server for the ProofService defined in the protobuf.
 type ProofServiceServer struct {
 	auditv1.UnimplementedProofServiceServer
-	service           *service.LedgerService
-	checkpointService *service.CheckpointService
+	service           *service3.LedgerService
+	checkpointService *service3.CheckpointService
 }
 
 // NewProofServiceServer creates a new instance of ProofServiceServer with the provided LedgerService. This allows the gRPC server to delegate the actual proof generation logic to the service layer, keeping the transport layer focused on handling gRPC requests and responses.
-func NewProofServiceServer(s *service.LedgerService, cs *service.CheckpointService) *ProofServiceServer {
+func NewProofServiceServer(s *service3.LedgerService, cs *service3.CheckpointService) *ProofServiceServer {
 	return &ProofServiceServer{
 		service:           s,
 		checkpointService: cs,

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
-	"github.com/andrlikjirka/dp-teals/services/generator/internal/model"
+	model2 "github.com/andrlikjirka/dp-teals/tools/generator/internal/model"
 	"github.com/google/uuid"
 )
 
@@ -86,8 +86,8 @@ func (g *Generator) Run(ctx context.Context, count int, delayMs int) error {
 }
 
 // buildAuditEvent constructs a random audit event by picking a random scenario and then randomly selecting appropriate values for each field based on that scenario's configuration.
-func buildAuditEvent() (*model.AuditEvent, error) {
-	sc := model.Scenarios[rand.Intn(len(model.Scenarios))]
+func buildAuditEvent() (*model2.AuditEvent, error) {
+	sc := model2.Scenarios[rand.Intn(len(model2.Scenarios))]
 	a := pickAction(sc)
 	r := pickResource(sc)
 	act := pickActor(sc)
@@ -103,7 +103,7 @@ func buildAuditEvent() (*model.AuditEvent, error) {
 	if err != nil {
 		return nil, fmt.Errorf("generate event ID: %w", err)
 	}
-	return &model.AuditEvent{
+	return &model2.AuditEvent{
 		ID:          id,
 		Timestamp:   time.Now().UTC(),
 		Environment: e,
@@ -117,8 +117,8 @@ func buildAuditEvent() (*model.AuditEvent, error) {
 }
 
 // buildMetadata generates metadata for an event based on the scenario's metadata template function, if defined. It returns nil if no metadata should be generated for this scenario/action combination.
-func buildMetadata(sc model.Scenario, action model.ActionType, res *model.Resource, act *model.Actor) (map[string]any, error) {
-	if sc.Name == "crm_record_mutation" && action != model.ActionUpdate {
+func buildMetadata(sc model2.Scenario, action model2.ActionType, res *model2.Resource, act *model2.Actor) (map[string]any, error) {
+	if sc.Name == "crm_record_mutation" && action != model2.ActionUpdate {
 		return nil, nil // only generate metadata for UPDATE actions in this scenario
 	}
 	if sc.MetaTmpl == nil {
@@ -129,51 +129,51 @@ func buildMetadata(sc model.Scenario, action model.ActionType, res *model.Resour
 }
 
 // pickAction randomly selects an action from the scenario's list of possible actions.
-func pickAction(sc model.Scenario) model.ActionType {
+func pickAction(sc model2.Scenario) model2.ActionType {
 	return sc.Actions[rand.Intn(len(sc.Actions))]
 }
 
 // pickActor randomly selects an actor from the allowed actor types defined in the scenario. It first compiles a list of all actors that match the scenario's ActorTypes, then picks one at random.
-func pickActor(sc model.Scenario) *model.Actor {
-	var allowed []model.Actor
+func pickActor(sc model2.Scenario) *model2.Actor {
+	var allowed []model2.Actor
 	for _, t := range sc.ActorTypes {
-		allowed = append(allowed, model.ActorsOfType(t)...)
+		allowed = append(allowed, model2.ActorsOfType(t)...)
 	}
 	return &allowed[rand.Intn(len(allowed))]
 }
 
 // pickSubject randomly selects a subject for the event. For authentication scenarios (where SelfSubject is true), the subject is the same as the actor (i.e., the user is acting on themselves). For other scenarios, it picks a random subject from the global Subjects list.
-func pickSubject(sc model.Scenario) *model.Subject {
+func pickSubject(sc model2.Scenario) *model2.Subject {
 	// for auth scenarios, subject == actor
 	if sc.SelfSubject {
 		actor := pickActor(sc)
-		return &model.Subject{ID: actor.ID}
+		return &model2.Subject{ID: actor.ID}
 	}
-	return &model.Subjects[rand.Intn(len(model.Subjects))]
+	return &model2.Subjects[rand.Intn(len(model2.Subjects))]
 }
 
 // pickResource randomly selects a resource from the scenario's list of possible resources.
-func pickResource(sc model.Scenario) *model.Resource {
+func pickResource(sc model2.Scenario) *model2.Resource {
 	return sc.Resources[rand.Intn(len(sc.Resources))]
 }
 
 // pickResult determines the result of the action based on the scenario's FailureProb. It randomly decides if the action was a success or failure, and if it's a failure, it picks a random reason from the predefined FailureReasons for that scenario.
-func pickResult(sc model.Scenario) *model.Result {
+func pickResult(sc model2.Scenario) *model2.Result {
 	if rand.Float64() < sc.FailureProb {
-		reasons := model.FailureReasons[sc.Name]
-		return &model.Result{
-			Status: model.ResultStatusFailure,
+		reasons := model2.FailureReasons[sc.Name]
+		return &model2.Result{
+			Status: model2.ResultStatusFailure,
 			Reason: reasons[rand.Intn(len(reasons))],
 		}
 	}
-	return &model.Result{
-		Status: model.ResultStatusSuccess,
+	return &model2.Result{
+		Status: model2.ResultStatusSuccess,
 	}
 }
 
 // buildEnvironment constructs an environment object with a fixed service name and random trace and span IDs. The trace ID is 32 hex characters (16 bytes) and the span ID is 16 hex characters (8 bytes), following common tracing conventions.
-func buildEnvironment() *model.Environment {
-	return &model.Environment{
+func buildEnvironment() *model2.Environment {
+	return &model2.Environment{
 		Service: "crm_service",
 		TraceID: randomHex(32),
 		SpanID:  randomHex(16),

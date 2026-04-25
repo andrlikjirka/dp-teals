@@ -11,7 +11,7 @@ import (
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository/sql/query"
 	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
-	svcmodel "github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
+	model3 "github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/google/uuid"
 	"github.com/jackc/pgerrcode"
@@ -45,7 +45,7 @@ func (r *AuditLogRepository) StoreAuditLogEntry(ctx context.Context, eventId uui
 }
 
 // GetAuditLogEntryByEventID retrieves an audit log entry from the database by its event ID. It executes an SQL query to fetch the entry details, and handles any errors that may occur during the operation. If no entry is found with the given event ID, it returns a specific error indicating that the audit log entry was not found.
-func (r *AuditLogRepository) GetAuditLogEntryByEventID(ctx context.Context, eventID uuid.UUID) (*svcmodel.AuditLogEntryRaw, error) {
+func (r *AuditLogRepository) GetAuditLogEntryByEventID(ctx context.Context, eventID uuid.UUID) (*model3.AuditLogEntryRaw, error) {
 	var record model.AuditLogEntryRecord
 	err := pgxscan.Get(ctx, r.db, &record, query.GetAuditLogEntryByEventID, eventID)
 	if err != nil {
@@ -55,7 +55,7 @@ func (r *AuditLogRepository) GetAuditLogEntryByEventID(ctx context.Context, even
 		return nil, fmt.Errorf("get audit log entry by event id: %w", err)
 	}
 
-	return &svcmodel.AuditLogEntryRaw{
+	return &model3.AuditLogEntryRaw{
 		ID:             &record.ID,
 		EventID:        record.EventID,
 		ProducerKeyID:  record.ProducerKeyID,
@@ -67,7 +67,7 @@ func (r *AuditLogRepository) GetAuditLogEntryByEventID(ctx context.Context, even
 }
 
 // ListAuditLogEntries retrieves a list of audit log entries from the database based on the provided filter criteria and pagination cursor. It constructs an SQL query dynamically using the squirrel library, executes the query to fetch matching entries, and handles any errors that may occur during the operation. The results are returned as a slice of AuditLogEntryRaw objects.
-func (r *AuditLogRepository) ListAuditLogEntries(ctx context.Context, filter *svcmodel.AuditEventFilter, cursor *int64, size int) ([]*svcmodel.AuditLogEntryRaw, error) {
+func (r *AuditLogRepository) ListAuditLogEntries(ctx context.Context, filter *model3.AuditEventFilter, cursor *int64, size int) ([]*model3.AuditLogEntryRaw, error) {
 	sqlSelect, args, err := buildListAuditLogEntriesQuery(filter, cursor, size)
 	if err != nil {
 		return nil, fmt.Errorf("build list audit log entries query: %w", err)
@@ -79,10 +79,10 @@ func (r *AuditLogRepository) ListAuditLogEntries(ctx context.Context, filter *sv
 		return nil, fmt.Errorf("list audit log entries: %w", err)
 	}
 
-	results := make([]*svcmodel.AuditLogEntryRaw, len(records))
+	results := make([]*model3.AuditLogEntryRaw, len(records))
 	for i, rec := range records {
 		id := rec.ID
-		results[i] = &svcmodel.AuditLogEntryRaw{
+		results[i] = &model3.AuditLogEntryRaw{
 			ID:             &id,
 			EventID:        rec.EventID,
 			ProducerKeyID:  rec.ProducerKeyID,
@@ -105,7 +105,7 @@ func toStringSlice[T ~string](vals []T) []string {
 }
 
 // buildListAuditLogEntriesQuery constructs an SQL query for listing audit log entries based on the provided filter criteria. It uses the squirrel library to build the query dynamically, applying the appropriate WHERE clauses for each filter parameter. The function returns the final SQL query string, a slice of arguments for the query, and any error that may occur during query construction.
-func buildListAuditLogEntriesQuery(filter *svcmodel.AuditEventFilter, cursor *int64, size int) (string, []any, error) {
+func buildListAuditLogEntriesQuery(filter *model3.AuditEventFilter, cursor *int64, size int) (string, []any, error) {
 	q := squirrel.StatementBuilder.
 		PlaceholderFormat(squirrel.Dollar).
 		Select("le.id", "le.event_id", "le.mmr_node_id", "le.producer_key_id",
