@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
-	"fmt"
 
 	"github.com/andrlikjirka/dp-teals/pkg/hash"
 	"github.com/andrlikjirka/dp-teals/pkg/merkle"
@@ -125,8 +124,6 @@ func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byt
 	// 2. Hash the leaf (Domain separator: 0x00)
 	//h := hashFunc(append([]byte{0x00}, leafData...))
 	h := merkle.HashLeafData(leafData, hashFunc)
-	fmt.Println(hex.EncodeToString(h))
-	fmt.Println(string(leafData))
 
 	// 3. Traverse the path
 	for i, siblingHash := range proof.Siblings {
