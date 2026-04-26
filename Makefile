@@ -117,6 +117,11 @@ migrate-down-teals:
 	@echo "Reverting last teals migration..."
 	migrate -database "$(DATABASE_URL)?sslmode=disable" -path $(TEALS_MIGRATIONS_PATH) down 1
 
+# === Master KEK Rotation ===
+.PHONY: gen-master-kek
+gen-master-kek:
+	@openssl rand -base64 32
+
 # ==== Testing ====
 
 # Fast unit tests only (service + pkg)
