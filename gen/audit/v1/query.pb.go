@@ -71,8 +71,9 @@ func (x *GetAuditEventRequest) GetEventId() string {
 type GetAuditEventResponse struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Event             *structpb.Struct       `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
-	LeafIndex         int64                  `protobuf:"varint,2,opt,name=leaf_index,json=leafIndex,proto3" json:"leaf_index,omitempty"`
-	ProducerSignToken string                 `protobuf:"bytes,3,opt,name=producer_sign_token,json=producerSignToken,proto3" json:"producer_sign_token,omitempty"`
+	RevealedMetadata  *structpb.Struct       `protobuf:"bytes,2,opt,name=revealed_metadata,json=revealedMetadata,proto3,oneof" json:"revealed_metadata,omitempty"`
+	LeafIndex         int64                  `protobuf:"varint,3,opt,name=leaf_index,json=leafIndex,proto3" json:"leaf_index,omitempty"`
+	ProducerSignToken string                 `protobuf:"bytes,4,opt,name=producer_sign_token,json=producerSignToken,proto3" json:"producer_sign_token,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -110,6 +111,13 @@ func (*GetAuditEventResponse) Descriptor() ([]byte, []int) {
 func (x *GetAuditEventResponse) GetEvent() *structpb.Struct {
 	if x != nil {
 		return x.Event
+	}
+	return nil
+}
+
+func (x *GetAuditEventResponse) GetRevealedMetadata() *structpb.Struct {
+	if x != nil {
+		return x.RevealedMetadata
 	}
 	return nil
 }
@@ -351,8 +359,9 @@ func (x *AuditEventFilter) GetTimestampTo() *timestamppb.Timestamp {
 type ListAuditEventsItem struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Event             *structpb.Struct       `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
-	LeafIndex         int64                  `protobuf:"varint,2,opt,name=leaf_index,json=leafIndex,proto3" json:"leaf_index,omitempty"`
-	ProducerSignToken string                 `protobuf:"bytes,3,opt,name=producer_sign_token,json=producerSignToken,proto3" json:"producer_sign_token,omitempty"`
+	RevealedMetadata  *structpb.Struct       `protobuf:"bytes,2,opt,name=revealed_metadata,json=revealedMetadata,proto3,oneof" json:"revealed_metadata,omitempty"`
+	LeafIndex         int64                  `protobuf:"varint,3,opt,name=leaf_index,json=leafIndex,proto3" json:"leaf_index,omitempty"`
+	ProducerSignToken string                 `protobuf:"bytes,4,opt,name=producer_sign_token,json=producerSignToken,proto3" json:"producer_sign_token,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -394,6 +403,13 @@ func (x *ListAuditEventsItem) GetEvent() *structpb.Struct {
 	return nil
 }
 
+func (x *ListAuditEventsItem) GetRevealedMetadata() *structpb.Struct {
+	if x != nil {
+		return x.RevealedMetadata
+	}
+	return nil
+}
+
 func (x *ListAuditEventsItem) GetLeafIndex() int64 {
 	if x != nil {
 		return x.LeafIndex
@@ -414,12 +430,14 @@ const file_audit_v1_query_proto_rawDesc = "" +
 	"\n" +
 	"\x14audit/v1/query.proto\x12\baudit.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bbuf/validate/validate.proto\x1a\x14audit/v1/event.proto\x1a\x1cgoogle/protobuf/struct.proto\";\n" +
 	"\x14GetAuditEventRequest\x12#\n" +
-	"\bevent_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\aeventId\"\x95\x01\n" +
+	"\bevent_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\aeventId\"\xf6\x01\n" +
 	"\x15GetAuditEventResponse\x12-\n" +
-	"\x05event\x18\x01 \x01(\v2\x17.google.protobuf.StructR\x05event\x12\x1d\n" +
+	"\x05event\x18\x01 \x01(\v2\x17.google.protobuf.StructR\x05event\x12I\n" +
+	"\x11revealed_metadata\x18\x02 \x01(\v2\x17.google.protobuf.StructH\x00R\x10revealedMetadata\x88\x01\x01\x12\x1d\n" +
 	"\n" +
-	"leaf_index\x18\x02 \x01(\x03R\tleafIndex\x12.\n" +
-	"\x13producer_sign_token\x18\x03 \x01(\tR\x11producerSignToken\"t\n" +
+	"leaf_index\x18\x03 \x01(\x03R\tleafIndex\x12.\n" +
+	"\x13producer_sign_token\x18\x04 \x01(\tR\x11producerSignTokenB\x14\n" +
+	"\x12_revealed_metadata\"t\n" +
 	"\x16ListAuditEventsRequest\x122\n" +
 	"\x06filter\x18\x01 \x01(\v2\x1a.audit.v1.AuditEventFilterR\x06filter\x12\x1b\n" +
 	"\x06cursor\x18\x02 \x01(\tH\x00R\x06cursor\x88\x01\x01B\t\n" +
@@ -443,12 +461,14 @@ const file_audit_v1_query_proto_rawDesc = "" +
 	"\rresource_name\x18\x06 \x01(\tR\fresourceName\x12@\n" +
 	"\x0fresult_statuses\x18\a \x03(\x0e2\x17.audit.v1.Result.StatusR\x0eresultStatuses\x12A\n" +
 	"\x0etimestamp_from\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\rtimestampFrom\x12=\n" +
-	"\ftimestamp_to\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\vtimestampTo\"\x93\x01\n" +
+	"\ftimestamp_to\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\vtimestampTo\"\xf4\x01\n" +
 	"\x13ListAuditEventsItem\x12-\n" +
-	"\x05event\x18\x01 \x01(\v2\x17.google.protobuf.StructR\x05event\x12\x1d\n" +
+	"\x05event\x18\x01 \x01(\v2\x17.google.protobuf.StructR\x05event\x12I\n" +
+	"\x11revealed_metadata\x18\x02 \x01(\v2\x17.google.protobuf.StructH\x00R\x10revealedMetadata\x88\x01\x01\x12\x1d\n" +
 	"\n" +
-	"leaf_index\x18\x02 \x01(\x03R\tleafIndex\x12.\n" +
-	"\x13producer_sign_token\x18\x03 \x01(\tR\x11producerSignToken2\xbc\x01\n" +
+	"leaf_index\x18\x03 \x01(\x03R\tleafIndex\x12.\n" +
+	"\x13producer_sign_token\x18\x04 \x01(\tR\x11producerSignTokenB\x14\n" +
+	"\x12_revealed_metadata2\xbc\x01\n" +
 	"\fQueryService\x12R\n" +
 	"\rGetAuditEvent\x12\x1e.audit.v1.GetAuditEventRequest\x1a\x1f.audit.v1.GetAuditEventResponse\"\x00\x12X\n" +
 	"\x0fListAuditEvents\x12 .audit.v1.ListAuditEventsRequest\x1a!.audit.v1.ListAuditEventsResponse\"\x00B\x94\x01\n" +
@@ -483,23 +503,25 @@ var file_audit_v1_query_proto_goTypes = []any{
 }
 var file_audit_v1_query_proto_depIdxs = []int32{
 	6,  // 0: audit.v1.GetAuditEventResponse.event:type_name -> google.protobuf.Struct
-	4,  // 1: audit.v1.ListAuditEventsRequest.filter:type_name -> audit.v1.AuditEventFilter
-	5,  // 2: audit.v1.ListAuditEventsResponse.items:type_name -> audit.v1.ListAuditEventsItem
-	7,  // 3: audit.v1.AuditEventFilter.actions:type_name -> audit.v1.Action
-	8,  // 4: audit.v1.AuditEventFilter.actor_types:type_name -> audit.v1.Actor.Type
-	9,  // 5: audit.v1.AuditEventFilter.result_statuses:type_name -> audit.v1.Result.Status
-	10, // 6: audit.v1.AuditEventFilter.timestamp_from:type_name -> google.protobuf.Timestamp
-	10, // 7: audit.v1.AuditEventFilter.timestamp_to:type_name -> google.protobuf.Timestamp
-	6,  // 8: audit.v1.ListAuditEventsItem.event:type_name -> google.protobuf.Struct
-	0,  // 9: audit.v1.QueryService.GetAuditEvent:input_type -> audit.v1.GetAuditEventRequest
-	2,  // 10: audit.v1.QueryService.ListAuditEvents:input_type -> audit.v1.ListAuditEventsRequest
-	1,  // 11: audit.v1.QueryService.GetAuditEvent:output_type -> audit.v1.GetAuditEventResponse
-	3,  // 12: audit.v1.QueryService.ListAuditEvents:output_type -> audit.v1.ListAuditEventsResponse
-	11, // [11:13] is the sub-list for method output_type
-	9,  // [9:11] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	6,  // 1: audit.v1.GetAuditEventResponse.revealed_metadata:type_name -> google.protobuf.Struct
+	4,  // 2: audit.v1.ListAuditEventsRequest.filter:type_name -> audit.v1.AuditEventFilter
+	5,  // 3: audit.v1.ListAuditEventsResponse.items:type_name -> audit.v1.ListAuditEventsItem
+	7,  // 4: audit.v1.AuditEventFilter.actions:type_name -> audit.v1.Action
+	8,  // 5: audit.v1.AuditEventFilter.actor_types:type_name -> audit.v1.Actor.Type
+	9,  // 6: audit.v1.AuditEventFilter.result_statuses:type_name -> audit.v1.Result.Status
+	10, // 7: audit.v1.AuditEventFilter.timestamp_from:type_name -> google.protobuf.Timestamp
+	10, // 8: audit.v1.AuditEventFilter.timestamp_to:type_name -> google.protobuf.Timestamp
+	6,  // 9: audit.v1.ListAuditEventsItem.event:type_name -> google.protobuf.Struct
+	6,  // 10: audit.v1.ListAuditEventsItem.revealed_metadata:type_name -> google.protobuf.Struct
+	0,  // 11: audit.v1.QueryService.GetAuditEvent:input_type -> audit.v1.GetAuditEventRequest
+	2,  // 12: audit.v1.QueryService.ListAuditEvents:input_type -> audit.v1.ListAuditEventsRequest
+	1,  // 13: audit.v1.QueryService.GetAuditEvent:output_type -> audit.v1.GetAuditEventResponse
+	3,  // 14: audit.v1.QueryService.ListAuditEvents:output_type -> audit.v1.ListAuditEventsResponse
+	13, // [13:15] is the sub-list for method output_type
+	11, // [11:13] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_audit_v1_query_proto_init() }
@@ -508,8 +530,10 @@ func file_audit_v1_query_proto_init() {
 		return
 	}
 	file_audit_v1_event_proto_init()
+	file_audit_v1_query_proto_msgTypes[1].OneofWrappers = []any{}
 	file_audit_v1_query_proto_msgTypes[2].OneofWrappers = []any{}
 	file_audit_v1_query_proto_msgTypes[3].OneofWrappers = []any{}
+	file_audit_v1_query_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

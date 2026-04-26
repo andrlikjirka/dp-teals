@@ -77,7 +77,7 @@ func run() error {
 	keyService := service.NewKeyService(keyRepo, log)
 	ledgerService := service.NewLedgerService(txProvider, log)
 	checkpointService := service.NewCheckpointService(txProvider, signer, log)
-	queryService := service.NewQueryService(txProvider, jcsSerializer, log)
+	queryService := service.NewQueryService(txProvider, jcsSerializer, protect, log)
 
 	// Transport
 	cpWorker := worker.NewCheckpointWorker(checkpointService, config.CheckpointInterval, log)

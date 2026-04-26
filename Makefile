@@ -2,12 +2,12 @@ include .env
 
 # ==== Protocol Buffer Generation ====
 
-.PHONY: generate_proto update_proto_deps
-
-generate_proto::
+.PHONY: generate-proto
+generate-proto::
 	buf generate --template buf.gen.yaml
 
-update_proto_deps::
+.PHONY: update-proto-deps
+update-proto-deps::
 	buf dep update
 
 # ==== Generator ====

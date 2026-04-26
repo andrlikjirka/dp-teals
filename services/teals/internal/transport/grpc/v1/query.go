@@ -42,13 +42,19 @@ func (s *QueryServiceServer) GetAuditEvent(ctx context.Context, req *auditv1.Get
 		return nil, status.Errorf(codes.Internal, "failed to retrieve audit event with ID %s: %v", req.GetEventId(), err)
 	}
 
-	event, err := s.eventPayloadToStruct(result.Payload)
+	event, err := eventPayloadToStruct(result.Payload)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to convert event payload to struct for event ID %s: %v", req.GetEventId(), err)
 	}
 
+	revealed, err := revealedMetadataToStruct(result.RevealedMetadata)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to convert revealed metadata for event ID %s: %v", req.GetEventId(), err)
+	}
+
 	return &auditv1.GetAuditEventResponse{
 		Event:             event,
+		RevealedMetadata:  revealed,
 		LeafIndex:         result.LeafIndex,
 		ProducerSignToken: result.SignatureToken,
 	}, nil
@@ -74,13 +80,19 @@ func (s *QueryServiceServer) ListAuditEvents(ctx context.Context, req *auditv1.L
 
 	items := make([]*auditv1.ListAuditEventsItem, len(result.Items))
 	for i, item := range result.Items {
-		event, err := s.eventPayloadToStruct(item.Payload)
+		event, err := eventPayloadToStruct(item.Payload)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to convert event payload to struct for event ID %s: %v", item.Event.ID, err)
 		}
 
+		revealed, err := revealedMetadataToStruct(item.RevealedMetadata)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to convert revealed metadata for event ID %s: %v", item.Event.ID, err)
+		}
+
 		items[i] = &auditv1.ListAuditEventsItem{
 			Event:             event,
+			RevealedMetadata:  revealed,
 			LeafIndex:         item.LeafIndex,
 			ProducerSignToken: item.SignatureToken,
 		}
@@ -99,10 +111,18 @@ func (s *QueryServiceServer) ListAuditEvents(ctx context.Context, req *auditv1.L
 }
 
 // eventPayloadToStruct converts a JSON payload from the audit event into a protobuf Struct, which can be used in the gRPC response. It returns an error if the payload cannot be unmarshaled into a Struct.
-func (s *QueryServiceServer) eventPayloadToStruct(payload json.RawMessage) (*structpb.Struct, error) {
+func eventPayloadToStruct(payload json.RawMessage) (*structpb.Struct, error) {
 	out := &structpb.Struct{}
 	if err := out.UnmarshalJSON(payload); err != nil {
 		return nil, err
 	}
 	return out, nil
+}
+
+// mapToAuditEventFilter converts a gRPC request filter into the internal model used by the service layer to query audit events. This function maps the fields from the gRPC request to the corresponding fields in the service's filter model.
+func revealedMetadataToStruct(m map[string]any) (*structpb.Struct, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return structpb.NewStruct(m)
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
 	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
@@ -17,14 +18,16 @@ const auditEventPageSize = 100
 type QueryService struct {
 	tx         ports.TransactionProvider
 	serializer ports.Serializer
+	protector  ports.MetadataProtector
 	logger     *logger.Logger
 }
 
-// NewQueryService creates a new instance of QueryService with the provided transaction provider, serializer, and logger.
-func NewQueryService(tx ports.TransactionProvider, s ports.Serializer, l *logger.Logger) *QueryService {
+// NewQueryService creates a new instance of QueryService with the provided transaction provider, serializer, metadata protector and logger.
+func NewQueryService(tx ports.TransactionProvider, s ports.Serializer, p ports.MetadataProtector, l *logger.Logger) *QueryService {
 	return &QueryService{
 		tx:         tx,
 		serializer: s,
+		protector:  p,
 		logger:     l,
 	}
 }
@@ -47,10 +50,11 @@ func (s *QueryService) GetAuditEvent(ctx context.Context, eventID uuid.UUID) (*m
 		}
 
 		result = &model.GetAuditEventResult{
-			Event:          event,
-			Payload:        entry.Payload,
-			LeafIndex:      entry.LeafIndex,
-			SignatureToken: entry.SignatureToken,
+			Event:            event,
+			Payload:          entry.Payload,
+			LeafIndex:        entry.LeafIndex,
+			SignatureToken:   entry.SignatureToken,
+			RevealedMetadata: s.tryRevealMetadata(ctx, r, event),
 		}
 		return nil
 	})
@@ -94,10 +98,11 @@ func (s *QueryService) ListAuditEvents(ctx context.Context, filter *model.AuditE
 				return svcerrors.ErrEventDeserializationFailed
 			}
 			items[i] = &model.AuditEventListItem{
-				Event:          event,
-				Payload:        entry.Payload,
-				SignatureToken: entry.SignatureToken,
-				LeafIndex:      entry.LeafIndex,
+				Event:            event,
+				Payload:          entry.Payload,
+				SignatureToken:   entry.SignatureToken,
+				LeafIndex:        entry.LeafIndex,
+				RevealedMetadata: s.tryRevealMetadata(ctx, r, event),
 			}
 		}
 
@@ -110,4 +115,27 @@ func (s *QueryService) ListAuditEvents(ctx context.Context, filter *model.AuditE
 
 	s.logger.Info("audit events listed", "count", len(result.Items))
 	return result, nil
+}
+
+// tryRevealMetadata attempts to reveal the protected metadata of an audit event using the subject's secret. If the event does not have protected metadata or if there was an issue during retrieval or revelation, it returns nil and logs the error.
+func (s *QueryService) tryRevealMetadata(ctx context.Context, r ports.Repositories, event *model.ProtectedAuditEvent) map[string]any {
+	if event.ProtectedMetadata == nil {
+		return nil
+	}
+
+	secret, err := r.SubjectSecretReader.GetSecretBySubjectId(ctx, event.Subject.ID)
+	if err != nil {
+		if !errors.Is(err, svcerrors.ErrSubjectSecretNotFound) {
+			s.logger.Error("failed to retrieve subject secret for metadata reveal", "subject_id", event.Subject.ID, "error", err)
+		}
+		return nil
+	}
+
+	revealed, err := s.protector.Reveal(secret, event.ProtectedMetadata)
+	if err != nil {
+		s.logger.Error("failed to reveal protected metadata", "subject_id", event.Subject.ID, "error", err)
+		return nil
+	}
+
+	return revealed
 }

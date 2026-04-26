@@ -23,10 +23,11 @@ type AuditEventFilter struct {
 
 // GetAuditEventResult encapsulates the result of retrieving a single audit event, including the event details and associated metadata.
 type GetAuditEventResult struct {
-	Event          *ProtectedAuditEvent
-	Payload        json.RawMessage
-	LeafIndex      int64
-	SignatureToken string
+	Event            *ProtectedAuditEvent
+	Payload          json.RawMessage
+	RevealedMetadata map[string]any
+	LeafIndex        int64
+	SignatureToken   string
 }
 
 // ListAuditEventsResult encapsulates the result of listing audit events based on a filter, including the list of events and the ledger size at the time of retrieval.
@@ -38,9 +39,10 @@ type ListAuditEventsResult struct {
 
 // AuditEventListItem represents an individual audit event in the list of events returned by a query, including the event details and associated metadata such as the leaf index and signature token.
 type AuditEventListItem struct {
-	EventID        uuid.UUID
-	Event          *ProtectedAuditEvent
-	Payload        json.RawMessage
-	SignatureToken string
-	LeafIndex      int64
+	EventID          uuid.UUID
+	Event            *ProtectedAuditEvent
+	Payload          json.RawMessage
+	RevealedMetadata map[string]any
+	SignatureToken   string
+	LeafIndex        int64
 }
