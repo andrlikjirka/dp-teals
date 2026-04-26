@@ -6,42 +6,40 @@ skinparam ranksep 80
 title "Kryptograficky verifikovatelný auditní log: Kontejnery"
 
 actor "Auditor" as Auditor
-[Informační systém] as Producer <<Producer>>
+[Information System] as Producer <<Producer>>
 'actor "Administrator" as Admin
-component "OpenBao (KMS)" as KMS
+'component "OpenBao (KMS)" as KMS
 
 package "Tamper-Evident Audit Log System" {
     interface "Ingestion API" as IngestorAPI 
-    interface "Proof API" as ProofAPI 
-    [Audit Log Server] as LogServer <<Container>>
+    interface "Query/Proof API" as ProofAPI
+    [\tAudit Log Server\t] as LogServer <<Container>>
     
-    database "WORM\núložiště" as EventStore
-    database "Databáze" as TreeStore
+    database "Databáze" as AuditStore
 
 
-    interface "Verification API" as VerificationAPI
-    [Verification Client] as Client <<Container>>
+    'interface "Audit API" as VerificationAPI
+    [\tAudit Client\t] as Client <<Container>>
 
     database "Databáze" as RootStore
     
 }
 
-Producer .> IngestorAPI : Produkuje auditní záznamy\n<<gRPC API>>
+Producer .> IngestorAPI : Odesílá auditní záznamy\n<<gRPC API>>
 IngestorAPI - LogServer
-LogServer - ProofAPI 
+LogServer - ProofAPI
 
-LogServer -up-> TreeStore : Ukládá MMR a \n podepsané \ncheckpointy
-LogServer -up-> EventStore : Ukládá \nauditní \nzáznamy
+LogServer -down-> AuditStore : Ukládá auditní záznamy,\nkryptografické stopy\na checkpointy
 
+'Auditor ..> VerificationAPI : Vyhledává auditní záznamy\na ověřuje důkazy integrity\n<<REST API>>
+'Client - VerificationAPI
+'VerificationAPI -- Client
+Auditor ..> Client: Vyhledává auditní záznamy\na ověřuje důkazy integrity
 
-Auditor ..> VerificationAPI : Vyhledává auditní záznamy\na ověřuje jejich integritu\n<<REST API>>
-'Client - VerificationAPI 
-VerificationAPI -- Client 
+ProofAPI <. Client: "Získává podepsané checkpointy \n a vyhledává auditní záznamy \n<<gRPC API>>"
+Client -down-> RootStore : Ukládá \nlokální kopie \ncheckpointů
 
-ProofAPI <. Client: Získává podepsané \ncheckpointy \n auditního logu\n<<gRPC API>>
-Client -> RootStore : Ukládá \nlokální kopie \ncheckpointů 
-
-LogServer --> KMS : Využívá klíče pro \n šifrování a digitální \npodepisování
-Client --> KMS : Ověřování \npodpepsaných\n checkpointů 
+'LogServer --> KMS : Využívá klíče pro \n šifrování a digitální \npodepisování
+'Client --> KMS : Ověřování \npodpepsaných\n checkpointů
 
 @enduml
