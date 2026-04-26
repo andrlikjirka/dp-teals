@@ -6,11 +6,11 @@ type ProtectedAuditEvent struct {
 	ProtectedMetadata *ProtectedMetadata
 }
 
-// ProtectedMetadata encapsulates the encrypted metadata containing PII data for a ProtectedAuditEvent.
+// ProtectedMetadata encapsulates the encrypted PII metadata for a ProtectedAuditEvent, including the ciphertext, the wrapped data encryption key (DEK), and the commitment used for PII integrity verification.
 type ProtectedMetadata struct {
-	Ciphertext []byte // AES-256-GCM encrypted canonical metadata
-	WrappedDEK []byte // DEK wrapped with Subject KEK
-	Commitment []byte // SHA256(canonical_metadata || salt)
+	Ciphertext []byte
+	WrappedDEK []byte
+	Commitment []byte
 }
 
 // CreateProtectedAuditEventParams encapsulates the parameters needed to create a ProtectedAuditEvent, including all standard event fields and the optional protected metadata.
