@@ -4,7 +4,7 @@ package audit.v1;
 import "google/protobuf/timestamp.proto";
 import "buf/validate/validate.proto";
 import "audit/v1/event.proto";
-import "audit/v1/proof.proto";
+import "google/protobuf/struct.proto";
 
 option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1";
 
@@ -18,7 +18,7 @@ message GetAuditEventRequest {
 }
 
 message GetAuditEventResponse {
-  ProtectedAuditEvent event = 1;
+  google.protobuf.Struct event = 1;
   int64 leaf_index = 2;
   string producer_sign_token = 3;
 }
@@ -47,7 +47,7 @@ message AuditEventFilter {
 }
 
 message ListAuditEventsItem {
-  ProtectedAuditEvent event = 1;
+  google.protobuf.Struct event = 1;
   int64 leaf_index = 2;
   string producer_sign_token = 3;
 }

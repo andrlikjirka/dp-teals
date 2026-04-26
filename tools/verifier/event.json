@@ -1,1 +1,29 @@
-{"id": "5cef2c59-7823-4c57-b362-9f45b334098d", "actor": {"id": "fb5cafa6-e9ad-4b61-990f-d81e8469a0df", "type": "USER"}, "action": "EXPORT", "result": {"reason": "insufficient permissions", "status": "FAILURE"}, "subject": {"id": "f47ac10b-58cc-4372-a567-0e02b2c3d479"}, "metadata": {"destination": "s3", "record_count": 381, "export_format": "xlsx"}, "resource": {"id": "aaaaaaaa-0001-4000-8000-000000000007", "name": "CustomerReport"}, "timestamp": "2026-04-14T17:44:25.108593Z", "environment": {"service": "crm_service", "span_id": "a9a481b4a05b575bd7f331b780e98291", "trace_id": "0e64da59d5e8d34b18ddecc7fe380bee1a874d2b24047254f21d821a839832de"}}
+{
+  "id": "019dcb47-948f-7589-b325-ef18444462a8",
+  "actor": {
+    "id": "5d695536-c35c-4e34-a4c5-ea6cbf0ec90c",
+    "type": "USER"
+  },
+  "action": "SHARE",
+  "subject": {
+    "id": "b8f3a2d1-4e5f-6789-abcd-ef0123456789"
+  },
+  "resource": {
+    "id": "aaaaaaaa-0001-4000-8000-000000000007",
+    "name": "CustomerReport"
+  },
+  "timestamp": "2026-04-26T19:32:39.183363Z",
+  "environment": {
+    "service": "crm_service",
+    "span_id": "09c876d5a28c31741c7bf56965300634",
+    "trace_id": "54ab7843936467b20918ece516bd84241ac0989b9b238f8bc481a998f63c7813"
+  },
+  "protected_metadata": {
+    "ciphertext": "JnzVIOHArLAHO7HtNrwAJqe5OmW7whWGYOwxIE6pig/05CAkN+QZggZcBKkVkz9V1Nmq5QbAkz6JfBQa9ApF2uefFu9IdlLww4uEC/czc/eAZz2RKgpOFlRAqA==",
+    "commitment": "2e4c250f7ce37261c3478995fef8d50723f55e729b8d524595c63e0beb6591c9",
+    "wrapped_dek": "Hv7tzR0D84cTzovQ1PCdxrQHEDyVJULYPn7PIy6Lx//P9NhDtSOzeJxvIDbLeJZdsC4GK34EkFQXx3Co"
+  },
+  "result": {
+    "status": "SUCCESS"
+  }
+}

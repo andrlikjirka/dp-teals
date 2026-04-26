@@ -191,10 +191,6 @@ func mapToProtoAuditEvent(event *model.AuditEvent) *auditv1.AuditEvent {
 			Name:   event.Resource.Name,
 			Fields: event.Resource.Fields,
 		},
-		Result: &auditv1.Result{
-			Status: fromResultStatus(event.Result.Status),
-			Reason: event.Result.Reason,
-		},
 	}
 
 	if event.Environment != nil {
@@ -204,6 +200,14 @@ func mapToProtoAuditEvent(event *model.AuditEvent) *auditv1.AuditEvent {
 			SpanId:  event.Environment.SpanID,
 		}
 	}
+
+	result := &auditv1.Result{
+		Status: fromResultStatus(event.Result.Status),
+	}
+	if event.Result.Reason != "" {
+		result.Reason = &event.Result.Reason
+	}
+	proto.Result = result
 
 	if len(event.Metadata) > 0 {
 		if s, err := structpb.NewStruct(event.Metadata); err == nil {
@@ -234,10 +238,6 @@ func mapToProtoProtectedAuditEvent(event *model.ProtectedAuditEvent) *auditv1.Pr
 			Name:   event.Resource.Name,
 			Fields: event.Resource.Fields,
 		},
-		Result: &auditv1.Result{
-			Status: fromResultStatus(event.Result.Status),
-			Reason: event.Result.Reason,
-		},
 	}
 
 	if event.Environment != nil {
@@ -255,6 +255,14 @@ func mapToProtoProtectedAuditEvent(event *model.ProtectedAuditEvent) *auditv1.Pr
 			Commitment: event.ProtectedMetadata.Commitment,
 		}
 	}
+
+	result := &auditv1.Result{
+		Status: fromResultStatus(event.Result.Status),
+	}
+	if event.Result.Reason != "" {
+		result.Reason = &event.Result.Reason
+	}
+	proto.Result = result
 
 	return proto
 }

@@ -696,7 +696,7 @@ func (x *Resource) GetFields() []string {
 type Result struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Status        Result_Status          `protobuf:"varint,1,opt,name=status,proto3,enum=audit.v1.Result_Status" json:"status,omitempty"`
-	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
+	Reason        *string                `protobuf:"bytes,2,opt,name=reason,proto3,oneof" json:"reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -739,8 +739,8 @@ func (x *Result) GetStatus() Result_Status {
 }
 
 func (x *Result) GetReason() string {
-	if x != nil {
-		return x.Reason
+	if x != nil && x.Reason != nil {
+		return *x.Reason
 	}
 	return ""
 }
@@ -799,15 +799,16 @@ const file_audit_v1_event_proto_rawDesc = "" +
 	"\bResource\x12\x17\n" +
 	"\x02id\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x02id\x12\x1b\n" +
 	"\x04name\x18\x03 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04name\x12\x16\n" +
-	"\x06fields\x18\x04 \x03(\tR\x06fields\"\xa7\x01\n" +
+	"\x06fields\x18\x04 \x03(\tR\x06fields\"\xb7\x01\n" +
 	"\x06Result\x12;\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x17.audit.v1.Result.StatusB\n" +
-	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\x06status\x12\x16\n" +
-	"\x06reason\x18\x02 \x01(\tR\x06reason\"H\n" +
+	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\x06status\x12\x1b\n" +
+	"\x06reason\x18\x02 \x01(\tH\x00R\x06reason\x88\x01\x01\"H\n" +
 	"\x06Status\x12\x16\n" +
 	"\x12STATUS_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSTATUS_SUCCESS\x10\x01\x12\x12\n" +
-	"\x0eSTATUS_FAILURE\x10\x02*\xcc\x01\n" +
+	"\x0eSTATUS_FAILURE\x10\x02B\t\n" +
+	"\a_reason*\xcc\x01\n" +
 	"\x06Action\x12\x16\n" +
 	"\x12ACTION_UNSPECIFIED\x10\x00\x12\x11\n" +
 	"\rACTION_ACCESS\x10\x01\x12\x11\n" +
@@ -883,6 +884,7 @@ func file_audit_v1_event_proto_init() {
 		return
 	}
 	file_audit_v1_event_proto_msgTypes[2].OneofWrappers = []any{}
+	file_audit_v1_event_proto_msgTypes[7].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

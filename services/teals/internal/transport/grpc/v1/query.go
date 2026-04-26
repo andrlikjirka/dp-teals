@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 
 	auditv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
@@ -10,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // QueryServiceServer implements the gRPC server for the QueryService defined in the protobuf. It provides methods to retrieve audit events by ID and to list audit events based on filters. The service layer is responsible for the actual retrieval logic, while the transport layer focuses on handling gRPC requests and responses.
@@ -40,8 +42,13 @@ func (s *QueryServiceServer) GetAuditEvent(ctx context.Context, req *auditv1.Get
 		return nil, status.Errorf(codes.Internal, "failed to retrieve audit event with ID %s: %v", req.GetEventId(), err)
 	}
 
+	event, err := s.eventPayloadToStruct(result.Payload)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to convert event payload to struct for event ID %s: %v", req.GetEventId(), err)
+	}
+
 	return &auditv1.GetAuditEventResponse{
-		Event:             mapToProtoProtectedAuditEvent(result.Event),
+		Event:             event,
 		LeafIndex:         result.LeafIndex,
 		ProducerSignToken: result.SignatureToken,
 	}, nil
@@ -67,8 +74,13 @@ func (s *QueryServiceServer) ListAuditEvents(ctx context.Context, req *auditv1.L
 
 	items := make([]*auditv1.ListAuditEventsItem, len(result.Items))
 	for i, item := range result.Items {
+		event, err := s.eventPayloadToStruct(item.Payload)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to convert event payload to struct for event ID %s: %v", item.Event.ID, err)
+		}
+
 		items[i] = &auditv1.ListAuditEventsItem{
-			Event:             mapToProtoProtectedAuditEvent(item.Event),
+			Event:             event,
 			LeafIndex:         item.LeafIndex,
 			ProducerSignToken: item.SignatureToken,
 		}
@@ -84,4 +96,13 @@ func (s *QueryServiceServer) ListAuditEvents(ctx context.Context, req *auditv1.L
 	}
 
 	return resp, nil
+}
+
+// eventPayloadToStruct converts a JSON payload from the audit event into a protobuf Struct, which can be used in the gRPC response. It returns an error if the payload cannot be unmarshaled into a Struct.
+func (s *QueryServiceServer) eventPayloadToStruct(payload json.RawMessage) (*structpb.Struct, error) {
+	out := &structpb.Struct{}
+	if err := out.UnmarshalJSON(payload); err != nil {
+		return nil, err
+	}
+	return out, nil
 }

@@ -10,6 +10,7 @@ import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -69,7 +70,7 @@ func (x *GetAuditEventRequest) GetEventId() string {
 
 type GetAuditEventResponse struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	Event             *ProtectedAuditEvent   `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
+	Event             *structpb.Struct       `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
 	LeafIndex         int64                  `protobuf:"varint,2,opt,name=leaf_index,json=leafIndex,proto3" json:"leaf_index,omitempty"`
 	ProducerSignToken string                 `protobuf:"bytes,3,opt,name=producer_sign_token,json=producerSignToken,proto3" json:"producer_sign_token,omitempty"`
 	unknownFields     protoimpl.UnknownFields
@@ -106,7 +107,7 @@ func (*GetAuditEventResponse) Descriptor() ([]byte, []int) {
 	return file_audit_v1_query_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *GetAuditEventResponse) GetEvent() *ProtectedAuditEvent {
+func (x *GetAuditEventResponse) GetEvent() *structpb.Struct {
 	if x != nil {
 		return x.Event
 	}
@@ -349,7 +350,7 @@ func (x *AuditEventFilter) GetTimestampTo() *timestamppb.Timestamp {
 
 type ListAuditEventsItem struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	Event             *ProtectedAuditEvent   `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
+	Event             *structpb.Struct       `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
 	LeafIndex         int64                  `protobuf:"varint,2,opt,name=leaf_index,json=leafIndex,proto3" json:"leaf_index,omitempty"`
 	ProducerSignToken string                 `protobuf:"bytes,3,opt,name=producer_sign_token,json=producerSignToken,proto3" json:"producer_sign_token,omitempty"`
 	unknownFields     protoimpl.UnknownFields
@@ -386,7 +387,7 @@ func (*ListAuditEventsItem) Descriptor() ([]byte, []int) {
 	return file_audit_v1_query_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *ListAuditEventsItem) GetEvent() *ProtectedAuditEvent {
+func (x *ListAuditEventsItem) GetEvent() *structpb.Struct {
 	if x != nil {
 		return x.Event
 	}
@@ -411,11 +412,11 @@ var File_audit_v1_query_proto protoreflect.FileDescriptor
 
 const file_audit_v1_query_proto_rawDesc = "" +
 	"\n" +
-	"\x14audit/v1/query.proto\x12\baudit.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bbuf/validate/validate.proto\x1a\x14audit/v1/event.proto\x1a\x14audit/v1/proof.proto\";\n" +
+	"\x14audit/v1/query.proto\x12\baudit.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bbuf/validate/validate.proto\x1a\x14audit/v1/event.proto\x1a\x1cgoogle/protobuf/struct.proto\";\n" +
 	"\x14GetAuditEventRequest\x12#\n" +
-	"\bevent_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\aeventId\"\x9b\x01\n" +
-	"\x15GetAuditEventResponse\x123\n" +
-	"\x05event\x18\x01 \x01(\v2\x1d.audit.v1.ProtectedAuditEventR\x05event\x12\x1d\n" +
+	"\bevent_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\aeventId\"\x95\x01\n" +
+	"\x15GetAuditEventResponse\x12-\n" +
+	"\x05event\x18\x01 \x01(\v2\x17.google.protobuf.StructR\x05event\x12\x1d\n" +
 	"\n" +
 	"leaf_index\x18\x02 \x01(\x03R\tleafIndex\x12.\n" +
 	"\x13producer_sign_token\x18\x03 \x01(\tR\x11producerSignToken\"t\n" +
@@ -442,9 +443,9 @@ const file_audit_v1_query_proto_rawDesc = "" +
 	"\rresource_name\x18\x06 \x01(\tR\fresourceName\x12@\n" +
 	"\x0fresult_statuses\x18\a \x03(\x0e2\x17.audit.v1.Result.StatusR\x0eresultStatuses\x12A\n" +
 	"\x0etimestamp_from\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\rtimestampFrom\x12=\n" +
-	"\ftimestamp_to\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\vtimestampTo\"\x99\x01\n" +
-	"\x13ListAuditEventsItem\x123\n" +
-	"\x05event\x18\x01 \x01(\v2\x1d.audit.v1.ProtectedAuditEventR\x05event\x12\x1d\n" +
+	"\ftimestamp_to\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\vtimestampTo\"\x93\x01\n" +
+	"\x13ListAuditEventsItem\x12-\n" +
+	"\x05event\x18\x01 \x01(\v2\x17.google.protobuf.StructR\x05event\x12\x1d\n" +
 	"\n" +
 	"leaf_index\x18\x02 \x01(\x03R\tleafIndex\x12.\n" +
 	"\x13producer_sign_token\x18\x03 \x01(\tR\x11producerSignToken2\xbc\x01\n" +
@@ -474,14 +475,14 @@ var file_audit_v1_query_proto_goTypes = []any{
 	(*ListAuditEventsResponse)(nil), // 3: audit.v1.ListAuditEventsResponse
 	(*AuditEventFilter)(nil),        // 4: audit.v1.AuditEventFilter
 	(*ListAuditEventsItem)(nil),     // 5: audit.v1.ListAuditEventsItem
-	(*ProtectedAuditEvent)(nil),     // 6: audit.v1.ProtectedAuditEvent
+	(*structpb.Struct)(nil),         // 6: google.protobuf.Struct
 	(Action)(0),                     // 7: audit.v1.Action
 	(Actor_Type)(0),                 // 8: audit.v1.Actor.Type
 	(Result_Status)(0),              // 9: audit.v1.Result.Status
 	(*timestamppb.Timestamp)(nil),   // 10: google.protobuf.Timestamp
 }
 var file_audit_v1_query_proto_depIdxs = []int32{
-	6,  // 0: audit.v1.GetAuditEventResponse.event:type_name -> audit.v1.ProtectedAuditEvent
+	6,  // 0: audit.v1.GetAuditEventResponse.event:type_name -> google.protobuf.Struct
 	4,  // 1: audit.v1.ListAuditEventsRequest.filter:type_name -> audit.v1.AuditEventFilter
 	5,  // 2: audit.v1.ListAuditEventsResponse.items:type_name -> audit.v1.ListAuditEventsItem
 	7,  // 3: audit.v1.AuditEventFilter.actions:type_name -> audit.v1.Action
@@ -489,7 +490,7 @@ var file_audit_v1_query_proto_depIdxs = []int32{
 	9,  // 5: audit.v1.AuditEventFilter.result_statuses:type_name -> audit.v1.Result.Status
 	10, // 6: audit.v1.AuditEventFilter.timestamp_from:type_name -> google.protobuf.Timestamp
 	10, // 7: audit.v1.AuditEventFilter.timestamp_to:type_name -> google.protobuf.Timestamp
-	6,  // 8: audit.v1.ListAuditEventsItem.event:type_name -> audit.v1.ProtectedAuditEvent
+	6,  // 8: audit.v1.ListAuditEventsItem.event:type_name -> google.protobuf.Struct
 	0,  // 9: audit.v1.QueryService.GetAuditEvent:input_type -> audit.v1.GetAuditEventRequest
 	2,  // 10: audit.v1.QueryService.ListAuditEvents:input_type -> audit.v1.ListAuditEventsRequest
 	1,  // 11: audit.v1.QueryService.GetAuditEvent:output_type -> audit.v1.GetAuditEventResponse
@@ -507,7 +508,6 @@ func file_audit_v1_query_proto_init() {
 		return
 	}
 	file_audit_v1_event_proto_init()
-	file_audit_v1_proof_proto_init()
 	file_audit_v1_query_proto_msgTypes[2].OneofWrappers = []any{}
 	file_audit_v1_query_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}

@@ -48,6 +48,7 @@ func (s *QueryService) GetAuditEvent(ctx context.Context, eventID uuid.UUID) (*m
 
 		result = &model.GetAuditEventResult{
 			Event:          event,
+			Payload:        entry.Payload,
 			LeafIndex:      entry.LeafIndex,
 			SignatureToken: entry.SignatureToken,
 		}
@@ -94,6 +95,7 @@ func (s *QueryService) ListAuditEvents(ctx context.Context, filter *model.AuditE
 			}
 			items[i] = &model.AuditEventListItem{
 				Event:          event,
+				Payload:        entry.Payload,
 				SignatureToken: entry.SignatureToken,
 				LeafIndex:      entry.LeafIndex,
 			}

@@ -48,7 +48,7 @@ func toProto(event *model.AuditEvent) (*ingestionv1.AuditEvent, error) {
 		Subject:     &ingestionv1.Subject{Id: event.Subject.ID},
 		Action:      action,
 		Resource:    &ingestionv1.Resource{Id: event.Resource.ID, Name: event.Resource.Name, Fields: event.Resource.Fields},
-		Result:      &ingestionv1.Result{Status: resultStatus, Reason: event.Result.Reason},
+		Result:      &ingestionv1.Result{Status: resultStatus, Reason: &event.Result.Reason},
 		Metadata:    metadata,
 	}, nil
 }

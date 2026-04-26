@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model/enum"
@@ -23,6 +24,7 @@ type AuditEventFilter struct {
 // GetAuditEventResult encapsulates the result of retrieving a single audit event, including the event details and associated metadata.
 type GetAuditEventResult struct {
 	Event          *ProtectedAuditEvent
+	Payload        json.RawMessage
 	LeafIndex      int64
 	SignatureToken string
 }
@@ -38,6 +40,7 @@ type ListAuditEventsResult struct {
 type AuditEventListItem struct {
 	EventID        uuid.UUID
 	Event          *ProtectedAuditEvent
+	Payload        json.RawMessage
 	SignatureToken string
 	LeafIndex      int64
 }
