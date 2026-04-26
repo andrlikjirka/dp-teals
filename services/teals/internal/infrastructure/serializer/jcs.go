@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	pkgcanon "github.com/andrlikjirka/dp-teals/pkg/canonicalizer"
+	pkgcanon "github.com/andrlikjirka/dp-teals/pkg/canonical"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model/enum"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/ports"

@@ -1,4 +1,4 @@
-package canonicalizer
+package canonical
 
 import (
 	"encoding/json"

@@ -1,4 +1,4 @@
-package canonicalizer
+package canonical
 
 // CheckpointPayload is the canonical representation of a ledger checkpoint used as the JWS signing payload.
 type CheckpointPayload struct {

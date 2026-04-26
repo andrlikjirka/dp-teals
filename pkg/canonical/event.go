@@ -1,4 +1,4 @@
-package canonicalizer
+package canonical
 
 // AuditEventPayload is the canonical, transport-independent representation of an audit event used as the JWS signing payload.
 type AuditEventPayload struct {

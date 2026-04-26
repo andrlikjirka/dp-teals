@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	pkgcannon "github.com/andrlikjirka/dp-teals/pkg/canonicalizer"
+	pkgcannon "github.com/andrlikjirka/dp-teals/pkg/canonical"
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
 	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/model"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	pkgcanon "github.com/andrlikjirka/dp-teals/pkg/canonicalizer"
+	pkgcanon "github.com/andrlikjirka/dp-teals/pkg/canonical"
 	"github.com/andrlikjirka/dp-teals/pkg/jws"
 	"github.com/andrlikjirka/dp-teals/tools/generator/internal/model"
 )
