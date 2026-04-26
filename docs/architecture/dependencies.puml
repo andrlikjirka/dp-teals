@@ -1,0 +1,12 @@
+@startuml
+
+'title Závislosti mezi vrstvami
+
+component [Servisní vrstva] as Service
+component [Transportní vrstva] as Transport
+component [Infrastrukturní vrstva] as Infra
+
+Transport -> Service : závisí na
+Service <- Infra : závisí na
+
+@enduml

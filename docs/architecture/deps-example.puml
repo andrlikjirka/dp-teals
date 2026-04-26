@@ -1,0 +1,34 @@
+@startuml
+
+'title Ukázka závislostí mezi vrstvami
+
+hide empty members
+skinparam nodesep 100
+skinparam ranksep 100
+
+package "Transportní vrstva" {
+    class ProofServiceServer <<gRPC Service>> {
+    }
+}
+
+package "Servisní vrstva" {
+    class LedgerService <<Application Service>> {
+
+    }
+
+    interface LedgerProver <<Port>> {
+
+    }
+}
+
+package "Infrastrukturní vrstva" {
+    class Ledger <<Database Repository>> {
+
+    }
+}
+
+ProofServiceServer --> LedgerService
+LedgerService -> LedgerProver
+LedgerProver <|.. Ledger
+
+@enduml
