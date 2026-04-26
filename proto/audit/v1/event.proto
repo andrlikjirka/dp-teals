@@ -21,6 +21,28 @@ message AuditEvent {
   google.protobuf.Struct metadata = 9;
 }
 
+// ProtectedMetadata holds the encrypted PII metadata envelope for a protected audit event.
+message ProtectedMetadata {
+  bytes ciphertext = 1;
+  bytes wrapped_dek = 2;
+  bytes commitment = 3;
+}
+
+// ProtectedAuditEvent is the stored form of an audit event with encrypted metadata.
+// This is what gets hashed as an MMR leaf and returned to verifiers.
+message ProtectedAuditEvent {
+  string id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  Environment environment = 3;
+  Actor actor = 4;
+  Subject subject = 5;
+  Resource resource = 6;
+  Action action = 7;
+  Result result = 8;
+  optional ProtectedMetadata protected_metadata = 9; // nil if event had no PII metadata
+}
+
+
 // The environment message containing information about the service and trace context of the audit event.
 message Environment {
   string service = 1;

@@ -21,6 +21,7 @@ type Config struct {
 	ShutdownTimeout     time.Duration `env:"SHUTDOWN_TIMEOUT"   envDefault:"30s"`
 	ServerPrivateKeyB64 string        `env:"SERVER_PRIVATE_KEY_B64" validate:"required"`
 	CheckpointInterval  time.Duration `env:"CHECKPOINT_INTERVAL" envDefault:"10s"`
+	MasterKEKB64        string        `env:"MASTER_KEK_B64" validate:"required"`
 }
 
 // LoadEnvFile loads environment variables from the specified .env file.

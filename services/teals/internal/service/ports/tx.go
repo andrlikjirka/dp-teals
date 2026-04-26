@@ -3,11 +3,13 @@ package ports
 import "context"
 
 type Repositories struct {
-	AuditLog        AuditLog
-	ProducerKeys    ProducerKeyRegistry
-	Ledger          Ledger
-	LedgerProver    LedgerProver
-	CheckpointStore CheckpointStore
+	AuditLog            AuditLog
+	ProducerKeys        ProducerKeyRegistry
+	Ledger              Ledger
+	LedgerProver        LedgerProver
+	CheckpointStore     CheckpointStore
+	SubjectSecretWriter SubjectSecretWriter
+	SubjectSecretReader SubjectSecretReader
 }
 
 type TransactionProvider interface {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"os/signal"
@@ -10,6 +11,7 @@ import (
 	pkgjws "github.com/andrlikjirka/dp-teals/pkg/jws"
 	"github.com/andrlikjirka/dp-teals/pkg/logger"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/bootstrap"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/protector"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/repository"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/infrastructure/serializer"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service"
@@ -53,14 +55,25 @@ func run() error {
 	}
 	defer pool.Close()
 
+	masterKEK, err := base64.StdEncoding.DecodeString(config.MasterKEKB64)
+	if err != nil {
+		log.Error("failed to decode master KEK", "error", err)
+		return err
+	}
+
 	// Infrastructure
 	jcsSerializer := serializer.NewJcsSerializer()
 	txProvider := repository.NewTransactionProvider(pool)
 	keyRepo := repository.NewProducerKeyRepository(pool)
+	protect, err := protector.NewAesGcmProtector(masterKEK)
+	if err != nil {
+		log.Error("failed to create metadata protector", "error", err)
+		return err
+	}
 
 	// Services
 	verifier := pkgjws.NewEd25519Verifier(keyRepo)
-	ingestionService := service.NewAuditService(txProvider, jcsSerializer, verifier, log)
+	auditService := service.NewAuditService(txProvider, jcsSerializer, verifier, protect, log)
 	keyService := service.NewKeyService(keyRepo, log)
 	ledgerService := service.NewLedgerService(txProvider, log)
 	checkpointService := service.NewCheckpointService(txProvider, signer, log)
@@ -68,7 +81,7 @@ func run() error {
 
 	// Transport
 	cpWorker := worker.NewCheckpointWorker(checkpointService, config.CheckpointInterval, log)
-	ingestor := v1.NewIngestionServiceServer(ingestionService)
+	ingestor := v1.NewIngestionServiceServer(auditService)
 	keys := v1.NewKeyRegistrationServiceServer(keyService)
 	proofer := v1.NewProofServiceServer(ledgerService, checkpointService)
 	querier := v1.NewQueryServiceServer(queryService)

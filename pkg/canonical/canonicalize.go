@@ -7,13 +7,23 @@ import (
 )
 
 // CanonicalizeAuditEvent serializes an audit event payload to canonical JSON (JCS / RFC 8785).
-func CanonicalizeAuditEvent(p *AuditEventPayload) ([]byte, error) {
+func CanonicalizeAuditEvent(p *AuditEventPayload) (json.RawMessage, error) {
 	return canonicalize(p)
 }
 
 // CanonicalizeCheckpoint serializes a checkpoint payload to canonical JSON (JCS / RFC 8785).
-func CanonicalizeCheckpoint(p *CheckpointPayload) ([]byte, error) {
+func CanonicalizeCheckpoint(p *CheckpointPayload) (json.RawMessage, error) {
 	return canonicalize(p)
+}
+
+// CanonicalizeProtectedAuditEvent serializes a protected audit event payload to canonical JSON (JCS / RFC 8785).
+func CanonicalizeProtectedAuditEvent(p *ProtectedAuditEventPayload) (json.RawMessage, error) {
+	return canonicalize(p)
+}
+
+// CanonicalizeMetadata serializes metadata to canonical JSON (JCS / RFC 8785).
+func CanonicalizeMetadata(metadata map[string]any) (json.RawMessage, error) {
+	return canonicalize(metadata)
 }
 
 // canonicalize serializes the payload to canonical JSON using JCS (RFC 8785).

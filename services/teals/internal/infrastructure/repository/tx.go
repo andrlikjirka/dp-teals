@@ -26,12 +26,16 @@ func NewTransactionProvider(pool *pgxpool.Pool) *TransactionProvider {
 func (tp *TransactionProvider) Transact(ctx context.Context, txFunc func(ports.Repositories) error) error {
 	return runInTransaction(ctx, tp.pool, func(tx pgx.Tx) error {
 		ledgerRepo := NewLedgerRepository(tx, hash.SHA3HashFunc)
+		subjectSecretRepo := NewSubjectSecretRepository(tx)
+
 		r := ports.Repositories{
-			AuditLog:        NewAuditLogRepository(tx),
-			ProducerKeys:    NewProducerKeyRepository(tx),
-			Ledger:          ledgerRepo,
-			LedgerProver:    ledgerRepo,
-			CheckpointStore: NewCheckpointRepository(tx),
+			AuditLog:            NewAuditLogRepository(tx),
+			ProducerKeys:        NewProducerKeyRepository(tx),
+			Ledger:              ledgerRepo,
+			LedgerProver:        ledgerRepo,
+			CheckpointStore:     NewCheckpointRepository(tx),
+			SubjectSecretWriter: subjectSecretRepo,
+			SubjectSecretReader: subjectSecretRepo,
 		}
 
 		return txFunc(r)

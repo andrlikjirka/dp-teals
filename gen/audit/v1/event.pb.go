@@ -140,7 +140,7 @@ func (x Actor_Type) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Actor_Type.Descriptor instead.
 func (Actor_Type) EnumDescriptor() ([]byte, []int) {
-	return file_audit_v1_event_proto_rawDescGZIP(), []int{2, 0}
+	return file_audit_v1_event_proto_rawDescGZIP(), []int{4, 0}
 }
 
 type Result_Status int32
@@ -189,7 +189,7 @@ func (x Result_Status) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Result_Status.Descriptor instead.
 func (Result_Status) EnumDescriptor() ([]byte, []int) {
-	return file_audit_v1_event_proto_rawDescGZIP(), []int{5, 0}
+	return file_audit_v1_event_proto_rawDescGZIP(), []int{7, 0}
 }
 
 // The audit event message containing all relevant information about the event.
@@ -301,6 +301,177 @@ func (x *AuditEvent) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+// ProtectedMetadata holds the encrypted PII metadata envelope for a protected audit event.
+type ProtectedMetadata struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ciphertext    []byte                 `protobuf:"bytes,1,opt,name=ciphertext,proto3" json:"ciphertext,omitempty"`
+	WrappedDek    []byte                 `protobuf:"bytes,2,opt,name=wrapped_dek,json=wrappedDek,proto3" json:"wrapped_dek,omitempty"`
+	Commitment    []byte                 `protobuf:"bytes,3,opt,name=commitment,proto3" json:"commitment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ProtectedMetadata) Reset() {
+	*x = ProtectedMetadata{}
+	mi := &file_audit_v1_event_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProtectedMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProtectedMetadata) ProtoMessage() {}
+
+func (x *ProtectedMetadata) ProtoReflect() protoreflect.Message {
+	mi := &file_audit_v1_event_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProtectedMetadata.ProtoReflect.Descriptor instead.
+func (*ProtectedMetadata) Descriptor() ([]byte, []int) {
+	return file_audit_v1_event_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ProtectedMetadata) GetCiphertext() []byte {
+	if x != nil {
+		return x.Ciphertext
+	}
+	return nil
+}
+
+func (x *ProtectedMetadata) GetWrappedDek() []byte {
+	if x != nil {
+		return x.WrappedDek
+	}
+	return nil
+}
+
+func (x *ProtectedMetadata) GetCommitment() []byte {
+	if x != nil {
+		return x.Commitment
+	}
+	return nil
+}
+
+// ProtectedAuditEvent is the stored form of an audit event with encrypted metadata.
+// This is what gets hashed as an MMR leaf and returned to verifiers.
+type ProtectedAuditEvent struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Timestamp         *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Environment       *Environment           `protobuf:"bytes,3,opt,name=environment,proto3" json:"environment,omitempty"`
+	Actor             *Actor                 `protobuf:"bytes,4,opt,name=actor,proto3" json:"actor,omitempty"`
+	Subject           *Subject               `protobuf:"bytes,5,opt,name=subject,proto3" json:"subject,omitempty"`
+	Resource          *Resource              `protobuf:"bytes,6,opt,name=resource,proto3" json:"resource,omitempty"`
+	Action            Action                 `protobuf:"varint,7,opt,name=action,proto3,enum=audit.v1.Action" json:"action,omitempty"`
+	Result            *Result                `protobuf:"bytes,8,opt,name=result,proto3" json:"result,omitempty"`
+	ProtectedMetadata *ProtectedMetadata     `protobuf:"bytes,9,opt,name=protected_metadata,json=protectedMetadata,proto3,oneof" json:"protected_metadata,omitempty"` // nil if event had no PII metadata
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ProtectedAuditEvent) Reset() {
+	*x = ProtectedAuditEvent{}
+	mi := &file_audit_v1_event_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProtectedAuditEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProtectedAuditEvent) ProtoMessage() {}
+
+func (x *ProtectedAuditEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_audit_v1_event_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProtectedAuditEvent.ProtoReflect.Descriptor instead.
+func (*ProtectedAuditEvent) Descriptor() ([]byte, []int) {
+	return file_audit_v1_event_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ProtectedAuditEvent) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ProtectedAuditEvent) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
+func (x *ProtectedAuditEvent) GetEnvironment() *Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return nil
+}
+
+func (x *ProtectedAuditEvent) GetActor() *Actor {
+	if x != nil {
+		return x.Actor
+	}
+	return nil
+}
+
+func (x *ProtectedAuditEvent) GetSubject() *Subject {
+	if x != nil {
+		return x.Subject
+	}
+	return nil
+}
+
+func (x *ProtectedAuditEvent) GetResource() *Resource {
+	if x != nil {
+		return x.Resource
+	}
+	return nil
+}
+
+func (x *ProtectedAuditEvent) GetAction() Action {
+	if x != nil {
+		return x.Action
+	}
+	return Action_ACTION_UNSPECIFIED
+}
+
+func (x *ProtectedAuditEvent) GetResult() *Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *ProtectedAuditEvent) GetProtectedMetadata() *ProtectedMetadata {
+	if x != nil {
+		return x.ProtectedMetadata
+	}
+	return nil
+}
+
 // The environment message containing information about the service and trace context of the audit event.
 type Environment struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -313,7 +484,7 @@ type Environment struct {
 
 func (x *Environment) Reset() {
 	*x = Environment{}
-	mi := &file_audit_v1_event_proto_msgTypes[1]
+	mi := &file_audit_v1_event_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -325,7 +496,7 @@ func (x *Environment) String() string {
 func (*Environment) ProtoMessage() {}
 
 func (x *Environment) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_event_proto_msgTypes[1]
+	mi := &file_audit_v1_event_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -338,7 +509,7 @@ func (x *Environment) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Environment.ProtoReflect.Descriptor instead.
 func (*Environment) Descriptor() ([]byte, []int) {
-	return file_audit_v1_event_proto_rawDescGZIP(), []int{1}
+	return file_audit_v1_event_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Environment) GetService() string {
@@ -373,7 +544,7 @@ type Actor struct {
 
 func (x *Actor) Reset() {
 	*x = Actor{}
-	mi := &file_audit_v1_event_proto_msgTypes[2]
+	mi := &file_audit_v1_event_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -385,7 +556,7 @@ func (x *Actor) String() string {
 func (*Actor) ProtoMessage() {}
 
 func (x *Actor) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_event_proto_msgTypes[2]
+	mi := &file_audit_v1_event_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -398,7 +569,7 @@ func (x *Actor) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Actor.ProtoReflect.Descriptor instead.
 func (*Actor) Descriptor() ([]byte, []int) {
-	return file_audit_v1_event_proto_rawDescGZIP(), []int{2}
+	return file_audit_v1_event_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Actor) GetType() Actor_Type {
@@ -425,7 +596,7 @@ type Subject struct {
 
 func (x *Subject) Reset() {
 	*x = Subject{}
-	mi := &file_audit_v1_event_proto_msgTypes[3]
+	mi := &file_audit_v1_event_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -437,7 +608,7 @@ func (x *Subject) String() string {
 func (*Subject) ProtoMessage() {}
 
 func (x *Subject) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_event_proto_msgTypes[3]
+	mi := &file_audit_v1_event_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -450,7 +621,7 @@ func (x *Subject) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Subject.ProtoReflect.Descriptor instead.
 func (*Subject) Descriptor() ([]byte, []int) {
-	return file_audit_v1_event_proto_rawDescGZIP(), []int{3}
+	return file_audit_v1_event_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Subject) GetId() string {
@@ -472,7 +643,7 @@ type Resource struct {
 
 func (x *Resource) Reset() {
 	*x = Resource{}
-	mi := &file_audit_v1_event_proto_msgTypes[4]
+	mi := &file_audit_v1_event_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -484,7 +655,7 @@ func (x *Resource) String() string {
 func (*Resource) ProtoMessage() {}
 
 func (x *Resource) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_event_proto_msgTypes[4]
+	mi := &file_audit_v1_event_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -497,7 +668,7 @@ func (x *Resource) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Resource.ProtoReflect.Descriptor instead.
 func (*Resource) Descriptor() ([]byte, []int) {
-	return file_audit_v1_event_proto_rawDescGZIP(), []int{4}
+	return file_audit_v1_event_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Resource) GetId() string {
@@ -532,7 +703,7 @@ type Result struct {
 
 func (x *Result) Reset() {
 	*x = Result{}
-	mi := &file_audit_v1_event_proto_msgTypes[5]
+	mi := &file_audit_v1_event_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -544,7 +715,7 @@ func (x *Result) String() string {
 func (*Result) ProtoMessage() {}
 
 func (x *Result) ProtoReflect() protoreflect.Message {
-	mi := &file_audit_v1_event_proto_msgTypes[5]
+	mi := &file_audit_v1_event_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -557,7 +728,7 @@ func (x *Result) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Result.ProtoReflect.Descriptor instead.
 func (*Result) Descriptor() ([]byte, []int) {
-	return file_audit_v1_event_proto_rawDescGZIP(), []int{5}
+	return file_audit_v1_event_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Result) GetStatus() Result_Status {
@@ -590,7 +761,27 @@ const file_audit_v1_event_proto_rawDesc = "" +
 	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\x06action\x126\n" +
 	"\bresource\x18\x06 \x01(\v2\x12.audit.v1.ResourceB\x06\xbaH\x03\xc8\x01\x01R\bresource\x120\n" +
 	"\x06result\x18\b \x01(\v2\x10.audit.v1.ResultB\x06\xbaH\x03\xc8\x01\x01R\x06result\x123\n" +
-	"\bmetadata\x18\t \x01(\v2\x17.google.protobuf.StructR\bmetadata\"[\n" +
+	"\bmetadata\x18\t \x01(\v2\x17.google.protobuf.StructR\bmetadata\"t\n" +
+	"\x11ProtectedMetadata\x12\x1e\n" +
+	"\n" +
+	"ciphertext\x18\x01 \x01(\fR\n" +
+	"ciphertext\x12\x1f\n" +
+	"\vwrapped_dek\x18\x02 \x01(\fR\n" +
+	"wrappedDek\x12\x1e\n" +
+	"\n" +
+	"commitment\x18\x03 \x01(\fR\n" +
+	"commitment\"\xd8\x03\n" +
+	"\x13ProtectedAuditEvent\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x128\n" +
+	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x127\n" +
+	"\venvironment\x18\x03 \x01(\v2\x15.audit.v1.EnvironmentR\venvironment\x12%\n" +
+	"\x05actor\x18\x04 \x01(\v2\x0f.audit.v1.ActorR\x05actor\x12+\n" +
+	"\asubject\x18\x05 \x01(\v2\x11.audit.v1.SubjectR\asubject\x12.\n" +
+	"\bresource\x18\x06 \x01(\v2\x12.audit.v1.ResourceR\bresource\x12(\n" +
+	"\x06action\x18\a \x01(\x0e2\x10.audit.v1.ActionR\x06action\x12(\n" +
+	"\x06result\x18\b \x01(\v2\x10.audit.v1.ResultR\x06result\x12O\n" +
+	"\x12protected_metadata\x18\t \x01(\v2\x1b.audit.v1.ProtectedMetadataH\x00R\x11protectedMetadata\x88\x01\x01B\x15\n" +
+	"\x13_protected_metadata\"[\n" +
 	"\vEnvironment\x12\x18\n" +
 	"\aservice\x18\x01 \x01(\tR\aservice\x12\x19\n" +
 	"\btrace_id\x18\x02 \x01(\tR\atraceId\x12\x17\n" +
@@ -644,36 +835,46 @@ func file_audit_v1_event_proto_rawDescGZIP() []byte {
 }
 
 var file_audit_v1_event_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_audit_v1_event_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_audit_v1_event_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_audit_v1_event_proto_goTypes = []any{
 	(Action)(0),                   // 0: audit.v1.Action
 	(Actor_Type)(0),               // 1: audit.v1.Actor.Type
 	(Result_Status)(0),            // 2: audit.v1.Result.Status
 	(*AuditEvent)(nil),            // 3: audit.v1.AuditEvent
-	(*Environment)(nil),           // 4: audit.v1.Environment
-	(*Actor)(nil),                 // 5: audit.v1.Actor
-	(*Subject)(nil),               // 6: audit.v1.Subject
-	(*Resource)(nil),              // 7: audit.v1.Resource
-	(*Result)(nil),                // 8: audit.v1.Result
-	(*timestamppb.Timestamp)(nil), // 9: google.protobuf.Timestamp
-	(*structpb.Struct)(nil),       // 10: google.protobuf.Struct
+	(*ProtectedMetadata)(nil),     // 4: audit.v1.ProtectedMetadata
+	(*ProtectedAuditEvent)(nil),   // 5: audit.v1.ProtectedAuditEvent
+	(*Environment)(nil),           // 6: audit.v1.Environment
+	(*Actor)(nil),                 // 7: audit.v1.Actor
+	(*Subject)(nil),               // 8: audit.v1.Subject
+	(*Resource)(nil),              // 9: audit.v1.Resource
+	(*Result)(nil),                // 10: audit.v1.Result
+	(*timestamppb.Timestamp)(nil), // 11: google.protobuf.Timestamp
+	(*structpb.Struct)(nil),       // 12: google.protobuf.Struct
 }
 var file_audit_v1_event_proto_depIdxs = []int32{
-	9,  // 0: audit.v1.AuditEvent.timestamp:type_name -> google.protobuf.Timestamp
-	4,  // 1: audit.v1.AuditEvent.environment:type_name -> audit.v1.Environment
-	5,  // 2: audit.v1.AuditEvent.actor:type_name -> audit.v1.Actor
-	6,  // 3: audit.v1.AuditEvent.subject:type_name -> audit.v1.Subject
+	11, // 0: audit.v1.AuditEvent.timestamp:type_name -> google.protobuf.Timestamp
+	6,  // 1: audit.v1.AuditEvent.environment:type_name -> audit.v1.Environment
+	7,  // 2: audit.v1.AuditEvent.actor:type_name -> audit.v1.Actor
+	8,  // 3: audit.v1.AuditEvent.subject:type_name -> audit.v1.Subject
 	0,  // 4: audit.v1.AuditEvent.action:type_name -> audit.v1.Action
-	7,  // 5: audit.v1.AuditEvent.resource:type_name -> audit.v1.Resource
-	8,  // 6: audit.v1.AuditEvent.result:type_name -> audit.v1.Result
-	10, // 7: audit.v1.AuditEvent.metadata:type_name -> google.protobuf.Struct
-	1,  // 8: audit.v1.Actor.type:type_name -> audit.v1.Actor.Type
-	2,  // 9: audit.v1.Result.status:type_name -> audit.v1.Result.Status
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	9,  // 5: audit.v1.AuditEvent.resource:type_name -> audit.v1.Resource
+	10, // 6: audit.v1.AuditEvent.result:type_name -> audit.v1.Result
+	12, // 7: audit.v1.AuditEvent.metadata:type_name -> google.protobuf.Struct
+	11, // 8: audit.v1.ProtectedAuditEvent.timestamp:type_name -> google.protobuf.Timestamp
+	6,  // 9: audit.v1.ProtectedAuditEvent.environment:type_name -> audit.v1.Environment
+	7,  // 10: audit.v1.ProtectedAuditEvent.actor:type_name -> audit.v1.Actor
+	8,  // 11: audit.v1.ProtectedAuditEvent.subject:type_name -> audit.v1.Subject
+	9,  // 12: audit.v1.ProtectedAuditEvent.resource:type_name -> audit.v1.Resource
+	0,  // 13: audit.v1.ProtectedAuditEvent.action:type_name -> audit.v1.Action
+	10, // 14: audit.v1.ProtectedAuditEvent.result:type_name -> audit.v1.Result
+	4,  // 15: audit.v1.ProtectedAuditEvent.protected_metadata:type_name -> audit.v1.ProtectedMetadata
+	1,  // 16: audit.v1.Actor.type:type_name -> audit.v1.Actor.Type
+	2,  // 17: audit.v1.Result.status:type_name -> audit.v1.Result.Status
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_audit_v1_event_proto_init() }
@@ -681,13 +882,14 @@ func file_audit_v1_event_proto_init() {
 	if File_audit_v1_event_proto != nil {
 		return
 	}
+	file_audit_v1_event_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_audit_v1_event_proto_rawDesc), len(file_audit_v1_event_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

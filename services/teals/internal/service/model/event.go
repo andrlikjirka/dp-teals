@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// AuditEvent represents an audit event with all relevant details.
-type AuditEvent struct {
+// baseEvent holds the fields common to both AuditEvent and ProtectedAuditEvent.
+type baseEvent struct {
 	ID          uuid.UUID
 	Timestamp   time.Time
 	Environment *Environment
@@ -18,7 +18,12 @@ type AuditEvent struct {
 	Action      enum.ActionType
 	Resource    Resource
 	Result      Result
-	Metadata    map[string]any
+}
+
+// AuditEvent represents an audit event with all relevant details.
+type AuditEvent struct {
+	baseEvent
+	Metadata map[string]any
 }
 
 // Environment is the service and trace context where the activity occurred.
@@ -52,61 +57,71 @@ type Result struct {
 	Reason string
 }
 
-// CreateAuditEventParams encapsulates the parameters needed to create an AuditEvent.
-type CreateAuditEventParams struct {
+// BaseEventParams holds the parameters common to both factory methods.
+type BaseEventParams struct {
 	ID          uuid.UUID
 	Timestamp   time.Time
-	Environment *Environment // Pointer because it's optional
+	Environment *Environment
 	Actor       Actor
 	Subject     Subject
 	Action      enum.ActionType
 	Resource    Resource
 	Result      Result
-	Metadata    map[string]any
+}
+
+// CreateAuditEventParams encapsulates the parameters needed to create an AuditEvent.
+type CreateAuditEventParams struct {
+	BaseEventParams
+	Metadata map[string]any
+}
+
+// validateBaseEvent checks the common fields for validity and returns an error if any required fields are missing or invalid.
+func validateBaseEvent(p BaseEventParams) error {
+	if p.ID == uuid.Nil {
+		return errors.ErrInvalidEventID
+	}
+	if p.Timestamp.IsZero() {
+		return errors.ErrMissingTimestamp
+	}
+	if !p.Actor.Type.IsValid() {
+		return errors.ErrInvalidActorType
+	}
+	if p.Actor.ID == "" {
+		return errors.ErrMissingActorID
+	}
+	if p.Subject.ID == "" {
+		return errors.ErrMissingSubjectID
+	}
+	if !p.Action.IsValid() {
+		return errors.ErrInvalidActionType
+	}
+	if p.Resource.ID == "" || p.Resource.Name == "" {
+		return errors.ErrInvalidResource
+	}
+	if !p.Result.Status.IsValid() {
+		return errors.ErrInvalidResultStatus
+	}
+	return nil
 }
 
 // NewAuditEvent validates the input parameters and constructs a new AuditEvent.
 func NewAuditEvent(params CreateAuditEventParams) (*AuditEvent, error) {
-	if params.ID == uuid.Nil {
-		return nil, errors.ErrInvalidEventID
-	}
-	if params.Timestamp.IsZero() {
-		return nil, errors.ErrMissingTimestamp
-	}
-
-	if !params.Actor.Type.IsValid() {
-		return nil, errors.ErrInvalidActorType
-	}
-	if params.Actor.ID == "" {
-		return nil, errors.ErrMissingActorID
-	}
-
-	if params.Subject.ID == "" {
-		return nil, errors.ErrMissingSubjectID
-	}
-
-	if !params.Action.IsValid() {
-		return nil, errors.ErrInvalidActionType
-	}
-
-	if params.Resource.ID == "" || params.Resource.Name == "" {
-		return nil, errors.ErrInvalidResource
-	}
-
-	if !params.Result.Status.IsValid() {
-		return nil, errors.ErrInvalidResultStatus
+	if err := validateBaseEvent(params.BaseEventParams); err != nil {
+		return nil, err
 	}
 
 	return &AuditEvent{
-		ID:          params.ID,
-		Timestamp:   params.Timestamp,
-		Environment: params.Environment,
-		Actor:       params.Actor,
-		Subject:     params.Subject,
-		Action:      params.Action,
-		Resource:    params.Resource,
-		Result:      params.Result,
-		Metadata:    params.Metadata,
+		baseEvent: baseEvent{
+			ID:          params.ID,
+			Timestamp:   params.Timestamp,
+			Environment: params.Environment,
+			Actor:       params.Actor,
+			Subject:     params.Subject,
+			Action:      params.Action,
+			Resource:    params.Resource,
+			Result:      params.Result,
+		},
+		Metadata: params.Metadata,
 	}, nil
 }
 

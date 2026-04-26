@@ -40,7 +40,7 @@ func (s *QueryService) GetAuditEvent(ctx context.Context, eventID uuid.UUID) (*m
 			return svcerrors.ErrAuditLogEntryNotFound
 		}
 
-		event, err := s.serializer.DeserializeCanonicalAuditEvent(entry.Payload)
+		event, err := s.serializer.DeserializeCanonicalProtectedAuditEvent(entry.Payload)
 		if err != nil {
 			s.logger.Error("failed to deserialize audit event payload", "event_id", eventID, "error", err)
 			return svcerrors.ErrEventDeserializationFailed
@@ -87,7 +87,7 @@ func (s *QueryService) ListAuditEvents(ctx context.Context, filter *model.AuditE
 
 		items := make([]*model.AuditEventListItem, len(entries))
 		for i, entry := range entries {
-			event, err := s.serializer.DeserializeCanonicalAuditEvent(entry.Payload)
+			event, err := s.serializer.DeserializeCanonicalProtectedAuditEvent(entry.Payload)
 			if err != nil {
 				s.logger.Error("failed to deserialize audit event payload", "event_id", entry.EventID, "error", err)
 				return svcerrors.ErrEventDeserializationFailed

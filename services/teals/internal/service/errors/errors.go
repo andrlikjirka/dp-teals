@@ -45,4 +45,7 @@ var (
 	ErrGetCheckpointFailed              = errors.New("failed to get ledger root hash")
 	ErrSignCheckpointFailed             = errors.New("failed to sign checkpoint")
 	ErrCheckpointCanonicalizationFailed = errors.New("failed to canonicalize checkpoint payload")
+
+	ErrSubjectSecretNotFound = errors.New("subject secret not found")
+	ErrProtectionFailed      = errors.New("failed to protect audit event payload")
 )

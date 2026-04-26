@@ -56,15 +56,17 @@ func MapToAuditEvent(req *auditv1.AppendRequest) (*model.AuditEvent, error) {
 	}
 
 	return model.NewAuditEvent(model.CreateAuditEventParams{
-		ID:          id,
-		Timestamp:   timestamp,
-		Environment: toEnvironment(ev.GetEnvironment()),
-		Actor:       actor,
-		Subject:     toSubject(ev.GetSubject()),
-		Action:      action,
-		Resource:    toResource(ev.GetResource()),
-		Result:      result,
-		Metadata:    metadata,
+		BaseEventParams: model.BaseEventParams{
+			ID:          id,
+			Timestamp:   timestamp,
+			Environment: toEnvironment(ev.GetEnvironment()),
+			Actor:       actor,
+			Subject:     toSubject(ev.GetSubject()),
+			Action:      action,
+			Resource:    toResource(ev.GetResource()),
+			Result:      result,
+		},
+		Metadata: metadata,
 	})
 }
 
@@ -206,6 +208,51 @@ func mapToProtoAuditEvent(event *model.AuditEvent) *auditv1.AuditEvent {
 	if len(event.Metadata) > 0 {
 		if s, err := structpb.NewStruct(event.Metadata); err == nil {
 			proto.Metadata = s
+		}
+	}
+
+	return proto
+}
+
+// mapToProtoProtectedAuditEvent converts a service model ProtectedAuditEvent to the proto ProtectedAuditEvent message, including the protected metadata if present.
+func mapToProtoProtectedAuditEvent(event *model.ProtectedAuditEvent) *auditv1.ProtectedAuditEvent {
+	if event == nil {
+		return nil
+	}
+
+	proto := &auditv1.ProtectedAuditEvent{
+		Id:        event.ID.String(),
+		Timestamp: timestamppb.New(event.Timestamp),
+		Actor: &auditv1.Actor{
+			Type: fromActorType(event.Actor.Type),
+			Id:   event.Actor.ID,
+		},
+		Subject: &auditv1.Subject{Id: event.Subject.ID},
+		Action:  fromActionType(event.Action),
+		Resource: &auditv1.Resource{
+			Id:     event.Resource.ID,
+			Name:   event.Resource.Name,
+			Fields: event.Resource.Fields,
+		},
+		Result: &auditv1.Result{
+			Status: fromResultStatus(event.Result.Status),
+			Reason: event.Result.Reason,
+		},
+	}
+
+	if event.Environment != nil {
+		proto.Environment = &auditv1.Environment{
+			Service: event.Environment.Service,
+			TraceId: event.Environment.TraceID,
+			SpanId:  event.Environment.SpanID,
+		}
+	}
+
+	if event.ProtectedMetadata != nil {
+		proto.ProtectedMetadata = &auditv1.ProtectedMetadata{
+			Ciphertext: event.ProtectedMetadata.Ciphertext,
+			WrappedDek: event.ProtectedMetadata.WrappedDEK,
+			Commitment: event.ProtectedMetadata.Commitment,
 		}
 	}
 

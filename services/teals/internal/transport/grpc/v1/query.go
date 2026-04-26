@@ -41,7 +41,7 @@ func (s *QueryServiceServer) GetAuditEvent(ctx context.Context, req *auditv1.Get
 	}
 
 	return &auditv1.GetAuditEventResponse{
-		Event:             mapToProtoAuditEvent(result.Event),
+		Event:             mapToProtoProtectedAuditEvent(result.Event),
 		LeafIndex:         result.LeafIndex,
 		ProducerSignToken: result.SignatureToken,
 	}, nil
@@ -68,7 +68,7 @@ func (s *QueryServiceServer) ListAuditEvents(ctx context.Context, req *auditv1.L
 	items := make([]*auditv1.ListAuditEventsItem, len(result.Items))
 	for i, item := range result.Items {
 		items[i] = &auditv1.ListAuditEventsItem{
-			Event:             mapToProtoAuditEvent(item.Event),
+			Event:             mapToProtoProtectedAuditEvent(item.Event),
 			LeafIndex:         item.LeafIndex,
 			ProducerSignToken: item.SignatureToken,
 		}

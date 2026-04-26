@@ -40,4 +40,9 @@ var (
 	InsertCheckpoint string
 	//go:embed scripts/checkpoint/GetLatestCheckpoint.sql
 	GetLatestCheckpoint string
+
+	//go:embed scripts/subject/GetOrCreateSecret.sql
+	GetOrCreateSubjectSecret string
+	//go:embed scripts/subject/GetSecretBySubjectId.sql
+	GetSubjectSecret string
 )

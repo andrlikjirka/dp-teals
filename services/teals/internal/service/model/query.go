@@ -22,7 +22,7 @@ type AuditEventFilter struct {
 
 // GetAuditEventResult encapsulates the result of retrieving a single audit event, including the event details and associated metadata.
 type GetAuditEventResult struct {
-	Event          *AuditEvent
+	Event          *ProtectedAuditEvent
 	LeafIndex      int64
 	SignatureToken string
 }
@@ -37,7 +37,7 @@ type ListAuditEventsResult struct {
 // AuditEventListItem represents an individual audit event in the list of events returned by a query, including the event details and associated metadata such as the leaf index and signature token.
 type AuditEventListItem struct {
 	EventID        uuid.UUID
-	Event          *AuditEvent
+	Event          *ProtectedAuditEvent
 	SignatureToken string
 	LeafIndex      int64
 }

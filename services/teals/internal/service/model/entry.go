@@ -15,7 +15,7 @@ type AuditLogEntry struct {
 	SignatureToken string
 	LeafIndex      int64
 	CreatedAt      time.Time
-	Payload        AuditEvent
+	Payload        ProtectedAuditEvent
 }
 
 // AuditLogEntryRaw represents a raw audit log entry without deserialized audit event payload.

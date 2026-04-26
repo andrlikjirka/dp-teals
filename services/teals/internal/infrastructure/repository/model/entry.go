@@ -15,6 +15,7 @@ type AuditLogEntryRecord struct {
 	SignatureToken string          `db:"signature_token"`
 	MmrNodeID      int64           `db:"mmr_node_id"`
 	LeafIndex      int64           `db:"leaf_index"`
+	Salt           []byte          `db:"salt"`
 	CreatedAt      time.Time       `db:"created_at"`
 	Payload        json.RawMessage `db:"payload"`
 }

@@ -12,4 +12,8 @@ type Serializer interface {
 	SerializeCanonicalAuditEvent(event *model.AuditEvent) (json.RawMessage, error)
 	// DeserializeCanonicalAuditEvent takes a byte slice representing a canonicalized audit event and converts it back into an AuditEvent struct. It returns the deserialized AuditEvent or an error if deserialization fails.
 	DeserializeCanonicalAuditEvent(data json.RawMessage) (*model.AuditEvent, error)
+	// SerializeCanonicalProtectedAuditEvent takes a ProtectedAuditEvent and converts it into a canonical byte representation. It returns the serialized data or an error if serialization fails.
+	SerializeCanonicalProtectedAuditEvent(event *model.ProtectedAuditEvent) (json.RawMessage, error)
+	// DeserializeCanonicalProtectedAuditEvent takes a byte slice representing a canonicalized protected audit event and converts it back into a ProtectedAuditEvent struct. It returns the deserialized ProtectedAuditEvent or an error if deserialization fails.
+	DeserializeCanonicalProtectedAuditEvent(data json.RawMessage) (*model.ProtectedAuditEvent, error)
 }
