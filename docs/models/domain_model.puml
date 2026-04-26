@@ -1,0 +1,175 @@
+@startuml
+
+title Server auditního logování: Doménový model
+
+hide empty members
+
+skinparam nodesep 60
+skinparam ranksep 70
+
+enum ActorType {
+    USER
+    SYSTEM
+}
+
+enum ActionType {
+    ACCESS
+    CREATE
+    UPDATE
+    DELETE
+    SHARE
+    EXPORT
+    LOGIN
+    LOGOUT
+    AUTHORIZE
+}
+
+enum ResultStatusType {
+    SUCCESS
+    FAILURE
+}
+
+enum KeyStatus {
+    ACTIVE
+    REVOKED
+}
+
+class Environment {
+    service: string
+    traceID: string
+    spanID: string
+}
+
+class Actor {
+    type: ActorType
+    id: string
+}
+
+class Subject {
+    id: string
+}
+
+class Resource {
+    id: string
+    name: string
+    fields: string[]
+}
+
+class Result {
+    status: ResultStatusType
+    reason: string
+}
+
+class BaseAuditEvent {
+    id: UUID
+    timestamp: timestamp
+    action: ActionType
+    environment: Environment?
+    actor: Actor
+    subject: Subject
+    resource: Resource
+    result: Result
+}
+
+class AuditEvent {
+    '...
+    metadata: JSON
+}
+
+class ProtectedAuditEvent {
+    '...
+    metadata: ProtectedMetadata
+}
+
+class ProtectedMetadata {
+    ciphertext: string
+    wrappedDEK: string
+    commitment: string
+}
+
+class AuditLogEntry {
+    id: integer
+    eventID: UUID
+    producerKeyID: UUID
+    signatureToken: string
+    leafIndex: integer
+    payload: ProtectedAuditEvent
+    createdAt: timestamp
+}
+
+class Checkpoint {
+    size: integer
+    rootHash: hash
+    anchoredAt: timestamp
+}
+
+class SignedCheckpoint {
+    id: UUID
+    kid: string
+    signatureToken: string
+    checkpoint: Checkpoint
+}
+
+class ProducerKey {
+    id: UUID
+    producerID: UUID
+    keyID: string
+    publicKey: PublicKey
+    status: KeyStatus
+    createdAt: timestamp
+}
+
+class Producer {
+    id: UUID
+    name: string
+    keys: ProducerKey[]
+    createdAt: timestamp
+}
+
+class InclusionProof {
+    siblings: hash[]
+    left: boolean[]
+}
+
+class ConsistencyPath {
+    siblings: hash[]
+    left: boolean[]
+}
+
+class ConsistencyProof {
+    oldSize: integer
+    newSize: integer
+    oldPeaksHashes: hash[]
+    rightPeaks: hash[]
+    consistencyPaths: ConsistencyPath[]
+}
+
+BaseAuditEvent *-- Actor: actor
+BaseAuditEvent *-- Subject: subject
+BaseAuditEvent *-- Resource: resource
+BaseAuditEvent *- Result: result
+BaseAuditEvent *-- Environment: environment
+
+BaseAuditEvent -left-> ActionType: action
+
+Actor --> ActorType: type
+Result --> ResultStatusType: status
+
+AuditLogEntry *-- ProtectedAuditEvent: payload
+AuditLogEntry ->  ProducerKey: producerKeyId
+
+ProtectedAuditEvent --|> BaseAuditEvent
+ProtectedAuditEvent *-left- ProtectedMetadata: metadata
+AuditEvent --|> BaseAuditEvent
+
+ProducerKey -> KeyStatus: status
+ProducerKey -down-o Producer: keys
+
+SignedCheckpoint *-- Checkpoint: checkpoint
+
+ConsistencyProof *-- ConsistencyPath: consistencyPaths
+
+Checkpoint -[hidden]- ConsistencyProof
+InclusionProof -[hidden]- ConsistencyProof
+
+@enduml

@@ -1,0 +1,82 @@
+@startuml
+
+title Server auditního logování: Databázové schéma
+hide methods
+skinparam line ortho
+
+skinparam nodesep 100
+skinparam ranksep 70
+
+entity producer {
+    * id: uuid <<PK>>
+    ---
+    * name: string <<unique>>
+    * created_at: timestamp
+}
+
+entity producer_key {
+    * id: uuid <<PK>>
+    ---
+    * producer_id : uuid <<FK>>
+    * kid: varchar <<unique>>
+    * public_key: bytea
+    * status: identity_key_status
+    * created_at: timestamp
+}
+
+note bottom of producer_key
+    producer_key_status: active, revoked
+end note
+
+entity checkpoint {
+    * id: uuid <<PK>>
+    ---
+    * size: bigint
+    * root_hash: bytea
+    * anchored_at: timestamp
+    * signature_token: text
+    * kid: text
+}
+
+entity log_entry {
+    * id: bigint <<PK>>
+    ---
+    * mmr_node_id: bigint <<FK>>
+    * producer_key_id: uuid <<FK>>
+    * event_id: uuid <<unique>>
+    * signature_token: text
+    * salt: bytea
+    * created_at: timestamp
+    * payload: jsonb
+}
+
+entity mmr_node {
+    * id: bigint <<PK>>
+    ---
+    left_child_id: bigint <<FK>>
+    right_child_id: bigint <<FK>>
+    parent_id: bigint <<FK>>
+    leaf_index: bigint <<unique>>
+    * hash: bytea
+    * level: int
+}
+
+entity subject_secret {
+    * id: bigint <<PK>>
+    ---
+    * subject_id: varchar <<unique>>
+    * secret: bytea
+    * created_at: timestamp
+}
+
+producer ||--o{ producer_key: producer_id
+producer_key ||-o{ log_entry: producer_key_id
+log_entry |o--|| mmr_node: mmr_node_id
+
+checkpoint -[hidden]-> log_entry
+'producer_identity_key -[hidden]> log_entry
+'log_entry -[hidden]> subject_encryption_key
+
+mmr_node ||--o{ mmr_node : left_child_id\nright_child_id\nparent_id
+
+@enduml
