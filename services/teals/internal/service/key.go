@@ -14,6 +14,11 @@ import (
 	"github.com/google/uuid"
 )
 
+// KeyRegistrator defines the interface for registering producer public keys.
+type KeyRegistrator interface {
+	RegisterProducerKey(ctx context.Context, producerID uuid.UUID, key []byte) (string, error)
+}
+
 // KeyService provides functionality for managing producer keys, including registration and retrieval.
 type KeyService struct {
 	registry ports.ProducerKeyRegistry

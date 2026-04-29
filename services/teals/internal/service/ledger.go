@@ -11,6 +11,12 @@ import (
 	"github.com/google/uuid"
 )
 
+// LedgerProver defines the interface for generating ledger proofs.
+type LedgerProver interface {
+	GetInclusionProof(ctx context.Context, eventID uuid.UUID, size int64) (*model.InclusionProofResult, error)
+	GetConsistencyProof(ctx context.Context, fromSize int64, toSize int64) (*model.ConsistencyProofResult, error)
+}
+
 // LedgerService provides methods to interact with the MMR ledger, such as generating inclusion proofs and retrieving the root hash.
 type LedgerService struct {
 	tx     ports.TransactionProvider

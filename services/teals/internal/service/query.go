@@ -14,6 +14,12 @@ import (
 // auditEventPageSize defines the maximum number of audit events to return in a single page when listing audit events. If more than this number of events are available, a next cursor will be provided for pagination.
 const auditEventPageSize = 100
 
+// AuditQuerier defines the interface for querying audit events.
+type AuditQuerier interface {
+	GetAuditEvent(ctx context.Context, eventID uuid.UUID) (*model.GetAuditEventResult, error)
+	ListAuditEvents(ctx context.Context, filter *model.AuditEventFilter, cursor *int64) (*model.ListAuditEventsResult, error)
+}
+
 // QueryService provides methods to query audit events and their inclusion proofs.
 type QueryService struct {
 	tx         ports.TransactionProvider

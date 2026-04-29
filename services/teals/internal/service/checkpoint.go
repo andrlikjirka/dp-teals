@@ -14,6 +14,18 @@ import (
 	"github.com/google/uuid"
 )
 
+// CheckpointProvider defines the interface for retrieving signed checkpoints and server key material.
+type CheckpointProvider interface {
+	GetLatestCheckpoint(ctx context.Context) (*model.SignedCheckpoint, error)
+	ServerPublicKey() []byte
+	ServerKid() string
+}
+
+// CheckpointCreator defines the interface for creating new signed checkpoints of the ledger state.
+type CheckpointCreator interface {
+	CreateCheckpoint(ctx context.Context) (*model.SignedCheckpoint, error)
+}
+
 // CheckpointService provides methods for creating and retrieving ledger checkpoints. It interacts with the CheckpointStore to persist and access checkpoint data, and uses the CheckpointSigner to sign checkpoint payloads. The service ensures that all operations are executed within a transaction context to maintain data consistency.
 type CheckpointService struct {
 	tx     ports.TransactionProvider

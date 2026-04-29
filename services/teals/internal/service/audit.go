@@ -11,6 +11,11 @@ import (
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service/ports"
 )
 
+// AuditIngestor defines the interface for ingesting audit events.
+type AuditIngestor interface {
+	IngestAuditEvent(ctx context.Context, event *model.AuditEvent, signature string) (*model.IngestAuditEventResult, error)
+}
+
 // AuditService provides methods to ingest audit events, handling the necessary serialization, database transactions, and error management. It interacts with the TransactionProvider to manage database operations and the Serializer to convert audit events into a storable format.
 type AuditService struct {
 	tx         ports.TransactionProvider
