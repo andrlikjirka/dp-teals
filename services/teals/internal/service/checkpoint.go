@@ -47,7 +47,7 @@ func (s *CheckpointService) CreateCheckpoint(ctx context.Context) (*model.Signed
 	var sc *model.SignedCheckpoint
 
 	err := s.tx.Transact(ctx, func(repos ports.Repositories) error {
-		size, err := repos.LedgerProver.Size(ctx)
+		size, err := repos.Ledger.Size(ctx)
 		if err != nil {
 			s.logger.Error("failed to get ledger size", "error", err)
 			return svcerrors.ErrLedgerSizeFailed
@@ -66,7 +66,7 @@ func (s *CheckpointService) CreateCheckpoint(ctx context.Context) (*model.Signed
 			return svcerrors.ErrCheckpointEmptyLedger
 		}
 
-		rootHash, err := repos.LedgerProver.RootHash(ctx)
+		rootHash, err := repos.Ledger.RootHash(ctx)
 		if err != nil {
 			s.logger.Error("failed to get ledger root hash", "error", err)
 			return svcerrors.ErrGetCheckpointFailed

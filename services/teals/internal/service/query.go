@@ -78,7 +78,7 @@ func (s *QueryService) ListAuditEvents(ctx context.Context, filter *model.AuditE
 	var result *model.ListAuditEventsResult
 
 	err := s.tx.Transact(ctx, func(r ports.Repositories) error {
-		size, err := r.LedgerProver.Size(ctx)
+		size, err := r.Ledger.Size(ctx)
 		if err != nil {
 			s.logger.Error("failed to get ledger size", "error", err)
 			return svcerrors.ErrLedgerSizeFailed
@@ -129,7 +129,7 @@ func (s *QueryService) tryRevealMetadata(ctx context.Context, r ports.Repositori
 		return nil
 	}
 
-	secret, err := r.SubjectSecretReader.GetSecretBySubjectId(ctx, event.Subject.ID)
+	secret, err := r.SubjectSecretStore.GetSecretBySubjectId(ctx, event.Subject.ID)
 	if err != nil {
 		if !errors.Is(err, svcerrors.ErrSubjectSecretNotFound) {
 			s.logger.Error("failed to retrieve subject secret for metadata reveal", "subject_id", event.Subject.ID, "error", err)

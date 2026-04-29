@@ -11,10 +11,6 @@ import (
 type Ledger interface {
 	// AppendLeaf appends a new leaf with the given payload to the MMR ledger and returns the assigned node ID and the new size of the ledger. The payload is expected to be a canonicalized byte array representing an audit event.
 	AppendLeaf(ctx context.Context, payload []byte) (nodeID int64, size int64, err error)
-}
-
-// LedgerProver defines the interface for generating proofs related to the MMR ledger, such as inclusion and consistency proofs.
-type LedgerProver interface {
 	// Size returns the current number of leaves in the MMR ledger.
 	Size(ctx context.Context) (size int64, err error)
 	// RootHash returns the current root hash of the MMR ledger.

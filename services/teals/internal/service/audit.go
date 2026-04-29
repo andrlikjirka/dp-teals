@@ -112,7 +112,7 @@ func (s *AuditService) protectAuditEvent(ctx context.Context, r ports.Repositori
 	var salt []byte
 
 	if event.Metadata != nil {
-		secret, err := r.SubjectSecretWriter.GetOrCreateSecret(ctx, event.Subject.ID)
+		secret, err := r.SubjectSecretStore.GetOrCreateSecret(ctx, event.Subject.ID)
 		if err != nil {
 			s.logger.Error("failed to get or create subject secret", "subject_id", event.Subject.ID, "error", err)
 			return nil, nil, err

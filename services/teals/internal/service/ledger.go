@@ -41,7 +41,7 @@ func (s *LedgerService) GetInclusionProof(ctx context.Context, eventID uuid.UUID
 	resolvedSize := size
 
 	err := s.tx.Transact(ctx, func(r ports.Repositories) error {
-		currentSize, err := r.LedgerProver.Size(ctx)
+		currentSize, err := r.Ledger.Size(ctx)
 		if err != nil {
 			s.logger.Error("failed to get ledger size", "error", err)
 			return svcerrors.ErrLedgerSizeFailed
@@ -67,7 +67,7 @@ func (s *LedgerService) GetInclusionProof(ctx context.Context, eventID uuid.UUID
 			return svcerrors.ErrInvalidInclusionProofLedgerSize
 		}
 
-		proof, err := r.LedgerProver.GenerateInclusionProof(ctx, entry.LeafIndex, resolvedSize)
+		proof, err := r.Ledger.GenerateInclusionProof(ctx, entry.LeafIndex, resolvedSize)
 		if err != nil {
 			s.logger.Error("failed to generate inclusion proof", "leaf_index", entry.LeafIndex, "error", err)
 			return svcerrors.ErrInclusionProofFailed
@@ -101,7 +101,7 @@ func (s *LedgerService) GetConsistencyProof(ctx context.Context, fromSize int64,
 	var result *model.ConsistencyProofResult
 
 	err := s.tx.Transact(ctx, func(r ports.Repositories) error {
-		proof, err := r.LedgerProver.GenerateConsistencyProof(ctx, fromSize, toSize)
+		proof, err := r.Ledger.GenerateConsistencyProof(ctx, fromSize, toSize)
 		if err != nil {
 			if errors.Is(err, svcerrors.ErrInvalidConsistencyProofRange) {
 				s.logger.Warn("invalid consistency proof range", "from_size", fromSize, "to_size", toSize)

@@ -29,13 +29,11 @@ func (tp *TransactionProvider) Transact(ctx context.Context, txFunc func(ports.R
 		subjectSecretRepo := NewSubjectSecretRepository(tx)
 
 		r := ports.Repositories{
-			AuditLog:            NewAuditLogRepository(tx),
-			ProducerKeys:        NewProducerKeyRepository(tx),
-			Ledger:              ledgerRepo,
-			LedgerProver:        ledgerRepo,
-			CheckpointStore:     NewCheckpointRepository(tx),
-			SubjectSecretWriter: subjectSecretRepo,
-			SubjectSecretReader: subjectSecretRepo,
+			AuditLog:           NewAuditLogRepository(tx),
+			ProducerKeys:       NewProducerKeyRepository(tx),
+			Ledger:             ledgerRepo,
+			CheckpointStore:    NewCheckpointRepository(tx),
+			SubjectSecretStore: subjectSecretRepo,
 		}
 
 		return txFunc(r)
