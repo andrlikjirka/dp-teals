@@ -15,20 +15,20 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
-// QueryServiceServer implements the gRPC server for the QueryService defined in the protobuf. It provides methods to retrieve audit events by ID and to list audit events based on filters. The service layer is responsible for the actual retrieval logic, while the transport layer focuses on handling gRPC requests and responses.
+// QueryServiceServer implements the gRPC server for the QueryService defined in the protobuf. It provides methods to retrieve audit events by ID and to list audit events based on filters. The ledgerService layer is responsible for the actual retrieval logic, while the transport layer focuses on handling gRPC requests and responses.
 type QueryServiceServer struct {
 	auditv1.UnimplementedQueryServiceServer
-	service *service.QueryService
+	service service.AuditQuerier
 }
 
-// NewQueryServiceServer creates a new instance of QueryService with the provided QueryService. This allows the gRPC server to delegate the actual query logic to the service layer, keeping the transport layer focused on handling gRPC requests and responses.
-func NewQueryServiceServer(s *service.QueryService) *QueryServiceServer {
+// NewQueryServiceServer creates a new instance of QueryService with the provided QueryService. This allows the gRPC server to delegate the actual query logic to the ledgerService layer, keeping the transport layer focused on handling gRPC requests and responses.
+func NewQueryServiceServer(s service.AuditQuerier) *QueryServiceServer {
 	return &QueryServiceServer{
 		service: s,
 	}
 }
 
-// GetAuditEvent handles incoming GetAuditEventRequest messages, parses the event ID, and calls the service layer to retrieve the specified audit event. It returns a GetAuditEventResponse with the event details if successful, or an appropriate gRPC error status if the request is invalid or if there was an error during retrieval.
+// GetAuditEvent handles incoming GetAuditEventRequest messages, parses the event ID, and calls the ledgerService layer to retrieve the specified audit event. It returns a GetAuditEventResponse with the event details if successful, or an appropriate gRPC error status if the request is invalid or if there was an error during retrieval.
 func (s *QueryServiceServer) GetAuditEvent(ctx context.Context, req *auditv1.GetAuditEventRequest) (*auditv1.GetAuditEventResponse, error) {
 	id, err := uuid.Parse(req.GetEventId())
 	if err != nil {
@@ -61,7 +61,7 @@ func (s *QueryServiceServer) GetAuditEvent(ctx context.Context, req *auditv1.Get
 	}, nil
 }
 
-// ListAuditEvents handles incoming ListAuditEventsRequest messages, retrieves a list of audit events based on the provided filter criteria using the service layer, and returns a ListAuditEventsResponse with the matching events and ledger size if successful. It returns an appropriate gRPC error status if there was an error during retrieval.
+// ListAuditEvents handles incoming ListAuditEventsRequest messages, retrieves a list of audit events based on the provided filter criteria using the ledgerService layer, and returns a ListAuditEventsResponse with the matching events and ledger size if successful. It returns an appropriate gRPC error status if there was an error during retrieval.
 func (s *QueryServiceServer) ListAuditEvents(ctx context.Context, req *auditv1.ListAuditEventsRequest) (*auditv1.ListAuditEventsResponse, error) {
 	filter := model.MapToAuditEventFilter(req.Filter)
 
@@ -120,7 +120,7 @@ func eventPayloadToStruct(payload json.RawMessage) (*structpb.Struct, error) {
 	return out, nil
 }
 
-// mapToAuditEventFilter converts a gRPC request filter into the internal model used by the service layer to query audit events. This function maps the fields from the gRPC request to the corresponding fields in the service's filter model.
+// mapToAuditEventFilter converts a gRPC request filter into the internal model used by the ledgerService layer to query audit events. This function maps the fields from the gRPC request to the corresponding fields in the ledgerService's filter model.
 func revealedMetadataToStruct(m map[string]any) (*structpb.Struct, error) {
 	if m == nil {
 		return nil, nil

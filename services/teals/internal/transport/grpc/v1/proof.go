@@ -15,26 +15,26 @@ import (
 // ProofServiceServer implements the gRPC server for the ProofService defined in the protobuf.
 type ProofServiceServer struct {
 	auditv1.UnimplementedProofServiceServer
-	service           *service.LedgerService
-	checkpointService *service.CheckpointService
+	ledgerService     service.LedgerProver
+	checkpointService service.CheckpointProvider
 }
 
-// NewProofServiceServer creates a new instance of ProofServiceServer with the provided LedgerService. This allows the gRPC server to delegate the actual proof generation logic to the service layer, keeping the transport layer focused on handling gRPC requests and responses.
-func NewProofServiceServer(s *service.LedgerService, cs *service.CheckpointService) *ProofServiceServer {
+// NewProofServiceServer creates a new instance of ProofServiceServer with the provided LedgerService. This allows the gRPC server to delegate the actual proof generation logic to the ledgerService layer, keeping the transport layer focused on handling gRPC requests and responses.
+func NewProofServiceServer(s service.LedgerProver, c service.CheckpointProvider) *ProofServiceServer {
 	return &ProofServiceServer{
-		service:           s,
-		checkpointService: cs,
+		ledgerService:     s,
+		checkpointService: c,
 	}
 }
 
-// GetInclusionProof handles incoming GetInclusionProofRequest messages, parses the event ID, and calls the service layer to generate an inclusion proof for the specified audit event. It returns a GetInclusionProofResponse with the proof if successful, or an appropriate gRPC error status if the request is invalid or if there was an error during proof generation.
+// GetInclusionProof handles incoming GetInclusionProofRequest messages, parses the event ID, and calls the ledgerService layer to generate an inclusion proof for the specified audit event. It returns a GetInclusionProofResponse with the proof if successful, or an appropriate gRPC error status if the request is invalid or if there was an error during proof generation.
 func (s *ProofServiceServer) GetInclusionProof(ctx context.Context, req *auditv1.GetInclusionProofRequest) (*auditv1.GetInclusionProofResponse, error) {
 	id, err := uuid.Parse(req.GetEventId())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid event_id: %v", err)
 	}
 
-	proof, err := s.service.GetInclusionProof(ctx, id, req.GetLedgerSize())
+	proof, err := s.ledgerService.GetInclusionProof(ctx, id, req.GetLedgerSize())
 	if err != nil {
 		if errors.Is(err, svcerrors.ErrAuditLogEntryNotFound) {
 			return nil, status.Errorf(codes.NotFound, "audit event %s not found", req.GetEventId())
@@ -58,9 +58,9 @@ func (s *ProofServiceServer) GetInclusionProof(ctx context.Context, req *auditv1
 	}, nil
 }
 
-// GetConsistencyProof handles incoming GetConsistencyProofRequest messages, extracts the from and to sizes, and calls the service layer to generate a consistency proof between the specified ledger sizes. It returns a GetConsistencyProofResponse with the proof if successful, or an appropriate gRPC error status if there was an error during proof generation.
+// GetConsistencyProof handles incoming GetConsistencyProofRequest messages, extracts the from and to sizes, and calls the ledgerService layer to generate a consistency proof between the specified ledger sizes. It returns a GetConsistencyProofResponse with the proof if successful, or an appropriate gRPC error status if there was an error during proof generation.
 func (s *ProofServiceServer) GetConsistencyProof(ctx context.Context, req *auditv1.GetConsistencyProofRequest) (*auditv1.GetConsistencyProofResponse, error) {
-	result, err := s.service.GetConsistencyProof(ctx, req.GetFromSize(), req.GetToSize())
+	result, err := s.ledgerService.GetConsistencyProof(ctx, req.GetFromSize(), req.GetToSize())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to generate consistency proof: %v", err)
 	}
@@ -80,7 +80,7 @@ func (s *ProofServiceServer) GetConsistencyProof(ctx context.Context, req *audit
 	}, nil
 }
 
-// GetLatestSignedCheckpoint handles incoming GetLatestSignedCheckpointRequest messages and calls the checkpoint service to retrieve the most recently anchored checkpoint. It returns a GetLatestSignedCheckpointResponse with the checkpoint details if successful, or an appropriate gRPC error status if there was an error during retrieval.
+// GetLatestSignedCheckpoint handles incoming GetLatestSignedCheckpointRequest messages and calls the checkpoint ledgerService to retrieve the most recently anchored checkpoint. It returns a GetLatestSignedCheckpointResponse with the checkpoint details if successful, or an appropriate gRPC error status if there was an error during retrieval.
 func (s *ProofServiceServer) GetLatestSignedCheckpoint(ctx context.Context, req *auditv1.GetLatestSignedCheckpointRequest) (*auditv1.GetLatestSignedCheckpointResponse, error) {
 	ch, err := s.checkpointService.GetLatestCheckpoint(ctx)
 	if err != nil {
@@ -102,7 +102,7 @@ func (s *ProofServiceServer) GetLatestSignedCheckpoint(ctx context.Context, req 
 	}, nil
 }
 
-// GetServerPublicKey handles incoming GetServerPublicKeyRequest messages and calls the checkpoint service to retrieve the server's public key and key ID. It returns a GetServerPublicKeyResponse with the public key details if successful, or an appropriate gRPC error status if there was an error during retrieval.
+// GetServerPublicKey handles incoming GetServerPublicKeyRequest messages and calls the checkpoint ledgerService to retrieve the server's public key and key ID. It returns a GetServerPublicKeyResponse with the public key details if successful, or an appropriate gRPC error status if there was an error during retrieval.
 func (s *ProofServiceServer) GetServerPublicKey(ctx context.Context, req *auditv1.GetServerPublicKeyRequest) (*auditv1.GetServerPublicKeyResponse, error) {
 	return &auditv1.GetServerPublicKeyResponse{
 		PublicKey: s.checkpointService.ServerPublicKey(),

@@ -15,17 +15,17 @@ import (
 // KeyRegistrationServiceServer implements the gRPC server for the KeyRegistrationService defined in the protobuf. It provides an endpoint for producers to register their public keys, which are necessary for signing audit events.
 type KeyRegistrationServiceServer struct {
 	auditv1.UnimplementedKeyRegistrationServiceServer
-	service *service.KeyService
+	service service.KeyRegistrator
 }
 
-// NewKeyRegistrationServiceServer creates a new instance of KeyRegistrationServiceServer with the provided KeyService. This allows the gRPC server to delegate the actual key registration logic to the service layer, keeping the transport layer focused on handling gRPC requests and responses.
-func NewKeyRegistrationServiceServer(s *service.KeyService) *KeyRegistrationServiceServer {
+// NewKeyRegistrationServiceServer creates a new instance of KeyRegistrationServiceServer with the provided KeyService. This allows the gRPC server to delegate the actual key registration logic to the ledgerService layer, keeping the transport layer focused on handling gRPC requests and responses.
+func NewKeyRegistrationServiceServer(s service.KeyRegistrator) *KeyRegistrationServiceServer {
 	return &KeyRegistrationServiceServer{
 		service: s,
 	}
 }
 
-// RegisterKey handles incoming RegisterKeyRequest messages, validates the producer ID and public key, and calls the service layer to register the key. It returns a RegisterKeyResponse with the key ID (kid) if successful, or an appropriate gRPC error status if the request is invalid or if there was an error during registration.
+// RegisterKey handles incoming RegisterKeyRequest messages, validates the producer ID and public key, and calls the ledgerService layer to register the key. It returns a RegisterKeyResponse with the key ID (kid) if successful, or an appropriate gRPC error status if the request is invalid or if there was an error during registration.
 func (s *KeyRegistrationServiceServer) RegisterKey(ctx context.Context, req *auditv1.RegisterKeyRequest) (*auditv1.RegisterKeyResponse, error) {
 	producerId, err := uuid.Parse(req.GetProducerId())
 	if err != nil {

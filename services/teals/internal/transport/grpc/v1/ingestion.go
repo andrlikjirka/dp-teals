@@ -17,17 +17,17 @@ import (
 // IngestionServiceServer implements the gRPC server for the IngestionService defined in the protobuf.
 type IngestionServiceServer struct {
 	auditv1.UnimplementedIngestionServiceServer
-	service *service.AuditService
+	service service.AuditIngestor
 }
 
-// NewIngestionServiceServer creates a new instance of IngestionServiceServer with the provided AuditService. This allows the gRPC server to delegate the actual ingestion logic to the service layer, keeping the transport layer focused on handling gRPC requests and responses.
-func NewIngestionServiceServer(s *service.AuditService) *IngestionServiceServer {
+// NewIngestionServiceServer creates a new instance of IngestionServiceServer with the provided AuditService. This allows the gRPC server to delegate the actual ingestion logic to the ledgerService layer, keeping the transport layer focused on handling gRPC requests and responses.
+func NewIngestionServiceServer(s service.AuditIngestor) *IngestionServiceServer {
 	return &IngestionServiceServer{
 		service: s,
 	}
 }
 
-// Append handles incoming AppendRequest messages, maps them to the internal audit event model, and calls the service layer to ingest the event. It returns an AppendResponse with the event ID if successful, or an appropriate gRPC error status if the request is invalid or if there was an error during ingestion.
+// Append handles incoming AppendRequest messages, maps them to the internal audit event model, and calls the ledgerService layer to ingest the event. It returns an AppendResponse with the event ID if successful, or an appropriate gRPC error status if the request is invalid or if there was an error during ingestion.
 func (s *IngestionServiceServer) Append(ctx context.Context, req *auditv1.AppendRequest) (*auditv1.AppendResponse, error) {
 	sig, ok := interceptor.SignatureFromContext(ctx)
 	if !ok {
