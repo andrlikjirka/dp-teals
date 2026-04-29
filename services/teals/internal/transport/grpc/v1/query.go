@@ -8,6 +8,7 @@ import (
 	auditv1 "github.com/andrlikjirka/dp-teals/gen/audit/v1"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service"
 	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/transport/grpc/v1/model"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -62,11 +63,11 @@ func (s *QueryServiceServer) GetAuditEvent(ctx context.Context, req *auditv1.Get
 
 // ListAuditEvents handles incoming ListAuditEventsRequest messages, retrieves a list of audit events based on the provided filter criteria using the service layer, and returns a ListAuditEventsResponse with the matching events and ledger size if successful. It returns an appropriate gRPC error status if there was an error during retrieval.
 func (s *QueryServiceServer) ListAuditEvents(ctx context.Context, req *auditv1.ListAuditEventsRequest) (*auditv1.ListAuditEventsResponse, error) {
-	filter := mapToAuditEventFilter(req.Filter)
+	filter := model.MapToAuditEventFilter(req.Filter)
 
 	var cursor *int64
 	if req.Cursor != nil {
-		decoded, err := decodeCursor(*req.Cursor)
+		decoded, err := model.DecodeCursor(*req.Cursor)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid cursor: %v", err)
 		}
@@ -103,7 +104,7 @@ func (s *QueryServiceServer) ListAuditEvents(ctx context.Context, req *auditv1.L
 		LedgerSize: result.LedgerSize,
 	}
 	if result.NextCursor != nil {
-		next := encodeCursor(*result.NextCursor)
+		next := model.EncodeCursor(*result.NextCursor)
 		resp.NextCursor = &next
 	}
 

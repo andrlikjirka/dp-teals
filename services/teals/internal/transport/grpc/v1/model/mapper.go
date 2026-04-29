@@ -1,4 +1,4 @@
-package v1
+package model
 
 import (
 	"encoding/base64"
@@ -314,8 +314,8 @@ func fromResultStatus(s enum.ResultStatusType) auditv1.Result_Status {
 	}
 }
 
-// mapToAuditEventFilter converts a proto AuditEventFilter message to the service model AuditEventFilter.
-func mapToAuditEventFilter(f *auditv1.AuditEventFilter) model.AuditEventFilter {
+// MapToAuditEventFilter converts a proto AuditEventFilter message to the service model AuditEventFilter.
+func MapToAuditEventFilter(f *auditv1.AuditEventFilter) model.AuditEventFilter {
 	if f == nil {
 		return model.AuditEventFilter{}
 	}
@@ -364,15 +364,15 @@ func mapToAuditEventFilter(f *auditv1.AuditEventFilter) model.AuditEventFilter {
 	return filter
 }
 
-// encodeCursor encodes an int64 ID into a base64 string for use as a pagination cursor.
-func encodeCursor(id int64) string {
+// EncodeCursor encodes an int64 ID into a base64 string for use as a pagination cursor.
+func EncodeCursor(id int64) string {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(id))
 	return base64.RawURLEncoding.EncodeToString(b)
 }
 
-// decodeCursor decodes a base64 string cursor back into an int64 ID. It returns an error if the input is not a valid base64 string or if the decoded byte length is not 8.
-func decodeCursor(s string) (int64, error) {
+// DecodeCursor decodes a base64 string cursor back into an int64 ID. It returns an error if the input is not a valid base64 string or if the decoded byte length is not 8.
+func DecodeCursor(s string) (int64, error) {
 	b, err := base64.RawURLEncoding.DecodeString(s)
 	if err != nil {
 		return 0, fmt.Errorf("invalid cursor: %w", err)

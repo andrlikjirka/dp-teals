@@ -8,6 +8,7 @@ import (
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/service"
 	svcerrors "github.com/andrlikjirka/dp-teals/services/teals/internal/service/errors"
 	"github.com/andrlikjirka/dp-teals/services/teals/internal/transport/grpc/interceptor"
+	"github.com/andrlikjirka/dp-teals/services/teals/internal/transport/grpc/v1/model"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -33,7 +34,7 @@ func (s *IngestionServiceServer) Append(ctx context.Context, req *auditv1.Append
 		return nil, status.Error(codes.Internal, "missing JWS signature in context")
 	}
 
-	e, err := MapToAuditEvent(req)
+	e, err := model.MapToAuditEvent(req)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
 	}
