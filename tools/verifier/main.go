@@ -25,13 +25,13 @@ func main() {
 
 	// inclusion flags
 	eventID := flag.String("event-id", "", "UUID of the audit event to verify")
-	treeSize := flag.Int64("tree-size", 0, "tree size to anchor inclusion proof against (0 = current)")
-	trustedRoot := flag.String("trusted-root", "", "trusted root hash at tree-size (base64); if omitted, verifies against server-returned root only")
+	ledgerSize := flag.Int64("ledger-size", 0, "ledger size to anchor inclusion proof against (0 = current)")
+	trustedRoot := flag.String("trusted-root", "", "trusted root hash at ledger-size (base64); if omitted, verifies against server-returned root only")
 	payloadFile := flag.String("payload-file", "", "path to JSON payload file; use '-' for stdin")
 
 	// consistency flags
-	fromSize := flag.Int64("from-size", 0, "old tree size")
-	toSize := flag.Int64("to-size", 0, "new tree size")
+	fromSize := flag.Int64("from-size", 0, "old ledger size")
+	toSize := flag.Int64("to-size", 0, "new ledger size")
 	oldRootB64 := flag.String("old-root", "", "trusted root hash at from-size (base64)")
 	newRootB64 := flag.String("new-root", "", "trusted root hash at to-size (base64)")
 	flag.Parse()
@@ -49,7 +49,7 @@ func main() {
 
 	switch *mode {
 	case "inclusion":
-		runInclusionProofVerification(ctx, client, *eventID, *payloadFile, *treeSize, *trustedRoot)
+		runInclusionProofVerification(ctx, client, *eventID, *payloadFile, *ledgerSize, *trustedRoot)
 	case "consistency":
 		runConsistencyProofVerification(ctx, client, *fromSize, *toSize, *oldRootB64, *newRootB64)
 	default:
@@ -159,9 +159,9 @@ func runConsistencyProofVerification(ctx context.Context, client auditv1.ProofSe
 	fmt.Printf("right_peaks: %d\n", len(proof.RightPeaks))
 	fmt.Println()
 	if valid {
-		fmt.Println("PROOF VALID — tree grew consistently")
+		fmt.Println("PROOF VALID — audit log grew consistently")
 	} else {
-		fmt.Println("PROOF INVALID — tree history may have been tampered")
+		fmt.Println("PROOF INVALID — audit log history may have been tampered")
 		return
 	}
 }
