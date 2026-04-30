@@ -58,8 +58,13 @@ func run() error {
 
 	client := ingestionv1.NewIngestionServiceClient(conn)
 	sender := generator2.NewGrpcSender(client)
-	eventSigner := generator2.NewEventSigner(signer)
-	gen := generator2.NewGenerator(eventSigner, sender, log)
+
+	var gen *generator2.Generator
+	if signer != nil {
+		gen = generator2.NewGenerator(generator2.NewEventSigner(signer), sender, log)
+	} else {
+		gen = generator2.NewGenerator(nil, sender, log)
+	}
 
 	if err = gen.Run(context.Background(), *count, *delayMs); err != nil {
 		if errors.Is(err, context.Canceled) {
