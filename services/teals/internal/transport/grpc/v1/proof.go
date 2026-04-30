@@ -91,11 +91,13 @@ func (s *ProofServiceServer) GetLatestSignedCheckpoint(ctx context.Context, req 
 	}
 
 	return &auditv1.GetLatestSignedCheckpointResponse{
+		Id: ch.ID.String(),
 		Checkpoint: &auditv1.Checkpoint{
-			Id:             ch.ID.String(),
-			Size:           ch.Checkpoint.Size,
-			RootHash:       ch.Checkpoint.RootHash,
-			AnchoredAt:     ch.Checkpoint.AnchoredAt.String(),
+			Size:       ch.Checkpoint.Size,
+			RootHash:   ch.Checkpoint.RootHash,
+			AnchoredAt: ch.Checkpoint.AnchoredAt.String(),
+		},
+		Signature: &auditv1.Signature{
 			Kid:            ch.Kid,
 			SignatureToken: ch.SignatureToken,
 		},
