@@ -12,7 +12,7 @@ import (
 )
 
 // auditEventPageSize defines the maximum number of audit events to return in a single page when listing audit events. If more than this number of events are available, a next cursor will be provided for pagination.
-const auditEventPageSize = 100
+const auditEventPageSize = 10
 
 // AuditQuerier defines the interface for querying audit events.
 type AuditQuerier interface {
