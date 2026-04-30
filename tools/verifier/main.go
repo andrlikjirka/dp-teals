@@ -93,11 +93,13 @@ func runInclusionProofVerification(ctx context.Context, client auditv1.ProofServ
 	}
 
 	valid := mmr.VerifyInclusionProof(canonical, proof, verifyRoot, hash.SHA3HashFunc)
+	canocicalHash := mmr.HashLeafData(canonical, hash.SHA3HashFunc)
 
 	fmt.Printf("event_id:    %s\n", resp.EventId)
 	fmt.Printf("leaf_index:  %d\n", resp.LeafIndex)
 	fmt.Printf("ledger_size: %d\n", resp.LedgerSize)
 	fmt.Printf("leaf_hash:   %s\n", hex.EncodeToString(resp.LeafHash))
+	fmt.Printf("event_hash:  %s\n", hex.EncodeToString(canocicalHash))
 	fmt.Printf("root_hash:   %s\n", hex.EncodeToString(resp.RootHash))
 	fmt.Printf("siblings:    %d\n", len(proof.Siblings))
 	if rootB64 == "" {

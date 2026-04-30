@@ -1,29 +1,36 @@
 {
-  "id": "019dcb47-948f-7589-b325-ef18444462a8",
+  "action": "SHARE",
   "actor": {
     "id": "5d695536-c35c-4e34-a4c5-ea6cbf0ec90c",
     "type": "USER"
   },
-  "action": "SHARE",
-  "subject": {
-    "id": "b8f3a2d1-4e5f-6789-abcd-ef0123456789"
-  },
-  "resource": {
-    "id": "aaaaaaaa-0001-4000-8000-000000000007",
-    "name": "CustomerReport"
-  },
-  "timestamp": "2026-04-26T19:32:39.183363Z",
   "environment": {
     "service": "crm_service",
-    "span_id": "09c876d5a28c31741c7bf56965300634",
-    "trace_id": "54ab7843936467b20918ece516bd84241ac0989b9b238f8bc481a998f63c7813"
+    "span_id": "4a41321d7ccb7632eda3ce014c9b3974",
+    "trace_id": "4a23e5a5e6d5e6f15729cc00255ef3d0ef95396b184c0c90e404fdc65ba085c2"
   },
+  "id": "019ddf77-c1df-705d-9b7d-ba60fa93ce69",
   "protected_metadata": {
-    "ciphertext": "JnzVIOHArLAHO7HtNrwAJqe5OmW7whWGYOwxIE6pig/05CAkN+QZggZcBKkVkz9V1Nmq5QbAkz6JfBQa9ApF2uefFu9IdlLww4uEC/czc/eAZz2RKgpOFlRAqA==",
-    "commitment": "2e4c250f7ce37261c3478995fef8d50723f55e729b8d524595c63e0beb6591c9",
-    "wrapped_dek": "Hv7tzR0D84cTzovQ1PCdxrQHEDyVJULYPn7PIy6Lx//P9NhDtSOzeJxvIDbLeJZdsC4GK34EkFQXx3Co"
+    "ciphertext": "h6DRoTWzitJuq+16DIbnGIYjPGv2CHLVBfWnqPBkc66c6f0n8Pw4Z6Wpv6eGrERGwzo8tqOdX3pqhB2Fi+eckRtHfAKdx8fQmUHmy2/I1LFwa7aZrcNDQODPhsrR",
+    "commitment": "2f783c662a9dec52a98bd2fc2b755387f2507f2b76df221027c5a4587d498d1d",
+    "wrapped_dek": "2/xcseuaq5Xdd6hr0/j/1QDQqKyq186uMrcq56Joube9X/Oxu8KJuU0DNBWuyVQX9BwT+E611EtFaJvn"
+  },
+  "resource": {
+    "fields": [
+      "first_name",
+      "last_name",
+      "email",
+      "phone",
+      "address"
+    ],
+    "id": "aaaaaaaa-1001-4000-8000-000000000001",
+    "name": "Contact"
   },
   "result": {
     "status": "SUCCESS"
-  }
+  },
+  "subject": {
+    "id": "c1d2e3f4-a5b6-7890-cdef-012345678901"
+  },
+  "timestamp": "2026-04-30T17:37:40.831024Z"
 }
