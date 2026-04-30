@@ -322,24 +322,23 @@ func TestGetLatestSignedCheckpoint_Success_ResponseFieldsPopulated(t *testing.T)
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	ch := resp.Checkpoint
-	if ch == nil {
+	if resp.Checkpoint == nil {
 		t.Fatal("expected Checkpoint in response")
 	}
-	if ch.Id != checkpoint.ID.String() {
-		t.Errorf("Id: got %q, want %q", ch.Id, checkpoint.ID.String())
+	if resp.Checkpoint.Id != checkpoint.ID.String() {
+		t.Errorf("Id: got %q, want %q", resp.Checkpoint.Id, checkpoint.ID.String())
 	}
-	if ch.Size != checkpoint.Checkpoint.Size {
-		t.Errorf("Size: got %d, want %d", ch.Size, checkpoint.Checkpoint.Size)
+	if resp.Checkpoint.Payload.Size != checkpoint.Checkpoint.Size {
+		t.Errorf("Size: got %d, want %d", resp.Checkpoint.Payload.Size, checkpoint.Checkpoint.Size)
 	}
-	if string(ch.RootHash) != string(checkpoint.Checkpoint.RootHash) {
-		t.Errorf("RootHash: got %v, want %v", ch.RootHash, checkpoint.Checkpoint.RootHash)
+	if string(resp.Checkpoint.Payload.RootHash) != string(checkpoint.Checkpoint.RootHash) {
+		t.Errorf("RootHash: got %v, want %v", resp.Checkpoint.Payload.RootHash, checkpoint.Checkpoint.RootHash)
 	}
-	if ch.Kid != checkpoint.Kid {
-		t.Errorf("Kid: got %q, want %q", ch.Kid, checkpoint.Kid)
+	if resp.Signature.Kid != checkpoint.Kid {
+		t.Errorf("Kid: got %q, want %q", resp.Signature.Kid, checkpoint.Kid)
 	}
-	if ch.SignatureToken != checkpoint.SignatureToken {
-		t.Errorf("SignatureToken: got %q, want %q", ch.SignatureToken, checkpoint.SignatureToken)
+	if resp.Signature.SignatureToken != checkpoint.SignatureToken {
+		t.Errorf("SignatureToken: got %q, want %q", resp.Signature.SignatureToken, checkpoint.SignatureToken)
 	}
 }
 

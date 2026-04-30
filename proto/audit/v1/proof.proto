@@ -56,12 +56,16 @@ message ConsistencyProof {
 message GetLatestSignedCheckpointRequest {}
 
 message GetLatestSignedCheckpointResponse {
-  string     id         = 1;
   Checkpoint checkpoint = 2;
   Signature  signature  = 3;
 }
 
 message Checkpoint {
+  string     id         = 1;
+  CheckpointPayload payload = 2;
+}
+
+message CheckpointPayload {
   int64  size        = 1;
   bytes  root_hash   = 2;
   string anchored_at = 3;
