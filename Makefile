@@ -36,7 +36,7 @@ run-generator:
 		$(if $(KID),--kid=$(KID))
 
 .PHONY: run-keygen-tool
-
+ 
 run-keygen-tool:
 	@go run ./tools/keygen
 
