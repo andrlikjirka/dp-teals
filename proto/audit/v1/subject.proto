@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package audit.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/andrlikjirka/dp-teals/proto/audit/v1;auditv1";
+
+service DataSubjectService {
+  rpc ForgetSubject(ForgetSubjectRequest) returns (ForgetSubjectResponse) {}
+}
+
+message ForgetSubjectRequest {
+  string subject_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message ForgetSubjectResponse {
+  string subject_id = 1;
+  google.protobuf.Timestamp forgotten_at = 2;
+}

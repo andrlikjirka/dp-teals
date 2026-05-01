@@ -78,6 +78,7 @@ func run() error {
 	ledgerService := service.NewLedgerService(txProvider, log)
 	checkpointService := service.NewCheckpointService(txProvider, signer, log)
 	queryService := service.NewQueryService(txProvider, jcsSerializer, protect, log)
+	subjectService := service.NewSubjectService(txProvider, log)
 
 	// Transport
 	cpWorker := worker.NewCheckpointWorker(checkpointService, config.CheckpointInterval, log)
@@ -85,8 +86,9 @@ func run() error {
 	keys := v1.NewKeyRegistrationServiceServer(keyService)
 	proofer := v1.NewProofServiceServer(ledgerService, checkpointService)
 	querier := v1.NewQueryServiceServer(queryService)
+	subjecter := v1.NewDataSubjectServiceServer(subjectService)
 
-	server, err := bootstrap.NewServer(config, log, ingestor, keys, proofer, querier)
+	server, err := bootstrap.NewServer(config, log, ingestor, keys, proofer, querier, subjecter)
 	if err != nil {
 		log.Error("Failed to create server", "error", err)
 		return err
