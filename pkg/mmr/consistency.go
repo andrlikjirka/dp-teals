@@ -6,7 +6,6 @@ import (
 	"math/bits"
 
 	"github.com/andrlikjirka/dp-teals/pkg/hash"
-	"github.com/andrlikjirka/dp-teals/pkg/merkle"
 )
 
 // ConsistencyPath represents the path from an old peak to a new peak in the MMR. It consists of the sibling hashes along the path and the direction (left/right) of each sibling (inclusion proof).
@@ -166,7 +165,7 @@ func VerifyConsistencyProof(proof *ConsistencyProof, oldRoot []byte, newRoot []b
 
 		calculatedOldRoot := proof.OldPeaksHashes[len(proof.OldPeaksHashes)-1]
 		for i := len(proof.OldPeaksHashes) - 2; i >= 0; i-- {
-			calculatedOldRoot = merkle.HashInternalNodes(proof.OldPeaksHashes[i], calculatedOldRoot, hashFunc)
+			calculatedOldRoot = HashInternalNodes(proof.OldPeaksHashes[i], calculatedOldRoot, hashFunc)
 		}
 
 		if !bytes.Equal(calculatedOldRoot, oldRoot) {
@@ -186,9 +185,9 @@ func VerifyConsistencyProof(proof *ConsistencyProof, oldRoot []byte, newRoot []b
 
 		for j, sibling := range path.Siblings {
 			if path.Left[j] {
-				currentHash = merkle.HashInternalNodes(sibling, currentHash, hashFunc)
+				currentHash = HashInternalNodes(sibling, currentHash, hashFunc)
 			} else {
-				currentHash = merkle.HashInternalNodes(currentHash, sibling, hashFunc)
+				currentHash = HashInternalNodes(currentHash, sibling, hashFunc)
 			}
 		}
 
@@ -208,7 +207,7 @@ func VerifyConsistencyProof(proof *ConsistencyProof, oldRoot []byte, newRoot []b
 	// 4. Combine all the new peaks to calculate the new root and compare it with the provided new root.
 	calculatedRoot := newPeaksHashes[len(newPeaksHashes)-1]
 	for i := len(newPeaksHashes) - 2; i >= 0; i-- {
-		calculatedRoot = merkle.HashInternalNodes(newPeaksHashes[i], calculatedRoot, hashFunc)
+		calculatedRoot = HashInternalNodes(newPeaksHashes[i], calculatedRoot, hashFunc)
 	}
 
 	return bytes.Equal(calculatedRoot, newRoot)

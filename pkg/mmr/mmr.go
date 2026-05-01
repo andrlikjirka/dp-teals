@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/andrlikjirka/dp-teals/pkg/hash"
-	"github.com/andrlikjirka/dp-teals/pkg/merkle"
 )
 
 // Node represents a single node in the MMR, which can be a leaf or an internal node. Each node stores its hash, pointers to its left and right children (if any), a pointer to its parent, and its height in the tree. The height is 0 for leaves and increases by 1 for each merge of two nodes.
@@ -53,7 +52,7 @@ func (m *MMR) Append(data []byte) error {
 		return errors.New("empty leaf not allowed")
 	}
 
-	leafHash := merkle.HashLeafData(data, m.hashFunc)
+	leafHash := HashLeafData(data, m.hashFunc)
 	newNode := &Node{
 		Hash:   leafHash,
 		Height: 0,
@@ -74,7 +73,7 @@ func (m *MMR) Append(data []byte) error {
 		m.peaks = m.peaks[:len(m.peaks)-1] // pop the last peak from the list
 
 		rightChild := newNode
-		mergedHash := merkle.HashInternalNodes(lastPeak.Hash, newNode.Hash, m.hashFunc) // merge the two nodes
+		mergedHash := HashInternalNodes(lastPeak.Hash, newNode.Hash, m.hashFunc) // merge the two nodes
 		newNode = &Node{
 			Hash:   mergedHash,
 			Left:   lastPeak,
@@ -101,7 +100,7 @@ func (m *MMR) RootHash() []byte {
 
 	root := m.peaks[len(m.peaks)-1].Hash // start with the rightmost peak
 	for i := len(m.peaks) - 2; i >= 0; i-- {
-		root = merkle.HashInternalNodes(m.peaks[i].Hash, root, m.hashFunc) // combine peaks from right to left
+		root = HashInternalNodes(m.peaks[i].Hash, root, m.hashFunc) // combine peaks from right to left
 	}
 	return root
 }

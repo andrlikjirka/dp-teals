@@ -6,7 +6,6 @@ import (
 	"errors"
 
 	"github.com/andrlikjirka/dp-teals/pkg/hash"
-	"github.com/andrlikjirka/dp-teals/pkg/merkle"
 )
 
 // InclusionProof represents the proof that a leaf is included in the MMR. It consists of the sibling hashes along the path from the leaf to its peak, and the direction (left/right) of each sibling.
@@ -28,7 +27,7 @@ func (m *MMR) GenerateInclusionProofByData(data []byte) (*InclusionProof, error)
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 
-	leafHash := merkle.HashLeafData(data, m.hashFunc)
+	leafHash := HashLeafData(data, m.hashFunc)
 	indices := m.indexMap[hex.EncodeToString(leafHash)]
 	if len(indices) == 0 {
 		return nil, errors.New("leaf not found in the MMR")
@@ -99,7 +98,7 @@ func (m *MMR) bagPeaksRightToLeft(peaks []*Node) []byte {
 	}
 	root := peaks[len(peaks)-1].Hash
 	for i := len(peaks) - 2; i >= 0; i-- {
-		root = merkle.HashInternalNodes(peaks[i].Hash, root, m.hashFunc)
+		root = HashInternalNodes(peaks[i].Hash, root, m.hashFunc)
 	}
 	return root
 }
@@ -123,7 +122,7 @@ func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byt
 
 	// 2. Hash the leaf (Domain separator: 0x00)
 	//h := hashFunc(append([]byte{0x00}, leafData...))
-	h := merkle.HashLeafData(leafData, hashFunc)
+	h := HashLeafData(leafData, hashFunc)
 
 	// 3. Traverse the path
 	for i, siblingHash := range proof.Siblings {
