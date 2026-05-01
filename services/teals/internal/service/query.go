@@ -131,8 +131,8 @@ func (s *QueryService) tryRevealMetadata(ctx context.Context, r ports.Repositori
 
 	secret, err := r.SubjectSecretStore.GetSecretBySubjectId(ctx, event.Subject.ID)
 	if err != nil {
-		if !errors.Is(err, svcerrors.ErrSubjectSecretNotFound) {
-			s.logger.Error("failed to retrieve subject secret for metadata reveal", "subject_id", event.Subject.ID, "error", err)
+		if errors.Is(err, svcerrors.ErrSubjectSecretNotFound) {
+			s.logger.Warn("failed to retrieve subject secret for metadata reveal", "subject_id", event.Subject.ID, "error", err)
 		}
 		return nil
 	}
