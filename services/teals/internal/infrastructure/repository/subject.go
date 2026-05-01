@@ -57,3 +57,15 @@ func (r *SubjectSecretRepository) GetSecretBySubjectId(ctx context.Context, subj
 	}
 	return secret, nil
 }
+
+// DeleteSecretBySubjectId deletes the cryptographic secret associated with the given subject ID from the database. It executes an SQL query to delete the secret, and handles any errors that may occur during the operation. If no secret is found for the specified subject ID, it returns an error indicating that the subject secret was not found.
+func (r *SubjectSecretRepository) DeleteSecretBySubjectId(ctx context.Context, subjectID string) error {
+	tag, err := r.db.Exec(ctx, query.DeleteSubjectSecret, subjectID)
+	if err != nil {
+		return fmt.Errorf("delete subject secret: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return svcerrors.ErrSubjectSecretNotFound
+	}
+	return nil
+}

@@ -45,4 +45,6 @@ var (
 	GetOrCreateSubjectSecret string
 	//go:embed scripts/subject/GetSecretBySubjectId.sql
 	GetSubjectSecret string
+	//go:embed scripts/subject/DeleteSecretBySubjectId.sql
+	DeleteSubjectSecret string
 )
