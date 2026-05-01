@@ -209,8 +209,7 @@ func TestReveal_TamperedCiphertext(t *testing.T) {
 		t.Fatalf("Protect error: %v", err)
 	}
 
-	// Flip the last byte of the ciphertext to simulate tampering.
-	protected.Ciphertext[len(protected.Ciphertext)-1] ^= 0xFF
+	protected.Ciphertext[len(protected.Ciphertext)-1] ^= 0xFF // flip the last byte of the ciphertext to simulate tampering
 
 	_, err = p.Reveal(secret, protected)
 	if err == nil {
@@ -237,7 +236,6 @@ func TestReveal_TamperedWrappedDEK(t *testing.T) {
 }
 
 func TestReveal_NumericValuesPreservedAsFloat64(t *testing.T) {
-	// JSON unmarshal represents numbers as float64.
 	p, _ := NewAesGcmProtector(randomKey(t))
 	secret := []byte("s")
 	meta := map[string]any{"count": float64(42)}
@@ -252,7 +250,7 @@ func TestReveal_NumericValuesPreservedAsFloat64(t *testing.T) {
 	}
 }
 
-// --- aesGcmSeal / aesGcmOpen (internal) ---
+// --- aesGcmSeal / aesGcmOpen ---
 
 func TestAesGcmSealOpen_RoundTrip(t *testing.T) {
 	key := randomKey(t)
@@ -309,7 +307,7 @@ func TestAesGcmSeal_NonDeterministic(t *testing.T) {
 	}
 }
 
-// --- deriveKey (internal) ---
+// --- deriveKey ---
 
 func TestDeriveKey_Deterministic(t *testing.T) {
 	ikm := randomKey(t)
