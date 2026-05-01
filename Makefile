@@ -124,10 +124,6 @@ gen-master-kek:
 
 # ==== Testing ====
 
-# Fast unit tests only (service + pkg)
+.PHONY: test
 test:
 	go test ./...
-
-# Infrastructure integration tests only
-test-integration:
-	go test -tags=integration ./...
