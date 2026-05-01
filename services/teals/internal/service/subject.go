@@ -44,7 +44,7 @@ func (s *SubjectService) ForgetSubject(ctx context.Context, subjectID string) (m
 			return model.ForgetSubjectResult{}, svcerrors.ErrSubjectSecretNotFound
 		}
 		s.logger.Error("failed to delete subject secret", "subject_id", subjectID, "error", err)
-		return model.ForgetSubjectResult{}, errors.New("failed to forget subject")
+		return model.ForgetSubjectResult{}, svcerrors.ErrSubjectSecretDeletionFailed
 	}
 	s.logger.Info("subject secret deleted", "subject_id", subjectID)
 	return model.ForgetSubjectResult{

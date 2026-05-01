@@ -73,7 +73,7 @@ func (s *QueryService) GetAuditEvent(ctx context.Context, eventID uuid.UUID) (*m
 	return result, nil
 }
 
-// ListAuditEvents retrieves a list of audit events based on the provided filter, along with the current ledger size. It returns an error if there was an issue during retrieval or deserialization of any of the events.
+// ListAuditEvents retrieves a list of audit events based on the provided filter, along with the current ledger size. It returns an error if there was an issue during retrieval or deserialization of the events.
 func (s *QueryService) ListAuditEvents(ctx context.Context, filter *model.AuditEventFilter, cursor *int64) (*model.ListAuditEventsResult, error) {
 	var result *model.ListAuditEventsResult
 
