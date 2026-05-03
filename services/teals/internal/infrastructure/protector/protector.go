@@ -4,9 +4,10 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"crypto/sha256"
+	"crypto/sha3"
 	"encoding/json"
 	"fmt"
+	"hash"
 	"io"
 
 	pkgcannon "github.com/andrlikjirka/dp-teals/pkg/canonical"
@@ -45,7 +46,7 @@ func (p *AesGcmProtector) Protect(secret []byte, metadata map[string]any) (*svcm
 	if _, err := rand.Read(salt); err != nil {
 		return nil, nil, fmt.Errorf("generate salt: %w", err)
 	}
-	h := sha256.New()
+	h := sha3.New256()
 	if _, err = h.Write(canonicalMeta); err != nil {
 		return nil, nil, err
 	}
@@ -107,7 +108,7 @@ func (p *AesGcmProtector) Reveal(secret []byte, metadata *svcmodel.ProtectedMeta
 
 // deriveKey derives a DEK using HKDF with the given input key material, salt (key isolation), and info. It returns the derived key or an error if key derivation fails.
 func deriveKey(ikm, salt, info []byte) ([]byte, error) {
-	r := hkdf.New(sha256.New, ikm, salt, info)
+	r := hkdf.New(func() hash.Hash { return sha3.New256() }, ikm, salt, info)
 	key := make([]byte, dekLength)
 	if _, err := io.ReadFull(r, key); err != nil {
 		return nil, err
