@@ -59,7 +59,7 @@ func (m *MMR) generateInclusionProofLocked(index int) (*InclusionProof, error) {
 		current = parent
 	}
 
-	// 'current' is now the peak. We need to find its index in m.peaks.
+	// 'current' is now the peak, find its index in m.peaks
 	peakIdx := -1
 	for i, p := range m.peaks {
 		if bytes.Equal(p.Hash, current.Hash) {
@@ -72,7 +72,7 @@ func (m *MMR) generateInclusionProofLocked(index int) (*InclusionProof, error) {
 	}
 
 	// PHASE 2: Peak Bagging
-	// Combine all peaks to the RIGHT into a single hash, add as RIGHT sibling
+	// combine all peaks to the RIGHT into a single hash, add as RIGHT sibling
 	if peakIdx < len(m.peaks)-1 {
 		rightBag := m.bagPeaksRightToLeft(m.peaks[peakIdx+1:])
 		siblings = append(siblings, rightBag)
@@ -121,13 +121,10 @@ func VerifyInclusionProof(leafData []byte, proof *InclusionProof, rootHash []byt
 	}
 
 	// 2. Hash the leaf (Domain separator: 0x00)
-	//h := hashFunc(append([]byte{0x00}, leafData...))
 	h := HashLeafData(leafData, hashFunc)
 
 	// 3. Traverse the path
 	for i, siblingHash := range proof.Siblings {
-		// Standard internal node / peak bagging domain separator: 0x01
-		// (Change this if your specific MMR spec requires a different prefix for peaks)
 		if proof.Left[i] {
 			h = hashFunc(append([]byte{0x01}, append(siblingHash, h...)...))
 		} else {
