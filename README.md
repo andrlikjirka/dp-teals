@@ -1,9 +1,6 @@
-# Diploma Thesis Project
-> Tamper-evident & Verifiable Audit logging service of personal data processing activities
+# dp-teals
 
-## Project Overview
+- Návrh a implementace kryptograficky verifikovatelného auditního logu o činnostech zpracování osobních dat v informačních systémech
+(Tamper-Evident Auditing Logging System)
 
-...
-
-## Project Structure
-...
+> Diplomová práce - Jiří Andrlík, 2026 (FIS VŠE)
