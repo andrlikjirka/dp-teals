@@ -8,8 +8,8 @@ actor "Auditor" as Auditor
 [Tamper-Evident Audit Log System] as TEALS <<System>>
 actor "Administrátor" as Admin
 
-Auditor --> TEALS : Vyhledává auditní záznamy\na ověřuje jejich integritu
-Producer -> TEALS : Produkuje auditní záznamy \ndle činností zpracování osobních dat
+Auditor --> TEALS : Vyhledává uchovávané auditní záznamy\na ověřuje integritu auditních záznamů
+Producer -> TEALS : Odesílá auditní záznamy produkované\ndle činností zpracování osobních dat
 'TEALS ..> KMS: Šifrování a digitální podepisování dat \n a správa kryptografických klíčů
 TEALS <- Admin: Konfigurace systému a řízení přístupu
 

@@ -4,13 +4,13 @@
 'skinparam nodesep 80
 'skinparam ranksep 150
 
-skinparam nodesep 70
-skinparam ranksep 130
+skinparam nodesep 40
+skinparam ranksep 160
 
 title "Kryptograficky verifikovatelný auditní log: Komponenty"
 
 [Information System] as Producer <<Producer>>
-[Audit Client] as Client <<Container>>
+[Verifier Client] as Client <<Container>>
 actor "Auditor" as Auditor
 
 package "Audit Log Server" {
@@ -20,6 +20,7 @@ package "Audit Log Server" {
         [ProofServer] as GrpcProof <<gRPC Handler>>
         [KeyServer] as GrpcKey <<gRPC Handler>>
         [Worker] as Worker <<Background Worker>>
+        [SubjectServer] as GrpcSubject <<gRPC Handler>>
     }
 
     package "Service Layer" {
@@ -27,6 +28,7 @@ package "Audit Log Server" {
         [QueryService] as QueryService <<Service>>
         [ProofService] as ProofService <<Service>>
         [CheckpointService] as CheckpointService <<Service>>
+        [SubjectService] as SubjectService <<Service>>
         [ProducerKeyService] as ProducerKeyService <<Service>>
     }
 
@@ -35,7 +37,7 @@ package "Audit Log Server" {
         [AuditLog] as LogRepo <<Repository>>
         [Ledger] as LedgerRepo <<Repository>>
         [CheckpointStore] as CheckpointRepo <<Repository>>
-
+        [SubjectSecretStore] as SubjectSecretRepo <<Repository>>
     }
 }
 
@@ -43,8 +45,9 @@ database "Database" as DB
 
 Producer ..> GrpcIngestion: Odesílá \nauditní záznamy\n<<gRPC API>>
 Producer ..> GrpcKey: Požadavek na \nregistraci klíče \npro ověření podpisu \nauditních záznamů\n<<gRPC API>>
-Client ..> GrpcProof: Získává důkazy a checkpointy\n<<gRPC API>>
-Client ..> GrpcQuery: Vyhledává auditní záznamy\n<<gRPC API>>
+Client ..> GrpcProof: Získává důkazy \na kontrolní body\n<<gRPC API>>
+Client ..> GrpcQuery: Vyhledává \nauditní záznamy\n<<gRPC API>>
+Client ..> GrpcSubject: Vyhledává \nauditní záznamy\n<<gRPC API>>
 
 Auditor .left.> Client: Vyhledává auditní záznamy \na ověřuje důkazy
 Producer .[hidden]>Client: "\t\t\t\t\t"
@@ -53,24 +56,27 @@ GrpcKey .[hidden]> GrpcIngestion
 GrpcKey ..> ProducerKeyService: Registrace klíče \nproducenta pro \nověření podpisu \nauditních záznamů
 GrpcIngestion ..> IngestionService: Zpracování \nauditní události\n a ověření podpisu
 GrpcProof ..> ProofService: Získání důkazu \no zařazení \nauditního záznamu \na konzistenci \nauditního logu
-GrpcProof ..> CheckpointService: Získání \naktuálního \npodepsaného \ncheckpointu
+GrpcProof ..> CheckpointService: Získání \naktuálního \npodepsaného \nkontrolního \nbodu
 GrpcQuery ..> QueryService: Zpracování \ndotazu \nvyhledávání \nauditních \nzáznamů
+GrpcSubject ..> SubjectService: Požadavek na \nzapomenutí \nsubjektu
 
-Worker ..> CheckpointService: Periodické \nvytváření \npodepsaného \ncheckpointu
+Worker ..> CheckpointService: Periodické \nvytváření \npodepsaného \nkontrolního \nbodu
 
 ProducerKeyService .down.> KeyRepo: Uložení \nveřejného \nklíče \nproducenta
 IngestionService .down.> KeyRepo: Vyhledání \nveřejného klíče \nproducenta
 IngestionService .down.> LogRepo: Uložení \nauditního \nzáznamu
-IngestionService .down.> LedgerRepo: Uložení \nkryptografické \nstopy auditního \nzáznamu
-ProofService .down.> LedgerRepo: Vyhledávání \nkryptografických stop \npro generování \ndůkazů
-CheckpointService .down.> CheckpointRepo: Uložení / vyhledání \npodepsaného \ncheckpointu
-CheckpointService .down.> LedgerRepo: Čtení aktuálního \nstavu ledgeru
+IngestionService .down.> LedgerRepo: Uložení \nkryptografické \nstopy
+ProofService .down.> LedgerRepo: Vyhledávání \nkryptografických \nstop pro \ngenerování \ndůkazů
+CheckpointService .down.> CheckpointRepo: Uložení \na vyhledání \npodepsaného \nkontrolního \nbodu
+CheckpointService .down.> LedgerRepo: Čtení \naktuálního \nstavu\n ledgeru
 QueryService .down.> LogRepo: Vyhledávání \nauditních \nzáznamů
+SubjectService .down.> SubjectSecretRepo: Odstranění \ntajných klíčů \nsubjektu \núdajů
 
 KeyRepo .down.> DB
 LogRepo .down.> DB
 LedgerRepo .down.> DB
 CheckpointRepo .down.> DB
+SubjectSecretRepo .down.> DB
 
 ProducerKeyService .[hidden]> IngestionService
 IngestionService .[hidden]> QueryService

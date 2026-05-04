@@ -12,23 +12,28 @@ package "Transportní vrstva" {
 }
 
 package "Servisní vrstva" {
+    interface LedgerProver {
+    }
+
     class LedgerService <<Application Service>> {
 
     }
 
-    interface LedgerProver <<Port>> {
+    interface Ledger <<Port>> {
 
     }
 }
 
 package "Infrastrukturní vrstva" {
-    class Ledger <<Database Repository>> {
+    class LedgerRepository <<Database Repository>> {
 
     }
 }
 
-ProofServiceServer --> LedgerService
-LedgerService -> LedgerProver
-LedgerProver <|.. Ledger
+ProofServiceServer --> LedgerProver
+
+LedgerProver <|.. LedgerService
+LedgerService -> Ledger
+Ledger <|.. LedgerRepository
 
 @enduml
