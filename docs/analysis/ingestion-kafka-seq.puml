@@ -1,0 +1,47 @@
+@startuml
+
+title Asynchronní zpracování auditních záznamů
+
+participant "Zdrojový systém" as producer
+queue "Fronta zpráv" as messaging
+participant "Server auditního logování" as teals
+database "Databáze" as db
+
+activate producer
+producer -> messaging: Odeslání digitálně podepsaného \nauditního záznamu ke zpracování
+activate messaging
+messaging --> producer: Potvrzení o zapsání auditního \nzáznamu do persistentní fronty
+deactivate messaging
+deactivate producer
+
+loop Zpracovávání auditních záznamů
+
+    messaging -> teals: Konzumování přijatého auditního \nzáznamu za účelem zpracování
+    activate messaging
+    deactivate messaging
+    activate teals
+
+    alt Auditní záznam obsahuje \nplatný digitální podpis
+        teals -> teals: Příprava na vložení auditního záznamu \ndo ledgeru a auditního logu
+
+        teals -> db: Uložit auditní záznam do databáze
+        activate db
+        db --> teals: Auditní záznam uložen \nv auditním logu a kryptografickém ledgeru
+        deactivate db
+
+        teals --> messaging: Potvrzení o zpracování auditního záznamu
+
+    else Auditní záznam obsahuje \nneplatný digitální podpis
+        ...
+        teals --> messaging: Odmítnutí zpraování auditního záznamu \na jeho přesměrování do DLQ
+
+    end
+end
+
+
+
+deactivate teals
+
+
+@enduml
+
